@@ -4,12 +4,23 @@ import (
 	"github.com/ulule/loukoum"
 )
 
-var (
+const (
+	// InnerJoin is used for "INNER JOIN" in join statement.
 	InnerJoin = loukoum.InnerJoin
-	LeftJoin  = loukoum.LeftJoin
+	// LeftJoin is used for "LEFT JOIN" in join statement.
+	LeftJoin = loukoum.LeftJoin
+	// RightJoin is used for "RIGHT JOIN" in join statement.
 	RightJoin = loukoum.RightJoin
-	Asc       = loukoum.Asc
-	Desc      = loukoum.Desc
+	// Asc is used for "ORDER BY" statement.
+	Asc = loukoum.Asc
+	// Desc is used for "ORDER BY" statement.
+	Desc = loukoum.Desc
+)
+
+// Map is a key/value map.
+type Map = loukoum.Map
+
+var (
 	And       = loukoum.And
 	Column    = loukoum.Column
 	Condition = loukoum.Condition
