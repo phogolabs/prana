@@ -24,22 +24,23 @@ var flags = []cli.Flag{
 		EnvVar: "GOM_LOG_FORMAT",
 	},
 	cli.StringFlag{
-		Name:   "db-driver",
+		Name:   "database-driver",
 		Value:  "postgres",
 		Usage:  "Database Driver",
 		EnvVar: "GOM_DB_DRIVER",
 	},
 	cli.StringFlag{
-		Name:   "db-source",
+		Name:   "database-url",
 		Value:  "",
-		Usage:  "Database Source",
-		EnvVar: "GOM_DB_SOURCE",
+		Usage:  "Database URL",
+		EnvVar: "GOM_DB_URL",
 	},
 }
 
 var commands = []cli.Command{
 	cli.Command{
 		Name:         "migration",
+		Usage:        "A group of commands for generating, running, and reverting migrations",
 		Description:  "A group of commands for generating, running, and reverting migrations",
 		BashComplete: cli.DefaultAppComplete,
 		Before:       migration.BeforeEach,

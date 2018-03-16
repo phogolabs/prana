@@ -69,6 +69,7 @@ func (m *Migrator) Create(name string) (string, error) {
 	buffer := &bytes.Buffer{}
 
 	fmt.Fprintln(buffer, "-- Auto-generated at", timestamp.Format(time.UnixDate))
+	fmt.Fprintln(buffer, "-- Please do not change the name attributes")
 	fmt.Fprintln(buffer)
 	fmt.Fprintln(buffer, "-- name: up")
 	fmt.Fprintln(buffer)

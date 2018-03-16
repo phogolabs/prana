@@ -35,13 +35,13 @@ func BeforeEach(ctx *Context) error {
 		},
 	)
 
-	driver := ctx.String("db-driver")
+	driver := ctx.String("database-driver")
 
 	if driver == "" {
 		return NewExitError("Database driver is not initialized", ErrCodeArg)
 	}
 
-	source := ctx.String("db-source")
+	source := ctx.String("database-url")
 	if source == "" {
 		return NewExitError("Database source is not initialized", ErrCodeArg)
 	}
