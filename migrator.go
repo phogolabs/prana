@@ -61,5 +61,38 @@ func (m *Migrator) Setup() error {
 }
 
 func (m *Migrator) Create(name string) (string, error) {
-	return "", nil
+	if err := m.configured(); err != nil {
+		return "", err
+	}
+
+	timestamp := time.Now().UTC()
+	buffer := &bytes.Buffer{}
+
+	fmt.Fprintln(buffer, "-- Auto-generated at", timestamp.Format(time.UnixDate))
+	fmt.Fprintln(buffer)
+	fmt.Fprintln(buffer, "-- name: up")
+	fmt.Fprintln(buffer)
+	fmt.Fprintln(buffer, "-- name: down")
+	fmt.Fprintln(buffer)
+
+	path := fmt.Sprintf("/database/migration/%s_%s.sql", timestamp.Format(DateTimeFormat), name)
+	path = filepath.Join(m.Dir, path)
+
+	if err := ioutil.WriteFile(path, buffer.Bytes(), 0600); err != nil {
+		return "", err
+	}
+
+	return path, nil
+}
+
+func (m *Migrator) configured() error {
+	path := fmt.Sprintf("/database/migration/%s_setup.sql", MinTime.Format(DateTimeFormat))
+	path = filepath.Join(m.Dir, path)
+
+	_, err := os.Stat(path)
+	if err != nil {
+		return fmt.Errorf("The project has not been configured")
+	}
+
+	return nil
 }

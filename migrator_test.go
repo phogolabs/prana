@@ -51,6 +51,7 @@ var _ = Describe("Migrator", func() {
 			path := fmt.Sprintf("/database/migration/%s_setup.sql", gom.MinTime.Format(gom.DateTimeFormat))
 			path = filepath.Join(migrator.Dir, path)
 			Expect(path).To(BeARegularFile())
+			Expect(path).To(HaveSuffix("00060524000000_setup.sql"))
 		})
 
 		Context("when the project has already been configured", func() {
@@ -60,6 +61,25 @@ var _ = Describe("Migrator", func() {
 
 			It("returns an error", func() {
 				Expect(migrator.Setup()).To(MatchError("The project has already been configured"))
+			})
+		})
+	})
+
+	Describe("Create", func() {
+		It("creates a migration successfully", func() {
+			Expect(migrator.Setup()).To(Succeed())
+
+			path, err := migrator.Create("test")
+			Expect(err).To(BeNil())
+			Expect(path).To(BeARegularFile())
+			Expect(path).To(HaveSuffix("_test.sql"))
+		})
+
+		Context("when the project is not configured", func() {
+			It("returns an error", func() {
+				path, err := migrator.Create("test")
+				Expect(err).To(MatchError("The project has not been configured"))
+				Expect(path).To(BeEmpty())
 			})
 		})
 	})

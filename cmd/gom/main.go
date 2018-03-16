@@ -40,6 +40,7 @@ var flags = []cli.Flag{
 var commands = []cli.Command{
 	cli.Command{
 		Name:         "migration",
+		Description:  "A group of commands for generating, running, and reverting migrations",
 		BashComplete: cli.DefaultAppComplete,
 		Before:       migration.BeforeEach,
 		Subcommands:  migration.Commands,

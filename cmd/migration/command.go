@@ -11,28 +11,36 @@ const (
 
 var Commands = []cli.Command{
 	cli.Command{
-		Name:   "setup",
-		Usage:  "Setup the migration for the current project",
-		Action: Setup,
+		Name:        "setup",
+		Usage:       "Setup the migration for the current project",
+		Description: "Configures the current project by creating database directory hierarchy and initial migration",
+		Action:      Setup,
 	},
 	cli.Command{
-		Name:   "create",
-		Usage:  "Create new migration",
-		Action: Create,
+		Name:        "create",
+		Usage:       "Generate a new migration with the given name, and the current timestamp as the version",
+		Description: "Create a new migration file for the given name, and the current timestamp as the version in database/migration directory",
+		ArgsUsage:   "[name]",
+		Action:      Create,
 	},
 	cli.Command{
 		Name:   "run",
-		Usage:  "Apply the pending migrations",
+		Usage:  "Runs the pending migrations",
 		Action: Run,
 	},
 	cli.Command{
-		Name:   "rollback",
-		Usage:  "Rollback the applied migrations",
-		Action: Rollback,
+		Name:   "revert",
+		Usage:  "Revert the latest applied migrations",
+		Action: Revert,
+	},
+	cli.Command{
+		Name:   "reset",
+		Usage:  "Reverts and re-run all migrations",
+		Action: Reset,
 	},
 	cli.Command{
 		Name:   "status",
-		Usage:  "Show the migration status",
+		Usage:  "Lists all migrations, marking those that have been applied",
 		Action: Status,
 	},
 }
@@ -47,6 +55,7 @@ func Setup(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
+	log.Infof("The project has been configured successfully")
 	return nil
 }
 
@@ -73,7 +82,11 @@ func Run(ctx *cli.Context) error {
 	return nil
 }
 
-func Rollback(ctx *cli.Context) error {
+func Revert(ctx *cli.Context) error {
+	return nil
+}
+
+func Reset(ctx *cli.Context) error {
 	return nil
 }
 
