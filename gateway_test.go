@@ -82,7 +82,7 @@ var _ = Describe("Gateway", func() {
 
 			Context("when an embedded statement is used", func() {
 				It("executes a query successfully", func() {
-					query := &gom.EmbeddedStmt{
+					query := &gom.Cmd{
 						Query:  "SELECT * FROM users WHERE first_name = ?",
 						Params: []gom.Param{"John"},
 					}
@@ -97,7 +97,7 @@ var _ = Describe("Gateway", func() {
 
 				Context("when the query does not exist", func() {
 					It("returns an error", func() {
-						query := &gom.EmbeddedStmt{
+						query := &gom.Cmd{
 							Query: "SELECT * FROM categories",
 						}
 						persons := []Person{}

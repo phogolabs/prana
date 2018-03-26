@@ -11,12 +11,12 @@ import (
 	"github.com/svett/gom"
 )
 
-var _ = Describe("Embedded", func() {
-	Describe("EmbeddedStmt", func() {
-		It("prepares the statement correctly", func() {
-			stmt := &gom.EmbeddedStmt{
+var _ = Describe("Command", func() {
+	Describe("Cmd", func() {
+		It("prepares the command correctly", func() {
+			stmt := &gom.Cmd{
 				Query:  "SELECT * FROM users WHERE id = ?",
-				Params: []interface{}{1},
+				Params: []gom.Param{1},
 			}
 
 			query, params := stmt.Prepare()
@@ -25,11 +25,11 @@ var _ = Describe("Embedded", func() {
 		})
 	})
 
-	Describe("StmtProvider", func() {
-		var provider *gom.StmtProvider
+	Describe("CmdProvider", func() {
+		var provider *gom.CmdProvider
 
 		BeforeEach(func() {
-			provider = &gom.StmtProvider{
+			provider = &gom.CmdProvider{
 				Repository: map[string]string{},
 			}
 		})
@@ -59,7 +59,7 @@ var _ = Describe("Embedded", func() {
 					fmt.Fprintln(buffer)
 					fmt.Fprintln(buffer, "SELECT * FROM categories;")
 
-					Expect(provider.Load(buffer)).To(MatchError("Statement 'up' already exists"))
+					Expect(provider.Load(buffer)).To(MatchError("Command 'up' already exists"))
 				})
 			})
 		})
@@ -73,23 +73,27 @@ var _ = Describe("Embedded", func() {
 				Expect(provider.Load(buffer)).To(Succeed())
 			})
 
-			It("returns a statement", func() {
-				stmt := provider.Statement("up")
+			It("returns a command", func() {
+				stmt, err := provider.Command("up")
+				Expect(err).To(BeNil())
 				Expect(stmt).NotTo(BeNil())
 				Expect(stmt.Params).To(BeEmpty())
 				Expect(stmt.Query).To(Equal("SELECT * FROM users"))
 			})
 
-			It("returns a statement with params", func() {
-				stmt := provider.Statement("up", 1)
+			It("returns a command with params", func() {
+				stmt, err := provider.Command("up", 1)
+				Expect(err).To(BeNil())
 				Expect(stmt).NotTo(BeNil())
 				Expect(stmt.Params).To(ContainElement(1))
 				Expect(stmt.Query).To(Equal("SELECT * FROM users"))
 			})
 
 			Context("when not statements are found", func() {
-				It("returns a nil statement", func() {
-					Expect(provider.Statement("down")).To(BeNil())
+				It("returns a error", func() {
+					cmd, err := provider.Command("down")
+					Expect(err).To(MatchError("Command 'down' not found"))
+					Expect(cmd).To(BeNil())
 				})
 			})
 		})
@@ -106,15 +110,15 @@ var _ = Describe("Embedded", func() {
 			Expect(gom.Load(buffer)).To(Succeed())
 		})
 
-		It("returns a statement", func() {
-			stmt := gom.Statement(script)
+		It("returns a command", func() {
+			stmt := gom.Command(script)
 			Expect(stmt).NotTo(BeNil())
 			Expect(stmt.Params).To(BeEmpty())
 			Expect(stmt.Query).To(Equal("SELECT * FROM users"))
 		})
 
-		It("returns a statement with params", func() {
-			stmt := gom.Statement(script, 1)
+		It("returns a command with params", func() {
+			stmt := gom.Command(script, 1)
 			Expect(stmt).NotTo(BeNil())
 			Expect(stmt.Params).To(ContainElement(1))
 			Expect(stmt.Query).To(Equal("SELECT * FROM users"))
@@ -122,7 +126,7 @@ var _ = Describe("Embedded", func() {
 
 		Context("when the statement does not exits", func() {
 			It("does not return a statement", func() {
-				Expect(gom.Statement("down")).To(BeNil())
+				Expect(func() { gom.Command("down") }).To(Panic())
 			})
 		})
 	})

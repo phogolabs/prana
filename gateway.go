@@ -1,16 +1,8 @@
 package gom
 
 import (
-	"database/sql"
-
 	"github.com/jmoiron/sqlx"
 )
-
-type Rows = sqlx.Rows
-type Row = sqlx.Row
-type Result = sql.Result
-type Tx = sqlx.Tx
-type Entity = interface{}
 
 type Preparer interface {
 	Prepare() (string, map[string]interface{})

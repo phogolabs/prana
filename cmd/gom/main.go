@@ -6,7 +6,6 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/svett/gom/cmd"
-	"github.com/svett/gom/cmd/migration"
 	"github.com/urfave/cli"
 )
 
@@ -37,18 +36,12 @@ var flags = []cli.Flag{
 	},
 }
 
-var commands = []cli.Command{
-	cli.Command{
-		Name:         "migration",
-		Usage:        "A group of commands for generating, running, and reverting migrations",
-		Description:  "A group of commands for generating, running, and reverting migrations",
-		BashComplete: cli.DefaultAppComplete,
-		Before:       migration.BeforeEach,
-		Subcommands:  migration.Commands,
-	},
-}
-
 func main() {
+	migration := &cmd.Migration{}
+	commands := []cli.Command{
+		migration.Command(),
+	}
+
 	app := &cli.App{
 		Name:                 "gom",
 		HelpName:             "gom",
@@ -57,12 +50,11 @@ func main() {
 		Version:              "0.1",
 		BashComplete:         cli.DefaultAppComplete,
 		EnableBashCompletion: true,
-		Commands:             commands,
 		Writer:               os.Stdout,
 		ErrWriter:            os.Stderr,
 		Flags:                flags,
 		Before:               cmd.BeforeEach,
-		After:                cmd.AfterEach,
+		Commands:             commands,
 	}
 
 	app.Run(os.Args)
