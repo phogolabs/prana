@@ -26,6 +26,16 @@ var _ = Describe("Model", func() {
 				Expect(item.Description).To(Equal("schema"))
 			})
 
+			Context("when the filename is hes longer description", func() {
+				It("parses the item successfully", func() {
+					filename := "20060102150405_my_schema_for_this_db.sql"
+					item, err := migration.Parse(filename)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(item.Id).To(Equal("20060102150405"))
+					Expect(item.Description).To(Equal("my_schema_for_this_db"))
+				})
+			})
+
 			Context("when the filename does not contain two parts", func() {
 				It("returns an error", func() {
 					filename := "schema.sql"

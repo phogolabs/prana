@@ -17,6 +17,9 @@ var (
 	min    = time.Date(1, time.January, 1970, 0, 0, 0, 0, time.UTC)
 )
 
+type RunFn func(item *Item)
+type RevertFn func(item *Item)
+
 type ItemRunner interface {
 	Run(item *Item) error
 	Revert(item *Item) error
@@ -48,7 +51,7 @@ func (m Item) Filename() string {
 
 func Parse(path string) (*Item, error) {
 	name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
-	parts := strings.Split(name, "_")
+	parts := strings.SplitN(name, "_", 2)
 	parseErr := fmt.Errorf("Migration '%s' has an invalid file name", path)
 
 	if len(parts) != 2 {

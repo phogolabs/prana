@@ -31,7 +31,7 @@ func (g *Generator) Write(m *Item, content *Content) error {
 	path := filepath.Join(g.Dir, m.Filename())
 
 	if _, err := os.Stat(path); err == nil {
-		return fmt.Errorf("Migration '%s' already exist", path)
+		return fmt.Errorf("Migration '%s' already exists", path)
 	}
 
 	buffer := &bytes.Buffer{}

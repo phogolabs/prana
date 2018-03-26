@@ -9,5 +9,5 @@ import (
 
 func TestGom(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Gom Suite")
+	RunSpecs(t, "GOM Suite")
 }

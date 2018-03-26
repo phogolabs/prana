@@ -7,9 +7,11 @@ import (
 )
 
 type Executor struct {
-	Provider  ItemProvider
-	Runner    ItemRunner
-	Generator FileGenerator
+	Provider   ItemProvider
+	Runner     ItemRunner
+	Generator  FileGenerator
+	OnRunFn    RunFn
+	OnRevertFn RevertFn
 }
 
 func (m *Executor) Setup() error {
@@ -63,12 +65,21 @@ func (m *Executor) Run(step int) error {
 			return nil
 		}
 
-		//TODO: skip the setup migration
-		if !migration.CreatedAt.IsZero() {
+		timestamp, err := time.Parse(format, migration.Id)
+		if err != nil {
+			return err
+		}
+
+		if !migration.CreatedAt.IsZero() || timestamp == min {
 			continue
 		}
 
 		op := migration
+
+		if m.OnRunFn != nil {
+			m.OnRunFn(&op)
+		}
+
 		if err := m.Runner.Run(&op); err != nil {
 			return err
 		}
@@ -92,12 +103,21 @@ func (m *Executor) Revert(step int) error {
 			return nil
 		}
 
-		//TODO: skip the setup migration
 		if migration.CreatedAt.IsZero() {
 			continue
 		}
 
+		timestamp, err := time.Parse(format, migration.Id)
+		if err != nil || timestamp == min {
+			return err
+		}
+
 		op := migration
+
+		if m.OnRevertFn != nil {
+			m.OnRevertFn(&op)
+		}
+
 		if err := m.Runner.Revert(&op); err != nil {
 			return err
 		}

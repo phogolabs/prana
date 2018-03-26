@@ -23,12 +23,6 @@ var flags = []cli.Flag{
 		EnvVar: "GOM_LOG_FORMAT",
 	},
 	cli.StringFlag{
-		Name:   "database-driver",
-		Value:  "postgres",
-		Usage:  "Database Driver",
-		EnvVar: "GOM_DB_DRIVER",
-	},
-	cli.StringFlag{
 		Name:   "database-url",
 		Value:  "",
 		Usage:  "Database URL",
@@ -38,8 +32,9 @@ var flags = []cli.Flag{
 
 func main() {
 	migration := &cmd.Migration{}
+
 	commands := []cli.Command{
-		migration.Command(),
+		migration.CreateCommand(),
 	}
 
 	app := &cli.App{

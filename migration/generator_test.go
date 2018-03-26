@@ -55,7 +55,7 @@ var _ = Describe("Generator", func() {
 				var err error
 
 				path := filepath.Join(generator.Dir, item.Filename())
-				msg := fmt.Sprintf("Migration '%s' already exist", path)
+				msg := fmt.Sprintf("Migration '%s' already exists", path)
 
 				_, err = generator.Create(item)
 				Expect(err).To(BeNil())
@@ -113,7 +113,7 @@ var _ = Describe("Generator", func() {
 				Expect(generator.Write(item, content)).To(Succeed())
 
 				path := filepath.Join(generator.Dir, item.Filename())
-				msg := fmt.Sprintf("Migration '%s' already exist", path)
+				msg := fmt.Sprintf("Migration '%s' already exists", path)
 				Expect(generator.Write(item, content)).To(MatchError(msg))
 			})
 		})
