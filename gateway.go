@@ -4,7 +4,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-type Preparer interface {
+type Query interface {
 	Prepare() (string, map[string]interface{})
 }
 
@@ -29,7 +29,7 @@ func (g *Gateway) DB() *sqlx.DB {
 	return g.db
 }
 
-func (g *Gateway) Select(dest Entity, preparer Preparer) error {
+func (g *Gateway) Select(dest Entity, preparer Query) error {
 	stmt, args, err := g.prepare(preparer)
 	if err != nil {
 		return err
@@ -45,7 +45,7 @@ func (g *Gateway) Select(dest Entity, preparer Preparer) error {
 	return err
 }
 
-func (g *Gateway) SelectRow(dest Entity, preparer Preparer) error {
+func (g *Gateway) SelectRow(dest Entity, preparer Query) error {
 	stmt, args, err := g.prepare(preparer)
 	if err != nil {
 		return err
@@ -61,7 +61,7 @@ func (g *Gateway) SelectRow(dest Entity, preparer Preparer) error {
 	return err
 }
 
-func (g *Gateway) Query(preparer Preparer) (*Rows, error) {
+func (g *Gateway) Query(preparer Query) (*Rows, error) {
 	stmt, args, err := g.prepare(preparer)
 	if err != nil {
 		return nil, err
@@ -78,7 +78,7 @@ func (g *Gateway) Query(preparer Preparer) (*Rows, error) {
 	return rows, err
 }
 
-func (g *Gateway) QueryRow(preparer Preparer) (*Row, error) {
+func (g *Gateway) QueryRow(preparer Query) (*Row, error) {
 	stmt, args, err := g.prepare(preparer)
 	if err != nil {
 		return nil, err
@@ -93,7 +93,7 @@ func (g *Gateway) QueryRow(preparer Preparer) (*Row, error) {
 	return stmt.QueryRowx(args), nil
 }
 
-func (g *Gateway) Exec(preparer Preparer) (Result, error) {
+func (g *Gateway) Exec(preparer Query) (Result, error) {
 	stmt, args, err := g.prepare(preparer)
 	if err != nil {
 		return nil, err
@@ -110,7 +110,7 @@ func (g *Gateway) Exec(preparer Preparer) (Result, error) {
 	return result, err
 }
 
-func (g *Gateway) prepare(preparer Preparer) (*sqlx.NamedStmt, map[string]interface{}, error) {
+func (g *Gateway) prepare(preparer Query) (*sqlx.NamedStmt, map[string]interface{}, error) {
 	query, args := preparer.Prepare()
 
 	stmt, err := g.db.PrepareNamed(query)

@@ -13,7 +13,7 @@ import (
 	"github.com/gchaincl/dotsql"
 )
 
-var _ Preparer = &Cmd{}
+var _ Query = &Cmd{}
 
 type Cmd struct {
 	Query  string
