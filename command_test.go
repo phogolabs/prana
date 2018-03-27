@@ -3,6 +3,8 @@ package gom_test
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -22,6 +24,71 @@ var _ = Describe("Command", func() {
 			query, params := stmt.Prepare()
 			Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg0"))
 			Expect(params).To(HaveKeyWithValue("arg0", 1))
+		})
+	})
+
+	Describe("CmdGenerator", func() {
+		var generator *gom.CmdGenerator
+
+		BeforeEach(func() {
+			dir, err := ioutil.TempDir("", "gom_generator")
+			Expect(err).To(BeNil())
+
+			generator = &gom.CmdGenerator{
+				Dir: dir,
+			}
+		})
+
+		Describe("Create", func() {
+			It("creates a command file successfully", func() {
+				path, err := generator.Create("commands", "update")
+				Expect(err).To(BeNil())
+				Expect(path).To(BeARegularFile())
+				Expect(path).To(Equal(filepath.Join(generator.Dir, "commands.sql")))
+				Expect(generator.Dir).To(BeADirectory())
+
+				data, err := ioutil.ReadFile(path)
+				Expect(err).To(BeNil())
+
+				script := string(data)
+				Expect(script).To(ContainSubstring("-- name: update"))
+			})
+
+			Context("when the file already exists", func() {
+				It("adds the command to the file successfully", func() {
+					path, err := generator.Create("commands", "update")
+					Expect(err).To(BeNil())
+
+					path, err = generator.Create("commands", "delete")
+					Expect(err).To(BeNil())
+
+					Expect(path).To(Equal(filepath.Join(generator.Dir, "commands.sql")))
+					Expect(generator.Dir).To(BeADirectory())
+
+					data, err := ioutil.ReadFile(path)
+					Expect(err).To(BeNil())
+
+					script := string(data)
+					Expect(script).To(ContainSubstring("-- name: update"))
+					Expect(script).To(ContainSubstring("-- name: delete"))
+				})
+			})
+
+			Context("when the dir is not valid", func() {
+				It("returns an error", func() {
+					generator.Dir = ""
+					_, err := generator.Create("commands", "update")
+					Expect(err).To(MatchError("mkdir : no such file or directory"))
+				})
+			})
+
+			Context("when the dir is the root dir", func() {
+				It("returns an error", func() {
+					generator.Dir = "/"
+					_, err := generator.Create("commands", "update")
+					Expect(err).To(MatchError("open /commands.sql: permission denied"))
+				})
+			})
 		})
 	})
 
@@ -64,7 +131,7 @@ var _ = Describe("Command", func() {
 			})
 		})
 
-		Describe("Statement", func() {
+		Describe("Command", func() {
 			BeforeEach(func() {
 				buffer := bytes.NewBufferString("-- name: up")
 				fmt.Fprintln(buffer)

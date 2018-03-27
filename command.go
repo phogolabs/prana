@@ -5,7 +5,10 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"os"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/gchaincl/dotsql"
 )
@@ -43,6 +46,37 @@ func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
 
 	query = buffer.String()
 	return query, params
+}
+
+type CmdGenerator struct {
+	Dir string
+}
+
+func (g *CmdGenerator) Create(container, command string) (string, error) {
+	if err := os.MkdirAll(g.Dir, 0700); err != nil {
+		return "", err
+	}
+
+	path := filepath.Join(g.Dir, fmt.Sprintf("%s.sql", container))
+
+	file, err := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
+	if err != nil {
+		return "", err
+	}
+
+	defer func() {
+		if ioErr := file.Close(); err != nil {
+			path = ""
+			err = ioErr
+		}
+	}()
+
+	fmt.Fprintln(file, "-- Auto-generated at", time.Now().Format(time.UnixDate))
+	fmt.Fprintf(file, "-- name: %s", command)
+	fmt.Fprintln(file)
+	fmt.Fprintln(file)
+
+	return path, err
 }
 
 type CmdProvider struct {

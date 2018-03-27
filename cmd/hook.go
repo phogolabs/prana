@@ -14,6 +14,7 @@ import (
 const (
 	ErrCodeArg       = 101
 	ErrCodeMigration = 103
+	ErrCodeCommand   = 104
 )
 
 type LogHandler struct {

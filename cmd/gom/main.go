@@ -31,10 +31,12 @@ var flags = []cli.Flag{
 }
 
 func main() {
-	migration := &cmd.Migration{}
+	migration := &cmd.SQLMigration{}
+	command := &cmd.SQLCommand{}
 
 	commands := []cli.Command{
 		migration.CreateCommand(),
+		command.CreateCommand(),
 	}
 
 	app := &cli.App{
