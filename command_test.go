@@ -27,71 +27,6 @@ var _ = Describe("Command", func() {
 		})
 	})
 
-	Describe("CmdGenerator", func() {
-		var generator *gom.CmdGenerator
-
-		BeforeEach(func() {
-			dir, err := ioutil.TempDir("", "gom_generator")
-			Expect(err).To(BeNil())
-
-			generator = &gom.CmdGenerator{
-				Dir: dir,
-			}
-		})
-
-		Describe("Create", func() {
-			It("creates a command file successfully", func() {
-				path, err := generator.Create("commands", "update")
-				Expect(err).To(BeNil())
-				Expect(path).To(BeARegularFile())
-				Expect(path).To(Equal(filepath.Join(generator.Dir, "commands.sql")))
-				Expect(generator.Dir).To(BeADirectory())
-
-				data, err := ioutil.ReadFile(path)
-				Expect(err).To(BeNil())
-
-				script := string(data)
-				Expect(script).To(ContainSubstring("-- name: update"))
-			})
-
-			Context("when the file already exists", func() {
-				It("adds the command to the file successfully", func() {
-					path, err := generator.Create("commands", "update")
-					Expect(err).To(BeNil())
-
-					path, err = generator.Create("commands", "delete")
-					Expect(err).To(BeNil())
-
-					Expect(path).To(Equal(filepath.Join(generator.Dir, "commands.sql")))
-					Expect(generator.Dir).To(BeADirectory())
-
-					data, err := ioutil.ReadFile(path)
-					Expect(err).To(BeNil())
-
-					script := string(data)
-					Expect(script).To(ContainSubstring("-- name: update"))
-					Expect(script).To(ContainSubstring("-- name: delete"))
-				})
-			})
-
-			Context("when the dir is not valid", func() {
-				It("returns an error", func() {
-					generator.Dir = ""
-					_, err := generator.Create("commands", "update")
-					Expect(err).To(MatchError("mkdir : no such file or directory"))
-				})
-			})
-
-			Context("when the dir is the root dir", func() {
-				It("returns an error", func() {
-					generator.Dir = "/"
-					_, err := generator.Create("commands", "update")
-					Expect(err).To(MatchError("open /commands.sql: permission denied"))
-				})
-			})
-		})
-	})
-
 	Describe("CmdProvider", func() {
 		var provider *gom.CmdProvider
 
@@ -108,10 +43,11 @@ var _ = Describe("Command", func() {
 				buffer = bytes.NewBufferString("-- name: up")
 				fmt.Fprintln(buffer)
 				fmt.Fprintln(buffer, "SELECT * FROM users;")
-				Expect(provider.Load(buffer)).To(Succeed())
 			})
 
 			It("loads the provider successfully", func() {
+				Expect(provider.Load(buffer)).To(Succeed())
+
 				query, ok := provider.Repository["up"]
 				Expect(ok).To(BeTrue())
 
@@ -127,6 +63,47 @@ var _ = Describe("Command", func() {
 					fmt.Fprintln(buffer, "SELECT * FROM categories;")
 
 					Expect(provider.Load(buffer)).To(MatchError("Command 'up' already exists"))
+				})
+			})
+		})
+
+		Describe("LoadDir", func() {
+			var dir string
+
+			BeforeEach(func() {
+				var err error
+
+				dir, err = ioutil.TempDir("", "gom_generator")
+				Expect(err).To(BeNil())
+
+				path := filepath.Join(dir, "commands.sql")
+
+				buffer := bytes.NewBufferString("-- name: up")
+				fmt.Fprintln(buffer)
+				fmt.Fprintln(buffer, "SELECT * FROM users;")
+
+				Expect(ioutil.WriteFile(path, buffer.Bytes(), 0700)).To(Succeed())
+			})
+
+			It("loads the provider successfully", func() {
+				Expect(provider.LoadDir(dir)).To(Succeed())
+
+				query, ok := provider.Repository["up"]
+				Expect(ok).To(BeTrue())
+
+				Expect(query).To(Equal("SELECT * FROM users;"))
+			})
+
+			Context("when the statement are duplicated", func() {
+				It("returns an error", func() {
+					path := filepath.Join(dir, "another.sql")
+
+					buffer := bytes.NewBufferString("-- name: up")
+					fmt.Fprintln(buffer)
+					fmt.Fprintln(buffer, "SELECT * FROM users;")
+
+					Expect(ioutil.WriteFile(path, buffer.Bytes(), 0700)).To(Succeed())
+					Expect(provider.LoadDir(dir)).To(MatchError("Command 'up' already exists"))
 				})
 			})
 		})

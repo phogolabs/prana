@@ -56,7 +56,7 @@ var _ = Describe("Migration Setup", func() {
 		It("returns an error", func() {
 			session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
-			Eventually(session).Should(gexec.Exit(103))
+			Eventually(session).Should(gexec.Exit(101))
 			Expect(session.Err).To(gbytes.Say(`sql: unknown driver`))
 		})
 	})

@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"fmt"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -87,22 +85,11 @@ func (m *SQLMigration) BeforeEach(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	conn := ctx.GlobalString("database-url")
-
-	uri, err := url.Parse(conn)
-	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	}
-
-	driver := uri.Scheme
-	source := strings.Replace(conn, fmt.Sprintf("%s://", driver), "", -1)
-
-	gateway, err := gom.Open(driver, source)
-	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	}
-
 	dir = filepath.Join(dir, "/database/migration")
+	gateway, err := Gateway(ctx)
+	if err != nil {
+		return err
+	}
 
 	m.executor = &migration.Executor{
 		Provider: &migration.Provider{

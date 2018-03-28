@@ -23,7 +23,7 @@ var _ = Describe("Command Create", func() {
 	})
 
 	It("generates command successfully", func() {
-		cmd.Args = append(cmd.Args, "commands", "update-user")
+		cmd.Args = append(cmd.Args, "-n", "commands", "update-user")
 		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
@@ -40,7 +40,7 @@ var _ = Describe("Command Create", func() {
 
 	Context("when the command name has space in it", func() {
 		It("generates command successfully", func() {
-			cmd.Args = append(cmd.Args, "commands", "update user")
+			cmd.Args = append(cmd.Args, "-n", "commands", "update user")
 			session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
@@ -58,7 +58,7 @@ var _ = Describe("Command Create", func() {
 
 	Context("when the container name has space in it", func() {
 		It("generates command successfully", func() {
-			cmd.Args = append(cmd.Args, "my commands", "update-user")
+			cmd.Args = append(cmd.Args, "-n", "my commands", "update-user")
 			session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
@@ -79,7 +79,7 @@ var _ = Describe("Command Create", func() {
 			session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(104))
-			Expect(session.Err).To(gbytes.Say("Create command expects two argument"))
+			Expect(session.Err).To(gbytes.Say("Create command expects a single argument"))
 		})
 	})
 })
