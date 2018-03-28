@@ -128,7 +128,7 @@ func (m *SQLCommand) Run(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
-	log.Infof("Running command '%s' completed", name)
+	log.Infof("Running command '%s' completed successfully", name)
 	return nil
 }
 

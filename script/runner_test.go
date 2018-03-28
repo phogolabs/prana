@@ -56,6 +56,26 @@ var _ = Describe("Runner", func() {
 		Expect(columns).To(ContainElement("sql"))
 	})
 
+	Context("when the command requires parameters", func() {
+		JustBeforeEach(func() {
+			command := &bytes.Buffer{}
+			fmt.Fprintln(command, "-- name: system-tables")
+			fmt.Fprintln(command, "SELECT ? AS Param FROM sqlite_master")
+
+			path := filepath.Join(runner.Dir, "commands.sql")
+			Expect(ioutil.WriteFile(path, command.Bytes(), 0700)).To(Succeed())
+		})
+
+		It("runs the command successfully", func() {
+			rows, err := runner.Run("system-tables", "hello")
+			Expect(err).To(Succeed())
+
+			columns, err := rows.Columns()
+			Expect(err).To(Succeed())
+			Expect(columns).To(ContainElement("Param"))
+		})
+	})
+
 	Context("when the command does not exist", func() {
 		JustBeforeEach(func() {
 			path := filepath.Join(runner.Dir, "commands.sql")
