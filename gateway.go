@@ -45,7 +45,7 @@ func (g *Gateway) Select(dest Entity, preparer Query) error {
 	return err
 }
 
-func (g *Gateway) SelectRow(dest Entity, preparer Query) error {
+func (g *Gateway) SelectOne(dest Entity, preparer Query) error {
 	stmt, args, err := g.prepare(preparer)
 	if err != nil {
 		return err

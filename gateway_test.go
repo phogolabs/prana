@@ -108,12 +108,12 @@ var _ = Describe("Gateway", func() {
 			})
 		})
 
-		Describe("SelectRow", func() {
+		Describe("SelectOne", func() {
 			It("executes a query successfully", func() {
 				query := gom.Select("first_name", "last_name", "email").From("users")
 
 				person := Person{}
-				Expect(db.SelectRow(&person, query)).To(Succeed())
+				Expect(db.SelectOne(&person, query)).To(Succeed())
 			})
 
 			Context("when the query fails", func() {
@@ -121,7 +121,7 @@ var _ = Describe("Gateway", func() {
 					query := gom.Select("name").From("categories")
 
 					person := Person{}
-					Expect(db.SelectRow(&person, query)).To(MatchError("no such table: categories"))
+					Expect(db.SelectOne(&person, query)).To(MatchError("no such table: categories"))
 				})
 			})
 		})
