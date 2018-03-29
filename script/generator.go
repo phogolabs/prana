@@ -7,10 +7,12 @@ import (
 	"time"
 )
 
+// Generator generates a new command.
 type Generator struct {
 	Dir string
 }
 
+// Create crates a new file and command for given file name and command name.
 func (g *Generator) Create(container, name string) (string, error) {
 	if err := os.MkdirAll(g.Dir, 0700); err != nil {
 		return "", err

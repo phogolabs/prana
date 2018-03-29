@@ -11,11 +11,14 @@ import (
 	"github.com/gchaincl/dotsql"
 )
 
+// Provider loads SQL scripts and provides all SQL statements as commands.
 type Provider struct {
 	mu         sync.RWMutex
 	repository map[string]string
 }
 
+// LoadDir loads all script commands from a given directory. Note that all
+// scripts should have .sql extension.
 func (p *Provider) LoadDir(dir string) error {
 	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if info == nil {
@@ -72,6 +75,8 @@ func (p *Provider) Load(r io.Reader) error {
 	return nil
 }
 
+// Command returns a command for given name and parameters. The operation can
+// err if the command cannot be found.
 func (p *Provider) Command(name string, params ...Param) (*Cmd, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()

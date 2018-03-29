@@ -2,11 +2,15 @@ package script
 
 import "github.com/jmoiron/sqlx"
 
+// Runner runs a SQL statement for given command name and parameters.
 type Runner struct {
+	// Dir is a directory where all commands are created.
 	Dir string
-	DB  *sqlx.DB
+	// DB is a client to underlying database.
+	DB *sqlx.DB
 }
 
+// Run runs a given command with provided parameters.
 func (r *Runner) Run(name string, args ...Param) (*Rows, error) {
 	provider := &Provider{}
 

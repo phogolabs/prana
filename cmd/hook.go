@@ -1,3 +1,4 @@
+// Package provides a set of commands used in CLI.
 package cmd
 
 import (
@@ -14,27 +15,31 @@ import (
 )
 
 const (
-	ErrCodeArg       = 101
+	// ErrCodeArg when the CLI argument is invalid.
+	ErrCodeArg = 101
+	// ErrCodeMigration when the migration operation fails.
 	ErrCodeMigration = 103
-	ErrCodeCommand   = 104
+	// ErrCodeCommand when the SQL command operation fails.
+	ErrCodeCommand = 104
 )
 
-type LogHandler struct {
+type logHandler struct {
 	Writer io.Writer
 }
 
-func (h *LogHandler) HandleLog(entry *log.Entry) error {
+func (h *logHandler) HandleLog(entry *log.Entry) error {
 	_, err := fmt.Fprintln(h.Writer, entry.Message)
 	return err
 }
 
+// BeforeEach is a function executed before each CLI operation.
 func BeforeEach(ctx *cli.Context) error {
 	var handler log.Handler
 
 	if strings.EqualFold("json", ctx.String("log-format")) {
 		handler = json.New(os.Stderr)
 	} else {
-		handler = &LogHandler{
+		handler = &logHandler{
 			Writer: os.Stderr,
 		}
 	}
@@ -44,7 +49,7 @@ func BeforeEach(ctx *cli.Context) error {
 	return nil
 }
 
-func Gateway(ctx *cli.Context) (*gom.Gateway, error) {
+func gateway(ctx *cli.Context) (*gom.Gateway, error) {
 	conn := ctx.GlobalString("database-url")
 
 	uri, err := url.Parse(conn)

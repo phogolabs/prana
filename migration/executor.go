@@ -6,14 +6,22 @@ import (
 	"time"
 )
 
+// Executor provides a group of operations that works with migrations.
 type Executor struct {
-	Provider   ItemProvider
-	Runner     ItemRunner
-	Generator  FileGenerator
-	OnRunFn    RunFn
-	OnRevertFn RevertFn
+	// Provider provides all migrations for the current project.
+	Provider ItemProvider
+	// Runner runs or reverts migrations for the current project.
+	Runner ItemRunner
+	// Generator generates a migration file.
+	Generator FileGenerator
+	// OnRunFn is executed when a migration is executed.
+	OnRunFn ItemFn
+	// OnRevertFn is executed when a migration is reverted.
+	OnRevertFn ItemFn
 }
 
+// Setups setups the current project for database migrations by creating
+// migration directory and related database.
 func (m *Executor) Setup() error {
 	migration := &Item{
 		Id:          min.Format(format),
@@ -42,6 +50,8 @@ func (m *Executor) Setup() error {
 	return m.Runner.Run(migration)
 }
 
+// Create creates a migration script successfully if the project has already
+// been setup, otherwise returns an error.
 func (m *Executor) Create(name string) (string, error) {
 	timestamp := time.Now()
 
@@ -54,6 +64,8 @@ func (m *Executor) Create(name string) (string, error) {
 	return m.Generator.Create(migration)
 }
 
+// Run runs a pending migration for given count. If the count is negative number, it
+// will execute all pending migrations.
 func (m *Executor) Run(step int) error {
 	migrations, err := m.Migrations()
 	if err != nil {
@@ -90,6 +102,13 @@ func (m *Executor) Run(step int) error {
 	return nil
 }
 
+// RunAll runs all pending migrations.
+func (m *Executor) RunAll() error {
+	return m.Run(-1)
+}
+
+// Revert reverts an applied migration for given count. If the count is
+// negative number, it will revert all applied migrations.
 func (m *Executor) Revert(step int) error {
 	migrations, err := m.Migrations()
 	if err != nil {
@@ -128,6 +147,12 @@ func (m *Executor) Revert(step int) error {
 	return nil
 }
 
+// RevertAll reverts all applied migrations.
+func (m *Executor) RevertAll() error {
+	return m.Revert(-1)
+}
+
+// Migrations returns all migrations.
 func (m *Executor) Migrations() ([]Item, error) {
 	return m.Provider.Migrations()
 }

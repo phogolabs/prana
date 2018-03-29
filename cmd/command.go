@@ -13,24 +13,27 @@ import (
 	"github.com/urfave/cli"
 )
 
+// SQLCommand provides a subcommands to work with SQL scripts and their
+// statements.
 type SQLCommand struct {
 	dir string
 }
 
+// CreateCommand creates a cli.Command that can be used by cli.App.
 func (m *SQLCommand) CreateCommand() cli.Command {
 	return cli.Command{
 		Name:         "command",
 		Usage:        "A group of commands for generating, running, and removing SQL commands",
 		Description:  "A group of commands for generating, running, and removing SQL commands",
 		BashComplete: cli.DefaultAppComplete,
-		Before:       m.BeforeEach,
+		Before:       m.beforeEach,
 		Subcommands: []cli.Command{
 			cli.Command{
 				Name:        "create",
 				Usage:       "Create a new SQL command for given container filename",
 				Description: "Create a new SQL command for given container filename",
 				ArgsUsage:   "[name]",
-				Action:      m.Create,
+				Action:      m.create,
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "filename, n",
@@ -44,7 +47,7 @@ func (m *SQLCommand) CreateCommand() cli.Command {
 				Usage:       "Run a SQL command for given arguments",
 				Description: "Run a SQL command for given arguments",
 				ArgsUsage:   "[name]",
-				Action:      m.Run,
+				Action:      m.run,
 				Flags: []cli.Flag{
 					cli.StringSliceFlag{
 						Name:  "param, p",
@@ -56,7 +59,7 @@ func (m *SQLCommand) CreateCommand() cli.Command {
 	}
 }
 
-func (m *SQLCommand) BeforeEach(ctx *cli.Context) error {
+func (m *SQLCommand) beforeEach(ctx *cli.Context) error {
 	dir, err := os.Getwd()
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
@@ -66,7 +69,7 @@ func (m *SQLCommand) BeforeEach(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLCommand) Create(ctx *cli.Context) error {
+func (m *SQLCommand) create(ctx *cli.Context) error {
 	args := ctx.Args()
 
 	if len(args) != 1 {
@@ -89,7 +92,7 @@ func (m *SQLCommand) Create(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLCommand) Run(ctx *cli.Context) error {
+func (m *SQLCommand) run(ctx *cli.Context) error {
 	args := ctx.Args()
 	params := params(ctx.StringSlice("param"))
 
@@ -101,7 +104,7 @@ func (m *SQLCommand) Run(ctx *cli.Context) error {
 
 	log.Infof("Running command '%s'", name)
 
-	gateway, err := Gateway(ctx)
+	gateway, err := gateway(ctx)
 	if err != nil {
 		return err
 	}

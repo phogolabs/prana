@@ -14,37 +14,39 @@ import (
 	"github.com/urfave/cli"
 )
 
+// SQLCommand provides a subcommands to work with SQL migrations.
 type SQLMigration struct {
 	executor *migration.Executor
 	gateway  *gom.Gateway
 }
 
+// CreateCommand creates a cli.Command that can be used by cli.App.
 func (m *SQLMigration) CreateCommand() cli.Command {
 	return cli.Command{
 		Name:         "migration",
 		Usage:        "A group of commands for generating, running, and reverting migrations",
 		Description:  "A group of commands for generating, running, and reverting migrations",
 		BashComplete: cli.DefaultAppComplete,
-		Before:       m.BeforeEach,
-		After:        m.AfterEach,
+		Before:       m.beforeEach,
+		After:        m.afterEach,
 		Subcommands: []cli.Command{
 			cli.Command{
 				Name:        "setup",
 				Usage:       "Setup the migration for the current project",
 				Description: "Configures the current project by creating database directory hierarchy and initial migration",
-				Action:      m.Setup,
+				Action:      m.setup,
 			},
 			cli.Command{
 				Name:        "create",
 				Usage:       "Generate a new migration with the given name, and the current timestamp as the version",
 				Description: "Create a new migration file for the given name, and the current timestamp as the version in database/migration directory",
 				ArgsUsage:   "[name]",
-				Action:      m.Create,
+				Action:      m.create,
 			},
 			cli.Command{
 				Name:   "run",
 				Usage:  "Runs the pending migrations",
-				Action: m.Run,
+				Action: m.run,
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "count, c",
@@ -56,7 +58,7 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 			cli.Command{
 				Name:   "revert",
 				Usage:  "Revert the latest applied migrations",
-				Action: m.Revert,
+				Action: m.revert,
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "count, c",
@@ -68,25 +70,25 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 			cli.Command{
 				Name:   "reset",
 				Usage:  "Reverts and re-run all migrations",
-				Action: m.Reset,
+				Action: m.reset,
 			},
 			cli.Command{
 				Name:   "status",
 				Usage:  "Lists all migrations, marking those that have been applied",
-				Action: m.Status,
+				Action: m.status,
 			},
 		},
 	}
 }
 
-func (m *SQLMigration) BeforeEach(ctx *cli.Context) error {
+func (m *SQLMigration) beforeEach(ctx *cli.Context) error {
 	dir, err := os.Getwd()
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
 	dir = filepath.Join(dir, "/database/migration")
-	gateway, err := Gateway(ctx)
+	gateway, err := gateway(ctx)
 	if err != nil {
 		return err
 	}
@@ -103,14 +105,14 @@ func (m *SQLMigration) BeforeEach(ctx *cli.Context) error {
 		Generator: &migration.Generator{
 			Dir: dir,
 		},
-		OnRunFn:    m.OnRun,
-		OnRevertFn: m.OnRevert,
+		OnRunFn:    m.onRun,
+		OnRevertFn: m.onRevert,
 	}
 
 	return nil
 }
 
-func (m *SQLMigration) AfterEach(ctx *cli.Context) error {
+func (m *SQLMigration) afterEach(ctx *cli.Context) error {
 	if m.gateway == nil {
 		return nil
 	}
@@ -123,7 +125,7 @@ func (m *SQLMigration) AfterEach(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) Setup(ctx *cli.Context) error {
+func (m *SQLMigration) setup(ctx *cli.Context) error {
 	if err := m.executor.Setup(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
@@ -132,7 +134,7 @@ func (m *SQLMigration) Setup(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) Create(ctx *cli.Context) error {
+func (m *SQLMigration) create(ctx *cli.Context) error {
 	if len(ctx.Args()) != 1 {
 		return cli.NewExitError("Create command expects a single argument", ErrCodeMigration)
 	}
@@ -149,7 +151,7 @@ func (m *SQLMigration) Create(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) Run(ctx *cli.Context) error {
+func (m *SQLMigration) run(ctx *cli.Context) error {
 	count := ctx.Int("count")
 	if count <= 0 {
 		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
@@ -162,11 +164,11 @@ func (m *SQLMigration) Run(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) OnRun(item *migration.Item) {
+func (m *SQLMigration) onRun(item *migration.Item) {
 	log.Infof("Running migration '%s'", item.Filename())
 }
 
-func (m *SQLMigration) Revert(ctx *cli.Context) error {
+func (m *SQLMigration) revert(ctx *cli.Context) error {
 	count := ctx.Int("count")
 	if count <= 0 {
 		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
@@ -179,25 +181,23 @@ func (m *SQLMigration) Revert(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) OnRevert(item *migration.Item) {
+func (m *SQLMigration) onRevert(item *migration.Item) {
 	log.Infof("Reverting migration '%s'", item.Filename())
 }
 
-func (m *SQLMigration) Reset(ctx *cli.Context) error {
-	const all = -1
-
-	if err := m.executor.Revert(all); err != nil {
+func (m *SQLMigration) reset(ctx *cli.Context) error {
+	if err := m.executor.RevertAll(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	if err := m.executor.Run(all); err != nil {
+	if err := m.executor.RunAll(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
 	return nil
 }
 
-func (m *SQLMigration) Status(ctx *cli.Context) error {
+func (m *SQLMigration) status(ctx *cli.Context) error {
 	migrations, err := m.executor.Migrations()
 	if err != nil {
 		return err

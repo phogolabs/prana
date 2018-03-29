@@ -10,10 +10,13 @@ import (
 	"time"
 )
 
+// Generator generates a new migration file for given directory.
 type Generator struct {
+	// Dir is a directory where all migrations are created.
 	Dir string
 }
 
+// Create creates a new migration.
 func (g *Generator) Create(m *Item) (string, error) {
 	if err := g.Write(m, nil); err != nil {
 		return "", err
@@ -23,6 +26,7 @@ func (g *Generator) Create(m *Item) (string, error) {
 	return path, nil
 }
 
+// Write creates a new migration for given content.
 func (g *Generator) Write(m *Item, content *Content) error {
 	if err := os.MkdirAll(g.Dir, 0700); err != nil {
 		return err

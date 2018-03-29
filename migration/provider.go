@@ -8,11 +8,15 @@ import (
 	"github.com/svett/gom"
 )
 
+// Provider provides all migration for given project.
 type Provider struct {
-	Dir     string
+	// Dir represents the project directory.
+	Dir string
+	// Gateway is a client to underlying database.
 	Gateway *gom.Gateway
 }
 
+// Migrations returns the project migrations.
 func (m *Provider) Migrations() ([]Item, error) {
 	migrations := []Item{}
 

@@ -9,11 +9,15 @@ import (
 	"github.com/svett/gom/script"
 )
 
+// Runner runs or reverts a given migration item.
 type Runner struct {
-	Dir     string
+	// Dir represents the project directory.
+	Dir string
+	// Gateway is a client to underlying database.
 	Gateway *gom.Gateway
 }
 
+// Run runs a given migration item.
 func (r *Runner) Run(m *Item) error {
 	p, err := r.provider(m)
 	if err != nil {
@@ -45,6 +49,7 @@ func (r *Runner) Run(m *Item) error {
 	return nil
 }
 
+// Revert reverts a given migration item.
 func (r *Runner) Revert(m *Item) error {
 	p, err := r.provider(m)
 	if err != nil {

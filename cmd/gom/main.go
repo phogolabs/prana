@@ -1,3 +1,4 @@
+// Command Line Interface of GOM.
 package main
 
 import (
