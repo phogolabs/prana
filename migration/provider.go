@@ -5,7 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/svett/gom"
+	"github.com/phogolabs/gom"
 )
 
 // Provider provides all migration for given project.

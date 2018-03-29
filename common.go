@@ -11,7 +11,7 @@ import (
 	"io"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/svett/gom/script"
+	"github.com/phogolabs/gom/script"
 )
 
 // Entity is a destination object for given select operation.

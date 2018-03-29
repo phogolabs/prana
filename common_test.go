@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/svett/gom"
+	"github.com/phogolabs/gom"
 )
 
 var _ = Describe("Command", func() {

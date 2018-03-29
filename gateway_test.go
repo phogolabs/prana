@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/svett/gom"
-	"github.com/svett/gom/script"
+	"github.com/phogolabs/gom"
+	"github.com/phogolabs/gom/script"
 )
 
 var _ = Describe("Gateway", func() {

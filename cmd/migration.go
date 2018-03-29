@@ -9,8 +9,8 @@ import (
 	"github.com/apex/log"
 	"github.com/fatih/color"
 	"github.com/olekukonko/tablewriter"
-	"github.com/svett/gom"
-	"github.com/svett/gom/migration"
+	"github.com/phogolabs/gom"
+	"github.com/phogolabs/gom/migration"
 	"github.com/urfave/cli"
 )
 

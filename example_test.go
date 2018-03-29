@@ -3,7 +3,7 @@ package gom_test
 import (
 	"fmt"
 
-	"github.com/svett/gom"
+	"github.com/phogolabs/gom"
 )
 
 type User struct {

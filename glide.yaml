@@ -1,4 +1,4 @@
-package: github.com/svett/gom
+package: github.com/phogolabs/gom
 import:
 - package: github.com/apex/log
   version: v1.0.0

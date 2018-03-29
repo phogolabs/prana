@@ -10,7 +10,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/json"
-	"github.com/svett/gom"
+	"github.com/phogolabs/gom"
 	"github.com/urfave/cli"
 )
 

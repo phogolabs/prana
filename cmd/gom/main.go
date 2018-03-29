@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/svett/gom/cmd"
+	"github.com/phogolabs/gom/cmd"
 	"github.com/urfave/cli"
 )
 

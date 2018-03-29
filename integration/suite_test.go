@@ -18,7 +18,7 @@ func TestIntegration(t *testing.T) {
 }
 
 var _ = SynchronizedBeforeSuite(func() []byte {
-	binPath, err := gexec.Build("github.com/svett/gom/cmd/gom")
+	binPath, err := gexec.Build("github.com/phogolabs/gom/cmd/gom")
 	Expect(err).NotTo(HaveOccurred())
 
 	return []byte(binPath)

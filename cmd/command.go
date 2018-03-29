@@ -8,8 +8,8 @@ import (
 
 	"github.com/apex/log"
 	"github.com/olekukonko/tablewriter"
-	"github.com/svett/gom"
-	"github.com/svett/gom/script"
+	"github.com/phogolabs/gom"
+	"github.com/phogolabs/gom/script"
 	"github.com/urfave/cli"
 )
 

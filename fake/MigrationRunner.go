@@ -4,7 +4,7 @@ package fake
 import (
 	"sync"
 
-	"github.com/svett/gom/migration"
+	"github.com/phogolabs/gom/migration"
 )
 
 type MigrationRunner struct {

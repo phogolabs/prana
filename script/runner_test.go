@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/svett/gom/script"
+	"github.com/phogolabs/gom/script"
 )
 
 var _ = Describe("Runner", func() {

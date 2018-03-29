@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/svett/gom"
-	"github.com/svett/gom/script"
+	"github.com/phogolabs/gom"
+	"github.com/phogolabs/gom/script"
 )
 
 // Runner runs or reverts a given migration item.

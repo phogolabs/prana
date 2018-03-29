@@ -9,8 +9,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/svett/gom"
-	"github.com/svett/gom/migration"
+	"github.com/phogolabs/gom"
+	"github.com/phogolabs/gom/migration"
 )
 
 var _ = Describe("Runner", func() {
