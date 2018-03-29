@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/svett/gom"
+	"github.com/svett/gom/script"
 )
 
 type Runner struct {
@@ -68,10 +69,8 @@ func (r *Runner) Revert(m *Item) error {
 	return err
 }
 
-func (r *Runner) provider(m *Item) (*gom.CmdProvider, error) {
-	provider := &gom.CmdProvider{
-		Repository: make(map[string]string),
-	}
+func (r *Runner) provider(m *Item) (*script.Provider, error) {
+	provider := &script.Provider{}
 
 	path := filepath.Join(r.Dir, m.Filename())
 	file, err := os.Open(path)

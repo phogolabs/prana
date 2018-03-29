@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/svett/gom"
 	"github.com/svett/gom/script"
 )
 
@@ -21,12 +21,12 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		db := filepath.Join(dir, "gom.db")
-		gateway, err := gom.Open("sqlite3", db)
+		gateway, err := sqlx.Open("sqlite3", db)
 		Expect(err).To(BeNil())
 
 		runner = &script.Runner{
-			Dir:     dir,
-			Gateway: gateway,
+			Dir: dir,
+			DB:  gateway,
 		}
 	})
 
@@ -40,7 +40,7 @@ var _ = Describe("Runner", func() {
 	})
 
 	AfterEach(func() {
-		runner.Gateway.Close()
+		runner.DB.Close()
 	})
 
 	It("runs the command successfully", func() {
@@ -90,7 +90,7 @@ var _ = Describe("Runner", func() {
 
 	Context("when the database is not available", func() {
 		JustBeforeEach(func() {
-			Expect(runner.Gateway.Close()).To(Succeed())
+			Expect(runner.DB.Close()).To(Succeed())
 		})
 
 		It("return an error", func() {

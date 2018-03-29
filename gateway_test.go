@@ -9,6 +9,7 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/svett/gom"
+	"github.com/svett/gom/script"
 )
 
 var _ = Describe("Gateway", func() {
@@ -82,9 +83,9 @@ var _ = Describe("Gateway", func() {
 
 			Context("when an embedded statement is used", func() {
 				It("executes a query successfully", func() {
-					query := &gom.Cmd{
+					query := &script.Cmd{
 						Query:  "SELECT * FROM users WHERE first_name = ?",
-						Params: []gom.Param{"John"},
+						Params: []script.Param{"John"},
 					}
 
 					persons := []Person{}
@@ -97,7 +98,7 @@ var _ = Describe("Gateway", func() {
 
 				Context("when the query does not exist", func() {
 					It("returns an error", func() {
-						query := &gom.Cmd{
+						query := &script.Cmd{
 							Query: "SELECT * FROM categories",
 						}
 						persons := []Person{}

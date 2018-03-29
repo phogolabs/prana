@@ -5,11 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"time"
-
-	"github.com/svett/gom"
 )
-
-var _ FileGenerator = &Generator{}
 
 type Generator struct {
 	Dir string
@@ -20,9 +16,7 @@ func (g *Generator) Create(container, name string) (string, error) {
 		return "", err
 	}
 
-	provider := &gom.CmdProvider{
-		Repository: make(map[string]string),
-	}
+	provider := &Provider{}
 
 	if err := provider.LoadDir(g.Dir); err != nil {
 		return "", err

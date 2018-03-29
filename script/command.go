@@ -1,4 +1,4 @@
-package gom
+package script
 
 import (
 	"bufio"
@@ -11,8 +11,6 @@ import (
 
 	"github.com/gchaincl/dotsql"
 )
-
-var _ Query = &Cmd{}
 
 type Cmd struct {
 	Query  string

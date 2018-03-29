@@ -113,8 +113,8 @@ func (m *SQLCommand) Run(ctx *cli.Context) error {
 	}()
 
 	runner := &script.Runner{
-		Dir:     m.dir,
-		Gateway: gateway,
+		Dir: m.dir,
+		DB:  gateway.DB(),
 	}
 
 	rows := &gom.Rows{}

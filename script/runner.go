@@ -1,18 +1,14 @@
 package script
 
-import (
-	"github.com/svett/gom"
-)
+import "github.com/jmoiron/sqlx"
 
 type Runner struct {
-	Dir     string
-	Gateway *gom.Gateway
+	Dir string
+	DB  *sqlx.DB
 }
 
-func (r *Runner) Run(name string, args ...gom.Param) (*gom.Rows, error) {
-	provider := &gom.CmdProvider{
-		Repository: make(map[string]string),
-	}
+func (r *Runner) Run(name string, args ...Param) (*Rows, error) {
+	provider := &Provider{}
 
 	if err := provider.LoadDir(r.Dir); err != nil {
 		return nil, err
@@ -23,5 +19,20 @@ func (r *Runner) Run(name string, args ...gom.Param) (*gom.Rows, error) {
 		return nil, err
 	}
 
-	return r.Gateway.Query(cmd)
+	query, params := cmd.Prepare()
+
+	stmt, err := r.DB.PrepareNamed(query)
+	if err != nil {
+		return nil, err
+	}
+
+	defer func() {
+		if stmtErr := stmt.Close(); err == nil {
+			err = stmtErr
+		}
+	}()
+
+	var rows *Rows
+	rows, err = stmt.Queryx(params)
+	return rows, err
 }
