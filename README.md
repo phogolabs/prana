@@ -152,11 +152,10 @@ return err
 
 ### SQL Migrations
 
-The SQL Migration are based on the command approach. But instead, the migration
-SQL scripts are created in `/database/migration` directory. Each migration has
-`up` and `down` commands.
+The SQL Migration are based on the SQL command approach. Each migration is a
+SQL script that contains `up` and `down` commands.
 
-In order to prepare the project for migration, you have setup it:
+In order to prepare the project for migration, you have set it up:
 
 ```console
 $ gom migration setup
@@ -179,7 +178,7 @@ database/
     └── 20180329162010_schema.sql
 ```
 
-The `20180329162010_schema.sql` migration has the following formate:
+The `20180329162010_schema.sql` migration has similar to example below format:
 
 ```sql
 -- Auto-generated at Thu Mar 29 16:20:10 CEST 2018
@@ -210,7 +209,7 @@ $ gom migration revert
 ## Contributing
 
 We are welcome to any contributions. Just fork the
-[project](https://github.com/ulule/loukoum)
+[project](https://github.com/phogolabs/gom).
 
 [gom-url]: https://github.com/phogolabs/gom
 [godoc-url]: https://godoc.org/github.com/phogolabs/gom
