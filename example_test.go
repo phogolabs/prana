@@ -12,7 +12,7 @@ type User struct {
 	LastName  string `db:"first_name"`
 }
 
-func GatewaySelectOneExample() error {
+func ExampleGatewaySelectOne() error {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
 		return err
@@ -34,7 +34,7 @@ func GatewaySelectOneExample() error {
 	return err
 }
 
-func GatewaySelectExample() error {
+func ExampleGatewaySelect() error {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
 		return err
@@ -53,7 +53,7 @@ func GatewaySelectExample() error {
 	return err
 }
 
-func GatewayQueryRowExample() error {
+func ExampleGatewayQueryRow() error {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
 		return err
@@ -82,7 +82,7 @@ func GatewayQueryRowExample() error {
 	return err
 }
 
-func GatewayQueryExample() error {
+func ExampleGatewayQuery() error {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
 		return err
@@ -116,7 +116,7 @@ func GatewayQueryExample() error {
 	return err
 }
 
-func GatewayExecExample() error {
+func ExampleGatewayExec() error {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
 		return err
@@ -139,7 +139,7 @@ func GatewayExecExample() error {
 	return err
 }
 
-func GatewayCommandExample() error {
+func ExampleGatewayCommand() error {
 	err := gom.LoadDir("./database/command")
 
 	if err != nil {
