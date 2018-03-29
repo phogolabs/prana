@@ -1,0 +1,114 @@
+hash: 3fdeea8edb6db538316c09d1863119ec22a49ae1da2284e70fca799d27d5a8e3
+updated: 2018-03-29T18:38:40.262394+02:00
+imports:
+- name: github.com/apex/log
+  version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
+  subpackages:
+  - handlers/json
+- name: github.com/fatih/color
+  version: 507f6050b8568533fb3f5504de8e5205fa62a114
+- name: github.com/gchaincl/dotsql
+  version: 5487b6a5fc12870425fc14d9e05a3fabddd91d7e
+- name: github.com/go-sql-driver/mysql
+  version: a0583e0143b1624142adab07e0e97fe106d99561
+- name: github.com/jmoiron/sqlx
+  version: cf35089a197953c69420c8d0cecda90809764b1d
+  subpackages:
+  - reflectx
+- name: github.com/lib/pq
+  version: d34b9ff171c21ad295489235aec8b6626023cd04
+  subpackages:
+  - oid
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: github.com/mattn/go-runewidth
+  version: a9d6d1e4dc51df2130326793d49971f238839169
+- name: github.com/mattn/go-sqlite3
+  version: 6c771bb9887719704b210e87e934f08be014bdb1
+- name: github.com/olekukonko/tablewriter
+  version: b8a9be070da40449e501c3c4730a889e42d87a9e
+- name: github.com/pkg/errors
+  version: 816c9085562cd7ee03e7f8188a1cfd942858cded
+- name: github.com/ulule/loukoum
+  version: 09752c4c10f314002ad590a1f9b12d2815376b51
+  subpackages:
+  - builder
+  - format
+  - lexer
+  - parser
+  - stmt
+  - token
+  - types
+- name: github.com/urfave/cli
+  version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
+- name: golang.org/x/sys
+  version: 378d26f46672a356c46195c28f61bdb4c0a781dd
+  subpackages:
+  - unix
+testImports:
+- name: github.com/onsi/ginkgo
+  version: 9eda700730cba42af70d53180f9dcce9266bc2bc
+  subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/spec_iterator
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - reporters/stenographer/support/go-colorable
+  - reporters/stenographer/support/go-isatty
+  - types
+- name: github.com/onsi/gomega
+  version: 003f63b7f4cff3fc95357005358af2de0f5fe152
+  subpackages:
+  - format
+  - gbytes
+  - gexec
+  - internal/assertion
+  - internal/asyncassertion
+  - internal/oraclematcher
+  - internal/testingtsupport
+  - matchers
+  - matchers/support/goraph/bipartitegraph
+  - matchers/support/goraph/edge
+  - matchers/support/goraph/node
+  - matchers/support/goraph/util
+  - types
+- name: golang.org/x/net
+  version: 6078986fec03a1dcc236c34816c71b0e05018fda
+  subpackages:
+  - html
+  - html/atom
+  - html/charset
+- name: golang.org/x/text
+  version: ece95c760240037f89ebcbdd7155ac8cb52e38fa
+  subpackages:
+  - encoding
+  - encoding/charmap
+  - encoding/htmlindex
+  - encoding/internal
+  - encoding/internal/identifier
+  - encoding/japanese
+  - encoding/korean
+  - encoding/simplifiedchinese
+  - encoding/traditionalchinese
+  - encoding/unicode
+  - internal/language
+  - internal/language/compact
+  - internal/tag
+  - internal/utf8internal
+  - language
+  - runes
+  - transform
+- name: gopkg.in/yaml.v2
+  version: 5420a8b6744d3b0345ab293f6fcba19c978f1183

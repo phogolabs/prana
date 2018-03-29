@@ -1,14 +1,11 @@
 package script
 
 import (
-	"bufio"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"sync"
-
-	"github.com/gchaincl/dotsql"
 )
 
 // Provider loads SQL scripts and provides all SQL statements as commands.
@@ -61,8 +58,8 @@ func (p *Provider) Load(r io.Reader) error {
 		p.repository = make(map[string]string)
 	}
 
-	scanner := &dotsql.Scanner{}
-	stmts := scanner.Run(bufio.NewScanner(r))
+	scanner := &Scanner{}
+	stmts := scanner.Scan(r)
 
 	for name, stmt := range stmts {
 		if _, ok := p.repository[name]; ok {
