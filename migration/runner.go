@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/apex/log"
 	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/script"
 )
@@ -15,10 +16,14 @@ type Runner struct {
 	Dir string
 	// Gateway is a client to underlying database.
 	Gateway *gom.Gateway
+	// Logger logs the runner exection
+	Logger log.Interface
 }
 
 // Run runs a given migration item.
 func (r *Runner) Run(m *Item) error {
+	r.log("Running migration '%s'", m.Filename())
+
 	p, err := r.provider(m)
 	if err != nil {
 		return err
@@ -46,11 +51,14 @@ func (r *Runner) Run(m *Item) error {
 		return err
 	}
 
+	r.log("Running migration '%s' completed successfully", m.Filename())
 	return nil
 }
 
 // Revert reverts a given migration item.
 func (r *Runner) Revert(m *Item) error {
+	r.log("Reverting migration '%s'", m.Filename())
+
 	p, err := r.provider(m)
 	if err != nil {
 		return err
@@ -71,7 +79,8 @@ func (r *Runner) Revert(m *Item) error {
 		return err
 	}
 
-	return err
+	r.log("Reverting migration '%s' completed successfully", m.Filename())
+	return nil
 }
 
 func (r *Runner) provider(m *Item) (*script.Provider, error) {
@@ -94,4 +103,10 @@ func (r *Runner) provider(m *Item) (*script.Provider, error) {
 	}
 
 	return provider, nil
+}
+
+func (r *Runner) log(text string, param ...interface{}) {
+	if r.Logger != nil {
+		r.Logger.Infof(text, param...)
+	}
 }

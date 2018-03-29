@@ -101,12 +101,11 @@ func (m *SQLMigration) beforeEach(ctx *cli.Context) error {
 		Runner: &migration.Runner{
 			Dir:     dir,
 			Gateway: gateway,
+			Logger:  log.Log,
 		},
 		Generator: &migration.Generator{
 			Dir: dir,
 		},
-		OnRunFn:    m.onRun,
-		OnRevertFn: m.onRevert,
 	}
 
 	return nil
@@ -126,6 +125,8 @@ func (m *SQLMigration) afterEach(ctx *cli.Context) error {
 }
 
 func (m *SQLMigration) setup(ctx *cli.Context) error {
+	log.Info("Configuring the project")
+
 	if err := m.executor.Setup(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
@@ -141,6 +142,8 @@ func (m *SQLMigration) create(ctx *cli.Context) error {
 
 	name := ctx.Args()[0]
 	name = strings.Replace(name, " ", "_", -1)
+
+	log.Infof("Creating a new migration '%s'", name)
 
 	path, err := m.executor.Create(name)
 	if err != nil {
@@ -164,10 +167,6 @@ func (m *SQLMigration) run(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) onRun(item *migration.Item) {
-	log.Infof("Running migration '%s'", item.Filename())
-}
-
 func (m *SQLMigration) revert(ctx *cli.Context) error {
 	count := ctx.Int("count")
 	if count <= 0 {
@@ -181,11 +180,9 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) onRevert(item *migration.Item) {
-	log.Infof("Reverting migration '%s'", item.Filename())
-}
-
 func (m *SQLMigration) reset(ctx *cli.Context) error {
+	log.Info("Reseting the project")
+
 	if err := m.executor.RevertAll(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
@@ -194,6 +191,7 @@ func (m *SQLMigration) reset(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
+	log.Info("Reseting the project completed successfully")
 	return nil
 }
 

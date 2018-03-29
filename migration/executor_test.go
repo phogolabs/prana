@@ -126,21 +126,11 @@ var _ = Describe("Executor", func() {
 	})
 
 	Describe("Run", func() {
-		var runCnt int
-
-		BeforeEach(func() {
-			runCnt = 0
-			executor.OnRunFn = func(item *migration.Item) {
-				runCnt++
-			}
-		})
-
 		Context("when there are no migrations", func() {
 			It("does not run any migration", func() {
 				Expect(executor.Run(1)).To(Succeed())
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(BeZero())
-				Expect(runCnt).To(BeZero())
 			})
 		})
 
@@ -167,7 +157,6 @@ var _ = Describe("Executor", func() {
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(Equal(1))
-				Expect(runCnt).To(Equal(1))
 
 				item := runner.RunArgsForCall(0)
 				Expect(*item).To(Equal(migrations[1]))
@@ -202,7 +191,6 @@ var _ = Describe("Executor", func() {
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(Equal(2))
-				Expect(runCnt).To(Equal(2))
 
 				for i := 0; i < runner.RunCallCount(); i++ {
 					item := runner.RunArgsForCall(i)
@@ -215,7 +203,6 @@ var _ = Describe("Executor", func() {
 					runner.RunReturns(fmt.Errorf("Oh no!"))
 					Expect(executor.Run(-1)).To(MatchError("Oh no!"))
 					Expect(runner.RunCallCount()).To(Equal(1))
-					Expect(runCnt).To(Equal(1))
 				})
 			})
 		})
@@ -224,27 +211,16 @@ var _ = Describe("Executor", func() {
 			It("returns the error", func() {
 				provider.MigrationsReturns([]migration.Item{}, fmt.Errorf("Oh no!"))
 				Expect(executor.Run(1)).To(MatchError("Oh no!"))
-				Expect(runCnt).To(BeZero())
 			})
 		})
 	})
 
 	Describe("Revert", func() {
-		var revertCnt int
-
-		BeforeEach(func() {
-			revertCnt = 0
-			executor.OnRevertFn = func(item *migration.Item) {
-				revertCnt++
-			}
-		})
-
 		Context("when there are no migrations", func() {
 			It("does not revert any migration", func() {
 				Expect(executor.Revert(1)).To(Succeed())
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RevertCallCount()).To(BeZero())
-				Expect(revertCnt).To(BeZero())
 			})
 		})
 
@@ -272,7 +248,6 @@ var _ = Describe("Executor", func() {
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RevertCallCount()).To(Equal(1))
-				Expect(revertCnt).To(Equal(1))
 
 				item := runner.RevertArgsForCall(0)
 				Expect(*item).To(Equal(migrations[1]))
@@ -308,7 +283,6 @@ var _ = Describe("Executor", func() {
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RevertCallCount()).To(Equal(2))
-				Expect(revertCnt).To(Equal(2))
 
 				for i := 0; i < runner.RunCallCount(); i++ {
 					item := runner.RevertArgsForCall(i)
@@ -321,7 +295,6 @@ var _ = Describe("Executor", func() {
 					runner.RevertReturns(fmt.Errorf("Oh no!"))
 					Expect(executor.Revert(-1)).To(MatchError("Oh no!"))
 					Expect(runner.RevertCallCount()).To(Equal(1))
-					Expect(revertCnt).To(Equal(1))
 				})
 			})
 		})
@@ -330,7 +303,6 @@ var _ = Describe("Executor", func() {
 			It("returns the error", func() {
 				provider.MigrationsReturns([]migration.Item{}, fmt.Errorf("Oh no!"))
 				Expect(executor.Revert(1)).To(MatchError("Oh no!"))
-				Expect(revertCnt).To(BeZero())
 			})
 		})
 	})

@@ -14,10 +14,6 @@ type Executor struct {
 	Runner ItemRunner
 	// Generator generates a migration file.
 	Generator FileGenerator
-	// OnRunFn is executed when a migration is executed.
-	OnRunFn ItemFn
-	// OnRevertFn is executed when a migration is reverted.
-	OnRevertFn ItemFn
 }
 
 // Setups setups the current project for database migrations by creating
@@ -88,10 +84,6 @@ func (m *Executor) Run(step int) error {
 
 		op := migration
 
-		if m.OnRunFn != nil {
-			m.OnRunFn(&op)
-		}
-
 		if err := m.Runner.Run(&op); err != nil {
 			return err
 		}
@@ -132,10 +124,6 @@ func (m *Executor) Revert(step int) error {
 		}
 
 		op := migration
-
-		if m.OnRevertFn != nil {
-			m.OnRevertFn(&op)
-		}
 
 		if err := m.Runner.Revert(&op); err != nil {
 			return err
