@@ -2,6 +2,7 @@
 
 [![Documentation][godoc-img]][godoc-url]
 ![License][license-img]
+[![Build Status](https://travis-ci.org/phogolabs/gom.svg?branch=master)](https://travis-ci.org/phogolabs/gom)
 
 ## Overview
 
