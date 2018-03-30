@@ -31,6 +31,10 @@ type ItemRunner interface {
 type ItemProvider interface {
 	// Migrations returns all migration items.
 	Migrations() ([]Item, error)
+	// Insert inserts exectued migration item in the migrations table.
+	Insert(item *Item) error
+	// Delete deletes applied migration item from migrations table.
+	Delete(item *Item) error
 }
 
 // FileGenerator generates a migration item file.

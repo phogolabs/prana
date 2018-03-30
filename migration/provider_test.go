@@ -59,6 +59,72 @@ var _ = Describe("Provider", func() {
 		provider.Gateway.Close()
 	})
 
+	Describe("Insert", func() {
+		It("inserts a migration item successfully", func() {
+			item := migration.Item{
+				Id:          "20070102150405",
+				Description: "trigger",
+			}
+
+			Expect(provider.Insert(&item)).To(Succeed())
+
+			items := []migration.Item{}
+			query := gom.Select().From("migrations").OrderBy(gom.Order("id", gom.Asc))
+
+			Expect(provider.Gateway.Select(&items, query)).To(Succeed())
+			Expect(items).To(HaveLen(2))
+
+			Expect(items[0].Id).To(Equal("20060102150405"))
+			Expect(items[0].Description).To(Equal("schema"))
+
+			Expect(items[1].Id).To(Equal("20070102150405"))
+			Expect(items[1].Description).To(Equal("trigger"))
+		})
+
+		Context("when the database is not available", func() {
+			JustBeforeEach(func() {
+				Expect(provider.Gateway.Close()).To(Succeed())
+			})
+
+			It("returns an error", func() {
+				items, err := provider.Migrations()
+				Expect(items).To(BeEmpty())
+				Expect(err).To(MatchError("sql: database is closed"))
+			})
+		})
+	})
+
+	Describe("Delete", func() {
+		It("deletes a migration item successfully", func() {
+			item := migration.Item{
+				Id:          "20060102150405",
+				Description: "schema",
+			}
+
+			Expect(provider.Delete(&item)).To(Succeed())
+
+			items := []migration.Item{}
+			query := gom.Select().From("migrations")
+
+			Expect(provider.Gateway.Select(&items, query)).To(Succeed())
+			Expect(items).To(BeEmpty())
+		})
+
+		Context("when the database is not available", func() {
+			JustBeforeEach(func() {
+				Expect(provider.Gateway.Close()).To(Succeed())
+			})
+
+			It("returns an error", func() {
+				item := migration.Item{
+					Id:          "20060102150405",
+					Description: "setup",
+				}
+				Expect(provider.Delete(&item)).To(MatchError("sql: database is closed"))
+			})
+		})
+	})
+
 	Describe("Migrations", func() {
 		It("returns the migrations successfully", func() {
 			path := filepath.Join(provider.Dir, "20070102150405_setup.sql")

@@ -3,7 +3,6 @@ package migration
 import (
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/apex/log"
 	"github.com/phogolabs/gom"
@@ -38,19 +37,6 @@ func (r *Runner) Run(m *Item) error {
 		return err
 	}
 
-	m.CreatedAt = time.Now()
-
-	query := gom.Insert("migrations").
-		Set(
-			gom.Pair("id", m.Id),
-			gom.Pair("description", m.Description),
-			gom.Pair("created_at", m.CreatedAt),
-		)
-
-	if _, err := r.Gateway.Exec(query); err != nil {
-		return err
-	}
-
 	r.log("Running migration '%s' completed successfully", m.Filename())
 	return nil
 }
@@ -70,12 +56,6 @@ func (r *Runner) Revert(m *Item) error {
 	}
 
 	if _, err := r.Gateway.Exec(cmd); err != nil {
-		return err
-	}
-
-	query := gom.Delete("migrations").Where(gom.Condition("id").Equal(m.Id))
-
-	if _, err := r.Gateway.Exec(query); err != nil {
 		return err
 	}
 

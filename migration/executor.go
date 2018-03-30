@@ -43,7 +43,11 @@ func (m *Executor) Setup() error {
 		return err
 	}
 
-	return m.Runner.Run(migration)
+	if err := m.Runner.Run(migration); err != nil {
+		return err
+	}
+
+	return m.Provider.Insert(migration)
 }
 
 // Create creates a migration script successfully if the project has already
@@ -88,6 +92,10 @@ func (m *Executor) Run(step int) error {
 			return err
 		}
 
+		if err := m.Provider.Insert(&op); err != nil {
+			return err
+		}
+
 		step = step - 1
 	}
 
@@ -126,6 +134,10 @@ func (m *Executor) Revert(step int) error {
 		op := migration
 
 		if err := m.Runner.Revert(&op); err != nil {
+			return err
+		}
+
+		if err := m.Provider.Delete(&op); err != nil {
 			return err
 		}
 

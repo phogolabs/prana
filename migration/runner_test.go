@@ -68,15 +68,6 @@ var _ = Describe("Runner", func() {
 			Expect(runner.Run(item)).To(Succeed())
 			_, err := runner.Gateway.Exec(gom.Select("id").From(gom.Table("test")))
 			Expect(err).NotTo(HaveOccurred())
-
-			items := []migration.Item{}
-			query := gom.Select().From("migrations")
-
-			Expect(runner.Gateway.Select(&items, query)).To(Succeed())
-			Expect(items).To(HaveLen(1))
-
-			Expect(items[0].Id).To(Equal(item.Id))
-			Expect(items[0].Description).To(Equal(item.Description))
 		})
 
 		Context("when the migration does not exist", func() {
@@ -123,15 +114,6 @@ var _ = Describe("Runner", func() {
 				Expect(runner.Run(item)).To(MatchError("open 20160102150_schema.sql: no such file or directory"))
 			})
 		})
-
-		Context("when the item is run more than once", func() {
-			It("return an error", func() {
-				Expect(runner.Run(item)).To(Succeed())
-				_, err := runner.Gateway.DB().Exec("DROP TABLE test")
-				Expect(err).NotTo(HaveOccurred())
-				Expect(runner.Run(item)).To(MatchError("UNIQUE constraint failed: migrations.id"))
-			})
-		})
 	})
 
 	Describe("Revert", func() {
@@ -139,12 +121,6 @@ var _ = Describe("Runner", func() {
 			Expect(runner.Revert(item)).To(Succeed())
 			_, err := runner.Gateway.Exec(gom.Select("id").From(gom.Table("test")))
 			Expect(err).To(MatchError("no such table: test"))
-
-			items := []migration.Item{}
-			query := gom.Select().From("migrations")
-
-			Expect(runner.Gateway.Select(&items, query)).To(Succeed())
-			Expect(items).To(HaveLen(0))
 		})
 
 		Context("when the migration does not exist", func() {
@@ -189,19 +165,6 @@ var _ = Describe("Runner", func() {
 			It("returns an error", func() {
 				runner.Dir = ""
 				Expect(runner.Revert(item)).To(MatchError("open 20160102150_schema.sql: no such file or directory"))
-			})
-		})
-
-		Context("when the migration table is locked", func() {
-			It("return an error", func() {
-				tx, err := runner.Gateway.DB().Begin()
-				Expect(err).NotTo(HaveOccurred())
-
-				_, err = tx.Exec("SELECT * FROM migrations")
-				Expect(err).NotTo(HaveOccurred())
-
-				Expect(runner.Revert(item)).To(MatchError("database is locked"))
-				Expect(tx.Commit()).To(Succeed())
 			})
 		})
 	})

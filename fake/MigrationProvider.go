@@ -15,6 +15,22 @@ type MigrationProvider struct {
 		result1 []migration.Item
 		result2 error
 	}
+	InsertStub        func(item *migration.Item) error
+	insertMutex       sync.RWMutex
+	insertArgsForCall []struct {
+		item *migration.Item
+	}
+	insertReturns struct {
+		result1 error
+	}
+	DeleteStub        func(item *migration.Item) error
+	deleteMutex       sync.RWMutex
+	deleteArgsForCall []struct {
+		item *migration.Item
+	}
+	deleteReturns struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -44,11 +60,79 @@ func (fake *MigrationProvider) MigrationsReturns(result1 []migration.Item, resul
 	}{result1, result2}
 }
 
+func (fake *MigrationProvider) Insert(item *migration.Item) error {
+	fake.insertMutex.Lock()
+	fake.insertArgsForCall = append(fake.insertArgsForCall, struct {
+		item *migration.Item
+	}{item})
+	fake.recordInvocation("Insert", []interface{}{item})
+	fake.insertMutex.Unlock()
+	if fake.InsertStub != nil {
+		return fake.InsertStub(item)
+	}
+	return fake.insertReturns.result1
+}
+
+func (fake *MigrationProvider) InsertCallCount() int {
+	fake.insertMutex.RLock()
+	defer fake.insertMutex.RUnlock()
+	return len(fake.insertArgsForCall)
+}
+
+func (fake *MigrationProvider) InsertArgsForCall(i int) *migration.Item {
+	fake.insertMutex.RLock()
+	defer fake.insertMutex.RUnlock()
+	return fake.insertArgsForCall[i].item
+}
+
+func (fake *MigrationProvider) InsertReturns(result1 error) {
+	fake.InsertStub = nil
+	fake.insertReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *MigrationProvider) Delete(item *migration.Item) error {
+	fake.deleteMutex.Lock()
+	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
+		item *migration.Item
+	}{item})
+	fake.recordInvocation("Delete", []interface{}{item})
+	fake.deleteMutex.Unlock()
+	if fake.DeleteStub != nil {
+		return fake.DeleteStub(item)
+	}
+	return fake.deleteReturns.result1
+}
+
+func (fake *MigrationProvider) DeleteCallCount() int {
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return len(fake.deleteArgsForCall)
+}
+
+func (fake *MigrationProvider) DeleteArgsForCall(i int) *migration.Item {
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
+	return fake.deleteArgsForCall[i].item
+}
+
+func (fake *MigrationProvider) DeleteReturns(result1 error) {
+	fake.DeleteStub = nil
+	fake.deleteReturns = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *MigrationProvider) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.migrationsMutex.RLock()
 	defer fake.migrationsMutex.RUnlock()
+	fake.insertMutex.RLock()
+	defer fake.insertMutex.RUnlock()
+	fake.deleteMutex.RLock()
+	defer fake.deleteMutex.RUnlock()
 	return fake.invocations
 }
 

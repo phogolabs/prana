@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/phogolabs/gom"
 )
@@ -73,4 +74,33 @@ func (m *Provider) Migrations() ([]Item, error) {
 	}
 
 	return migrations, err
+}
+
+// Insert inserts exectued migration item in the migrations table.
+func (m *Provider) Insert(item *Item) error {
+	item.CreatedAt = time.Now()
+
+	query := gom.Insert("migrations").
+		Set(
+			gom.Pair("id", item.Id),
+			gom.Pair("description", item.Description),
+			gom.Pair("created_at", item.CreatedAt),
+		)
+
+	if _, err := m.Gateway.Exec(query); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Delete deletes applied migration item from migrations table.
+func (m *Provider) Delete(item *Item) error {
+	query := gom.Delete("migrations").Where(gom.Condition("id").Equal(item.Id))
+
+	if _, err := m.Gateway.Exec(query); err != nil {
+		return err
+	}
+
+	return nil
 }

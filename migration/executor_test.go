@@ -160,6 +160,10 @@ var _ = Describe("Executor", func() {
 
 				item := runner.RunArgsForCall(0)
 				Expect(*item).To(Equal(migrations[1]))
+
+				Expect(provider.InsertCallCount()).To(Equal(1))
+				item = provider.InsertArgsForCall(0)
+				Expect(*item).To(Equal(migrations[1]))
 			})
 		})
 
@@ -203,6 +207,15 @@ var _ = Describe("Executor", func() {
 					runner.RunReturns(fmt.Errorf("Oh no!"))
 					Expect(executor.Run(-1)).To(MatchError("Oh no!"))
 					Expect(runner.RunCallCount()).To(Equal(1))
+				})
+			})
+
+			Context("when the provider fails", func() {
+				Context("when the insert fails", func() {
+					It("returns the error", func() {
+						provider.InsertReturns(fmt.Errorf("Oh no!"))
+						Expect(executor.Run(1)).To(MatchError("Oh no!"))
+					})
 				})
 			})
 		})
@@ -250,6 +263,10 @@ var _ = Describe("Executor", func() {
 				Expect(runner.RevertCallCount()).To(Equal(1))
 
 				item := runner.RevertArgsForCall(0)
+				Expect(*item).To(Equal(migrations[1]))
+
+				Expect(provider.DeleteCallCount()).To(Equal(1))
+				item = provider.DeleteArgsForCall(0)
 				Expect(*item).To(Equal(migrations[1]))
 			})
 		})
@@ -303,6 +320,30 @@ var _ = Describe("Executor", func() {
 			It("returns the error", func() {
 				provider.MigrationsReturns([]migration.Item{}, fmt.Errorf("Oh no!"))
 				Expect(executor.Revert(1)).To(MatchError("Oh no!"))
+			})
+
+			Context("when the delete fails", func() {
+				It("returns the error", func() {
+					migrations := []migration.Item{
+						migration.Item{
+							Id:          "20060102150405",
+							Description: "First",
+							CreatedAt:   time.Now(),
+						},
+						migration.Item{
+							Id:          "20070102150405",
+							Description: "Second",
+						},
+						migration.Item{
+							Id:          "20080102150405",
+							Description: "Third",
+						},
+					}
+
+					provider.MigrationsReturns(migrations, nil)
+					provider.DeleteReturns(fmt.Errorf("Oh no!"))
+					Expect(executor.Revert(1)).To(MatchError("Oh no!"))
+				})
 			})
 		})
 	})
