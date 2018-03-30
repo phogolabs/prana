@@ -12,15 +12,16 @@ type User struct {
 	LastName  string `db:"first_name"`
 }
 
-func ExampleGatewaySelectOne() error {
+func ExampleGatewaySelectOne() {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	defer func() {
-		if dbErr := gateway.Close(); err != nil {
-			err = dbErr
+		if dbErr := gateway.Close(); dbErr != nil {
+			fmt.Println(dbErr)
 		}
 	}()
 
@@ -29,39 +30,42 @@ func ExampleGatewaySelectOne() error {
 		Where(gom.Condition("first_name").Equal("John"))
 
 	user := User{}
-
-	err = gateway.SelectOne(&user, query)
-	return err
+	if err := gateway.SelectOne(&user, query); err != nil {
+		fmt.Println(err)
+	}
 }
 
-func ExampleGatewaySelect() error {
+func ExampleGatewaySelect() {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	defer func() {
-		if dbErr := gateway.Close(); err != nil {
-			err = dbErr
+		if dbErr := gateway.Close(); dbErr != nil {
+			fmt.Println(dbErr)
 		}
 	}()
 
 	query := gom.Select("id", "first_name", "last_name").From("users")
 	users := []User{}
 
-	err = gateway.Select(&users, query)
-	return err
+	if err := gateway.Select(&users, query); err != nil {
+		fmt.Println(err)
+	}
 }
 
-func ExampleGatewayQueryRow() error {
+func ExampleGatewayQueryRow() {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	defer func() {
-		if dbErr := gateway.Close(); err != nil {
-			err = dbErr
+		if dbErr := gateway.Close(); dbErr != nil {
+			fmt.Println(dbErr)
 		}
 	}()
 
@@ -73,24 +77,26 @@ func ExampleGatewayQueryRow() error {
 
 	row, err = gateway.QueryRow(query)
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	user := User{}
-	err = row.StructScan(&user)
-
-	return err
+	if err := row.StructScan(&user); err != nil {
+		fmt.Println(err)
+	}
 }
 
-func ExampleGatewayQuery() error {
+func ExampleGatewayQuery() {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	defer func() {
-		if dbErr := gateway.Close(); err != nil {
-			err = dbErr
+		if dbErr := gateway.Close(); dbErr != nil {
+			fmt.Println(dbErr)
 		}
 	}()
 
@@ -98,33 +104,34 @@ func ExampleGatewayQuery() error {
 	rows, err := gateway.Query(query)
 
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	user := User{}
 
 	for rows.Next() {
 		if err = rows.StructScan(&user); err != nil {
-			return err
+			fmt.Println(err)
+			return
 		}
 
 		if user.FirstName == "John" {
 			fmt.Println(user.LastName)
 		}
 	}
-
-	return err
 }
 
-func ExampleGatewayExec() error {
+func ExampleGatewayExec() {
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	defer func() {
-		if dbErr := gateway.Close(); err != nil {
-			err = dbErr
+		if dbErr := gateway.Close(); dbErr != nil {
+			fmt.Println(dbErr)
 		}
 	}()
 
@@ -135,30 +142,34 @@ func ExampleGatewayExec() error {
 		).
 		Returning("id")
 
-	_, err = gateway.Exec(query)
-	return err
+	if _, err := gateway.Exec(query); err != nil {
+		fmt.Println(err)
+	}
 }
 
-func ExampleGatewayCommand() error {
+func ExampleGatewayCommand() {
 	err := gom.LoadDir("./database/command")
 
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	cmd := gom.Command("show-sqlite-master")
 
 	gateway, err := gom.Open("sqlite3", "example.db")
 	if err != nil {
-		return err
+		fmt.Println(err)
+		return
 	}
 
 	defer func() {
-		if dbErr := gateway.Close(); err != nil {
-			err = dbErr
+		if dbErr := gateway.Close(); dbErr != nil {
+			fmt.Println(dbErr)
 		}
 	}()
 
-	_, err = gateway.Exec(cmd)
-	return err
+	if _, err := gateway.Exec(cmd); err != nil {
+		fmt.Println(err)
+	}
 }

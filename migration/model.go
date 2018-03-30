@@ -19,9 +19,6 @@ var (
 	min    = time.Date(1, time.January, 1970, 0, 0, 0, 0, time.UTC)
 )
 
-// ItemFn is a callback function called when item is processed.
-type ItemFn func(item *Item)
-
 // ItemRunner runs or reverts a given migration item.
 type ItemRunner interface {
 	// Run runs a given migration item.
