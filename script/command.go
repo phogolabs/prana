@@ -40,3 +40,11 @@ func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
 	query = buffer.String()
 	return query, params
 }
+
+// SQL create a new command from raw query
+func SQL(query string, params ...Param) *Cmd {
+	return &Cmd{
+		Query:  query,
+		Params: params,
+	}
+}

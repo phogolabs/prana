@@ -59,3 +59,8 @@ func Command(name string, params ...script.Param) *script.Cmd {
 
 	return cmd
 }
+
+// SQL create a new command from raw query
+func SQL(query string, params ...script.Param) *script.Cmd {
+	return script.SQL(query, params...)
+}
