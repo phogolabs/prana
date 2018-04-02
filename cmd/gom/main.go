@@ -27,7 +27,7 @@ var flags = []cli.Flag{
 	},
 	cli.StringFlag{
 		Name:   "database-url",
-		Value:  "",
+		Value:  "sqlite3://gom.db",
 		Usage:  "Database URL",
 		EnvVar: "GOM_DB_URL",
 	},
@@ -35,11 +35,13 @@ var flags = []cli.Flag{
 
 func main() {
 	migration := &cmd.SQLMigration{}
-	command := &cmd.SQLCommand{}
+	script := &cmd.SQLScript{}
+	schema := &cmd.SQLSchema{}
 
 	commands := []cli.Command{
 		migration.CreateCommand(),
-		command.CreateCommand(),
+		script.CreateCommand(),
+		schema.CreateCommand(),
 	}
 
 	app := &cli.App{

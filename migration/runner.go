@@ -1,11 +1,12 @@
 package migration
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
-	"github.com/apex/log"
-	"github.com/phogolabs/gom"
+	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/gom/script"
 )
 
@@ -13,59 +14,43 @@ import (
 type Runner struct {
 	// Dir represents the project directory.
 	Dir string
-	// Gateway is a client to underlying database.
-	Gateway *gom.Gateway
-	// Logger logs the runner exection
-	Logger log.Interface
+	// DB is a client to underlying database.
+	DB *sqlx.DB
 }
 
 // Run runs a given migration item.
 func (r *Runner) Run(m *Item) error {
-	r.log("Running migration '%s'", m.Filename())
-
-	p, err := r.provider(m)
-	if err != nil {
+	if err := r.exec("up", m); err != nil {
 		return err
 	}
 
-	cmd, err := p.Command("up")
-	if err != nil {
-		return err
-	}
-
-	if _, err := r.Gateway.Exec(cmd); err != nil {
-		return err
-	}
-
-	r.log("Running migration '%s' completed successfully", m.Filename())
 	return nil
 }
 
 // Revert reverts a given migration item.
 func (r *Runner) Revert(m *Item) error {
-	r.log("Reverting migration '%s'", m.Filename())
-
-	p, err := r.provider(m)
-	if err != nil {
+	if err := r.exec("down", m); err != nil {
 		return err
 	}
-
-	cmd, err := p.Command("down")
-	if err != nil {
-		return err
-	}
-
-	if _, err := r.Gateway.Exec(cmd); err != nil {
-		return err
-	}
-
-	r.log("Reverting migration '%s' completed successfully", m.Filename())
 	return nil
 }
 
-func (r *Runner) provider(m *Item) (*script.Provider, error) {
-	provider := &script.Provider{}
+func (r *Runner) exec(step string, m *Item) error {
+	statements, err := r.command(step, m)
+	if err != nil {
+		return err
+	}
 
+	for _, query := range statements {
+		if _, err := r.DB.Exec(query); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (r *Runner) command(name string, m *Item) ([]string, error) {
 	path := filepath.Join(r.Dir, m.Filename())
 	file, err := os.Open(path)
 	if err != nil {
@@ -78,15 +63,15 @@ func (r *Runner) provider(m *Item) (*script.Provider, error) {
 		}
 	}()
 
-	if err = provider.Load(file); err != nil {
-		return nil, err
+	scanner := &script.Scanner{}
+
+	queries := scanner.Scan(file)
+	statements, ok := queries[name]
+
+	if !ok {
+		return []string{}, fmt.Errorf("Command '%s' not found", name)
 	}
 
-	return provider, nil
-}
-
-func (r *Runner) log(text string, param ...interface{}) {
-	if r.Logger != nil {
-		r.Logger.Infof(text, param...)
-	}
+	commands := strings.Split(statements, ";")
+	return commands, nil
 }

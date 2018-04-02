@@ -1,20 +1,21 @@
 package migration
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 	"path/filepath"
 	"time"
 
-	"github.com/phogolabs/gom"
+	"github.com/jmoiron/sqlx"
 )
 
 // Provider provides all migration for given project.
 type Provider struct {
 	// Dir represents the project directory.
 	Dir string
-	// Gateway is a client to underlying database.
-	Gateway *gom.Gateway
+	// DB is a client to underlying database.
+	DB *sqlx.DB
 }
 
 // Migrations returns the project migrations.
@@ -49,11 +50,13 @@ func (m *Provider) Migrations() ([]Item, error) {
 	}
 
 	applied := []Item{}
-	query := gom.Select("id", "description", "created_at").
-		From("migrations").
-		OrderBy(gom.Order("id", gom.Asc))
 
-	if err := m.Gateway.Select(&applied, query); err != nil {
+	query := &bytes.Buffer{}
+	query.WriteString("SELECT id, description, created_at ")
+	query.WriteString("FROM migrations ")
+	query.WriteString("ORDER BY id ASC")
+
+	if err := m.DB.Select(&applied, query.String()); err != nil {
 		return []Item{}, err
 	}
 
@@ -80,14 +83,11 @@ func (m *Provider) Migrations() ([]Item, error) {
 func (m *Provider) Insert(item *Item) error {
 	item.CreatedAt = time.Now()
 
-	query := gom.Insert("migrations").
-		Set(
-			gom.Pair("id", item.Id),
-			gom.Pair("description", item.Description),
-			gom.Pair("created_at", item.CreatedAt),
-		)
+	query := &bytes.Buffer{}
+	query.WriteString("INSERT INTO migrations(id, description, created_at) ")
+	query.WriteString("VALUES (?, ?, ?)")
 
-	if _, err := m.Gateway.Exec(query); err != nil {
+	if _, err := m.DB.Exec(query.String(), item.Id, item.Description, item.CreatedAt); err != nil {
 		return err
 	}
 
@@ -96,9 +96,11 @@ func (m *Provider) Insert(item *Item) error {
 
 // Delete deletes applied migration item from migrations table.
 func (m *Provider) Delete(item *Item) error {
-	query := gom.Delete("migrations").Where(gom.Condition("id").Equal(item.Id))
+	query := &bytes.Buffer{}
+	query.WriteString("DELETE FROM migrations ")
+	query.WriteString("WHERE id = ?")
 
-	if _, err := m.Gateway.Exec(query); err != nil {
+	if _, err := m.DB.Exec(query.String(), item.Id); err != nil {
 		return err
 	}
 

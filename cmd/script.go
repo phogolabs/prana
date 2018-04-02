@@ -7,26 +7,27 @@ import (
 	"strings"
 
 	"github.com/apex/log"
+	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
 	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/script"
 	"github.com/urfave/cli"
 )
 
-// SQLCommand provides a subcommands to work with SQL scripts and their
+// SQLScript provides a subcommands to work with SQL scripts and their
 // statements.
-type SQLCommand struct {
+type SQLScript struct {
 	dir string
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
-func (m *SQLCommand) CreateCommand() cli.Command {
+func (m *SQLScript) CreateCommand() cli.Command {
 	return cli.Command{
-		Name:         "command",
+		Name:         "script",
 		Usage:        "A group of commands for generating, running, and removing SQL commands",
 		Description:  "A group of commands for generating, running, and removing SQL commands",
 		BashComplete: cli.DefaultAppComplete,
-		Before:       m.beforeEach,
+		Before:       m.before,
 		Subcommands: []cli.Command{
 			cli.Command{
 				Name:        "create",
@@ -59,8 +60,13 @@ func (m *SQLCommand) CreateCommand() cli.Command {
 	}
 }
 
-func (m *SQLCommand) beforeEach(ctx *cli.Context) error {
+func (m *SQLScript) before(ctx *cli.Context) error {
 	dir, err := os.Getwd()
+	if err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeMigration)
+	}
+
+	dir, err = filepath.Abs(dir)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
@@ -69,7 +75,7 @@ func (m *SQLCommand) beforeEach(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLCommand) create(ctx *cli.Context) error {
+func (m *SQLScript) create(ctx *cli.Context) error {
 	args := ctx.Args()
 
 	if len(args) != 1 {
@@ -82,17 +88,17 @@ func (m *SQLCommand) create(ctx *cli.Context) error {
 
 	container := strings.Replace(ctx.String("filename"), " ", "_", -1)
 	name := strings.Replace(args[0], " ", "-", -1)
-	path, err := generator.Create(container, name)
 
+	path, err := generator.Create(container, name)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
-	log.Infof("Command '%s' has been created at '%s' successfully", name, path)
+	log.Infof("Created command '%s' at '%s'", name, path)
 	return nil
 }
 
-func (m *SQLCommand) run(ctx *cli.Context) error {
+func (m *SQLScript) run(ctx *cli.Context) error {
 	args := ctx.Args()
 	params := params(ctx.StringSlice("param"))
 
@@ -102,22 +108,21 @@ func (m *SQLCommand) run(ctx *cli.Context) error {
 
 	name := args[0]
 
-	log.Infof("Running command '%s'", name)
-
-	gateway, err := gateway(ctx)
+	log.Infof("Running command '%s' from '%s'", name, m.dir)
+	db, err := open(ctx)
 	if err != nil {
 		return err
 	}
 
 	defer func() {
-		if ioErr := gateway.Close(); err == nil {
+		if ioErr := db.Close(); err == nil {
 			err = ioErr
 		}
 	}()
 
 	runner := &script.Runner{
 		Dir: m.dir,
-		DB:  gateway.DB(),
+		DB:  db,
 	}
 
 	rows := &gom.Rows{}
@@ -127,15 +132,14 @@ func (m *SQLCommand) run(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
-	if err := printTable(rows); err != nil {
+	if err := m.print(rows); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
-	log.Infof("Running command '%s' completed successfully", name)
 	return nil
 }
 
-func printTable(rows *gom.Rows) error {
+func (m *SQLScript) print(rows *sqlx.Rows) error {
 	table := tablewriter.NewWriter(os.Stdout)
 
 	columns, err := rows.Columns()
@@ -163,7 +167,12 @@ func printTable(rows *gom.Rows) error {
 		table.Append(row)
 	}
 
-	table.Render()
+	if table.NumLines() == 0 {
+		log.Info("Command does not have any rows to show")
+	} else {
+		table.Render()
+	}
+
 	return nil
 }
 

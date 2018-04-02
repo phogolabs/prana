@@ -26,7 +26,7 @@ var _ = Describe("Migration Setup", func() {
 		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
-		Eventually(session.Err).Should(gbytes.Say("The project has been configured successfully"))
+		Eventually(session.Err).Should(gbytes.Say("Created directory at"))
 
 		path := filepath.Join(cmd.Dir, "/database/migration/00060524000000_setup.sql")
 		Expect(path).To(BeARegularFile())
@@ -50,7 +50,7 @@ var _ = Describe("Migration Setup", func() {
 
 	Context("when the database is not available", func() {
 		BeforeEach(func() {
-			cmd.Args = []string{gomPath, "migration", "setup"}
+			cmd.Args = []string{gomPath, "--database-url", "wrong://database.db", "migration", "setup"}
 		})
 
 		It("returns an error", func() {

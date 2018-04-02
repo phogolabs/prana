@@ -8,8 +8,8 @@ import (
 
 	"github.com/apex/log"
 	"github.com/fatih/color"
+	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
-	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
 	"github.com/urfave/cli"
 )
@@ -17,7 +17,8 @@ import (
 // SQLCommand provides a subcommands to work with SQL migrations.
 type SQLMigration struct {
 	executor *migration.Executor
-	gateway  *gom.Gateway
+	db       *sqlx.DB
+	dir      string
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
@@ -27,8 +28,8 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 		Usage:        "A group of commands for generating, running, and reverting migrations",
 		Description:  "A group of commands for generating, running, and reverting migrations",
 		BashComplete: cli.DefaultAppComplete,
-		Before:       m.beforeEach,
-		After:        m.afterEach,
+		Before:       m.before,
+		After:        m.after,
 		Subcommands: []cli.Command{
 			cli.Command{
 				Name:        "setup",
@@ -81,27 +82,28 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 	}
 }
 
-func (m *SQLMigration) beforeEach(ctx *cli.Context) error {
+func (m *SQLMigration) before(ctx *cli.Context) error {
 	dir, err := os.Getwd()
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
 	dir = filepath.Join(dir, "/database/migration")
-	gateway, err := gateway(ctx)
+	db, err := open(ctx)
 	if err != nil {
 		return err
 	}
 
+	m.dir = dir
+	m.db = db
 	m.executor = &migration.Executor{
 		Provider: &migration.Provider{
-			Dir:     dir,
-			Gateway: gateway,
+			Dir: dir,
+			DB:  db,
 		},
 		Runner: &migration.Runner{
-			Dir:     dir,
-			Gateway: gateway,
-			Logger:  log.Log,
+			Dir: dir,
+			DB:  db,
 		},
 		Generator: &migration.Generator{
 			Dir: dir,
@@ -111,27 +113,20 @@ func (m *SQLMigration) beforeEach(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) afterEach(ctx *cli.Context) error {
-	if m.gateway == nil {
-		return nil
-	}
-
-	if err := m.gateway.Close(); err != nil {
+func (m *SQLMigration) after(ctx *cli.Context) error {
+	if err := m.db.Close(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	m.gateway = nil
 	return nil
 }
 
 func (m *SQLMigration) setup(ctx *cli.Context) error {
-	log.Info("Configuring the project")
-
 	if err := m.executor.Setup(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Info("The project has been configured successfully")
+	log.Infof("Created directory at: '%s'", m.dir)
 	return nil
 }
 
@@ -143,14 +138,12 @@ func (m *SQLMigration) create(ctx *cli.Context) error {
 	name := ctx.Args()[0]
 	name = strings.Replace(name, " ", "_", -1)
 
-	log.Infof("Creating a new migration '%s'", name)
-
 	path, err := m.executor.Create(name)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Infof("Migration '%s' has been created successfully", path)
+	log.Infof("Created migration at: '%s'", path)
 	return nil
 }
 
@@ -160,6 +153,7 @@ func (m *SQLMigration) run(ctx *cli.Context) error {
 		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
 	}
 
+	log.Infof("Running %d pending migration(s)", count)
 	if err := m.executor.Run(count); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
@@ -173,6 +167,7 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
 	}
 
+	log.Infof("Reverting %d pending migration(s)", count)
 	if err := m.executor.Revert(count); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
@@ -181,17 +176,16 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 }
 
 func (m *SQLMigration) reset(ctx *cli.Context) error {
-	log.Info("Reseting the project")
-
+	log.Info("Reverting all migrations")
 	if err := m.executor.RevertAll(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
+	log.Info("Running all pending migrations")
 	if err := m.executor.RunAll(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Info("Reseting the project completed successfully")
 	return nil
 }
 

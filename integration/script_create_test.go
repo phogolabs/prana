@@ -11,14 +11,14 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Command Create", func() {
+var _ = Describe("Script Create", func() {
 	var cmd *exec.Cmd
 
 	JustBeforeEach(func() {
 		dir, err := ioutil.TempDir("", "gom")
 		Expect(err).To(BeNil())
 
-		cmd = exec.Command(gomPath, "command", "create")
+		cmd = exec.Command(gomPath, "script", "create")
 		cmd.Dir = dir
 	})
 

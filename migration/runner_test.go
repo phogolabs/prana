@@ -7,9 +7,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
 )
 
@@ -23,13 +23,13 @@ var _ = Describe("Runner", func() {
 		dir, err := ioutil.TempDir("", "gom_runner")
 		Expect(err).To(BeNil())
 
-		db := filepath.Join(dir, "gom.db")
-		gateway, err := gom.Open("sqlite3", db)
+		conn := filepath.Join(dir, "gom.db")
+		db, err := sqlx.Open("sqlite3", conn)
 		Expect(err).To(BeNil())
 
 		runner = &migration.Runner{
-			Dir:     dir,
-			Gateway: gateway,
+			Dir: dir,
+			DB:  db,
 		}
 
 		item = &migration.Item{
@@ -46,27 +46,29 @@ var _ = Describe("Runner", func() {
 		fmt.Fprintln(query, " created_at  TIMESTAMP NOT NULL")
 		fmt.Fprintln(query, ");")
 
-		_, err := runner.Gateway.DB().Exec(query.String())
+		_, err := runner.DB.Exec(query.String())
 		Expect(err).To(BeNil())
 
 		migration := &bytes.Buffer{}
 		fmt.Fprintln(migration, "-- name: up")
-		fmt.Fprintln(migration, "CREATE TABLE test(id TEXT)")
+		fmt.Fprintln(migration, "CREATE TABLE test(id TEXT);")
+		fmt.Fprintln(migration, "CREATE TABLE test2(id TEXT);")
 		fmt.Fprintln(migration, "-- name: down")
-		fmt.Fprintln(migration, "DROP TABLE IF EXISTS test")
+		fmt.Fprintln(migration, "DROP TABLE IF EXISTS test;")
+		fmt.Fprintln(migration, "DROP TABLE IF EXISTS test2;")
 
 		path := filepath.Join(runner.Dir, item.Filename())
 		Expect(ioutil.WriteFile(path, migration.Bytes(), 0700)).To(Succeed())
 	})
 
 	AfterEach(func() {
-		runner.Gateway.Close()
+		runner.DB.Close()
 	})
 
 	Describe("Run", func() {
 		It("runs the migration successfully", func() {
 			Expect(runner.Run(item)).To(Succeed())
-			_, err := runner.Gateway.Exec(gom.Select("id").From(gom.Table("test")))
+			_, err := runner.DB.Exec("SELECT id FROM test")
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -85,7 +87,7 @@ var _ = Describe("Runner", func() {
 
 		Context("when the database is not available", func() {
 			JustBeforeEach(func() {
-				Expect(runner.Gateway.Close()).To(Succeed())
+				Expect(runner.DB.Close()).To(Succeed())
 			})
 
 			It("return an error", func() {
@@ -119,7 +121,7 @@ var _ = Describe("Runner", func() {
 	Describe("Revert", func() {
 		It("reverts the migration successfully", func() {
 			Expect(runner.Revert(item)).To(Succeed())
-			_, err := runner.Gateway.Exec(gom.Select("id").From(gom.Table("test")))
+			_, err := runner.DB.Exec("SELECT id FROM test")
 			Expect(err).To(MatchError("no such table: test"))
 		})
 
@@ -138,7 +140,7 @@ var _ = Describe("Runner", func() {
 
 		Context("when the database is not available", func() {
 			JustBeforeEach(func() {
-				Expect(runner.Gateway.Close()).To(Succeed())
+				Expect(runner.DB.Close()).To(Succeed())
 			})
 
 			It("return an error", func() {

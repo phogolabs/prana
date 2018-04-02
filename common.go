@@ -8,7 +8,10 @@ package gom
 
 import (
 	"database/sql"
+	"fmt"
 	"io"
+	"net/url"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/gom/script"
@@ -63,4 +66,22 @@ func Command(name string, params ...script.Param) *script.Cmd {
 // SQL create a new command from raw query
 func SQL(query string, params ...script.Param) *script.Cmd {
 	return script.SQL(query, params...)
+}
+
+// ParseURL parses a URL and returns the database driver and connection string to the database
+func ParseURL(conn string) (string, string, error) {
+	uri, err := url.Parse(conn)
+	if err != nil {
+		return "", "", err
+	}
+
+	driver := strings.ToLower(uri.Scheme)
+
+	switch driver {
+	case "mysql", "sqlite3":
+		source := strings.Replace(conn, fmt.Sprintf("%s://", driver), "", -1)
+		return driver, source, nil
+	default:
+		return driver, conn, nil
+	}
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Command Run", func() {
+var _ = Describe("Script Run", func() {
 	var (
 		cmd *exec.Cmd
 		db  *sql.DB
@@ -42,7 +42,7 @@ var _ = Describe("Command Run", func() {
 		path := filepath.Join(cmd.Dir, "/database/command/20060102150405.sql")
 		Expect(ioutil.WriteFile(path, script.Bytes(), 0700)).To(Succeed())
 
-		cmd = exec.Command(gomPath, append(args, "command", "run")...)
+		cmd = exec.Command(gomPath, append(args, "script", "run")...)
 		cmd.Dir = dir
 
 		db, err = sql.Open("sqlite3", filepath.Join(dir, "gom.db"))
@@ -60,7 +60,6 @@ var _ = Describe("Command Run", func() {
 		Eventually(session).Should(gexec.Exit(0))
 
 		Expect(session.Err).To(gbytes.Say("Running command 'show-migrations'"))
-		Expect(session.Err).To(gbytes.Say("Running command 'show-migrations' completed"))
 	})
 
 	Context("when the database is not available", func() {

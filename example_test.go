@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/phogolabs/gom"
+	lk "github.com/ulule/loukoum"
 )
 
 type User struct {
@@ -25,9 +26,9 @@ func ExampleGatewaySelectOne() {
 		}
 	}()
 
-	query := gom.Select("id", "first_name", "last_name").
+	query := lk.Select("id", "first_name", "last_name").
 		From("users").
-		Where(gom.Condition("first_name").Equal("John"))
+		Where(lk.Condition("first_name").Equal("John"))
 
 	user := User{}
 	if err := gateway.SelectOne(&user, query); err != nil {
@@ -48,7 +49,7 @@ func ExampleGatewaySelect() {
 		}
 	}()
 
-	query := gom.Select("id", "first_name", "last_name").From("users")
+	query := lk.Select("id", "first_name", "last_name").From("users")
 	users := []User{}
 
 	if err := gateway.Select(&users, query); err != nil {
@@ -69,9 +70,9 @@ func ExampleGatewayQueryRow() {
 		}
 	}()
 
-	query := gom.Select("id", "first_name", "last_name").
+	query := lk.Select("id", "first_name", "last_name").
 		From("users").
-		Where(gom.Condition("first_name").Equal("John"))
+		Where(lk.Condition("first_name").Equal("John"))
 
 	var row *gom.Row
 
@@ -100,7 +101,7 @@ func ExampleGatewayQuery() {
 		}
 	}()
 
-	query := gom.Select("id", "first_name", "last_name").From("users")
+	query := lk.Select("id", "first_name", "last_name").From("users")
 	rows, err := gateway.Query(query)
 
 	if err != nil {
@@ -135,10 +136,10 @@ func ExampleGatewayExec() {
 		}
 	}()
 
-	query := gom.Insert("users").
+	query := lk.Insert("users").
 		Set(
-			gom.Pair("first_name", "John"),
-			gom.Pair("last_name", "Doe"),
+			lk.Pair("first_name", "John"),
+			lk.Pair("last_name", "Doe"),
 		).
 		Returning("id")
 

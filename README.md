@@ -23,9 +23,14 @@ The GOM Gateway gets advantage by using internally [sqlx][sqlx-url].
 
 ### SQL Queries with Loukoum
 
-The `GOM` has aliases to [loukoum][loukoum-url] in order
-to simplify your imports. It provides a database wrapper API to work with any
-loukoum built queries.
+Before working with loukoum and gom, you should import the desired packages:
+
+```golang
+import (
+  lk "github.com/ulule/loukoum"
+  "github.com/phogolabs/gom"
+)
+```
 
 Let's assume that we have the following model and database:
 
@@ -49,10 +54,11 @@ if err != nil {
 #### Insert a new record
 
 ```golang
-query := gom.Insert("users").
+
+query := lk.Insert("users").
 	Set(
-		gom.Pair("first_name", "John"),
-		gom.Pair("last_name", "Doe"),
+		lk.Pair("first_name", "John"),
+		lk.Pair("last_name", "Doe"),
 	)
 
 if _, err := gateway.Exec(query); err != nil {
@@ -63,7 +69,7 @@ if _, err := gateway.Exec(query); err != nil {
 #### Select all records
 
 ```golang
-query := gom.Select("id", "first_name", "last_name").From("users")
+query := lk.Select("id", "first_name", "last_name").From("users")
 users := []User{}
 
 if err := gateway.Select(&users, query); err != nil {
@@ -74,7 +80,7 @@ if err := gateway.Select(&users, query); err != nil {
 #### Select a record
 
 ```golang
-query := gom.Select("id", "first_name", "last_name").
+query := lk.Select("id", "first_name", "last_name").
 	From("users").
 	Where(gom.Condition("first_name").Equal("John"))
 
@@ -85,7 +91,7 @@ if err := gateway.SelectOne(&user, query); err != nil {
 }
 ```
 
-### SQL Commands
+### SQL Scripts and Commands
 
 Also, it provides a way to work with SQL scripts by exposing them as GOM
 Commands. First of all you have create a script that contains your SQL
@@ -95,7 +101,7 @@ The easies way to generate a SQL script with correct format is by using `gom`
 command line interface:
 
 ```console
-$ gom command create show-sqlite-master
+$ gom script create show-sqlite-master
 ```
 
 The command above will generate a script in your `$PWD/database/command`;
@@ -123,7 +129,7 @@ body.
 Then you can use the `gom` command line interface to execute the command:
 
 ```console
-$ gom command run show-sqlite-master
+$ gom script run show-sqlite-master
 
 Running command 'show-sqlite-master'
 +-------+-------------------------------+----------+
@@ -206,6 +212,58 @@ If you want to rollback the migration you have to revert it:
 ```console
 $ gom migration revert
 ```
+
+## SQL Schema and Model Generation
+
+You can use the `gom` command line interface to generate a package that
+contains entities that maps to your database schema.
+
+For that purpose you should call the following subcommand:
+
+```bash
+$ gom schema sync
+```
+
+By default the command will place the entities in single `model.go` file in
+`$PWD/database/model` package for the default database schema. You can print
+the entities without generating a package by executing the following command:
+
+```bash
+$ gom schema sync
+```
+
+Note that you can specify the desired schema or tables by providing the correct
+arguments.
+
+### Command Line Interface Advance Usage
+
+By default the CLI work with `sqlite3` database called `gom.db` at your current
+directory.
+
+GOM supports:
+
+- PostgreSQL
+- MySQL
+- SQLite
+
+If you want to change the default connection, you can pass it via command line
+argument:
+
+```bash
+$ gom --database-url mysql://root@./gom_demo [command]
+```
+
+GOM uses a URL schema to determines the right database driver. If you want to
+pass the connection string via environment variable, you should export
+`GOM_DB_URL`.
+
+For more information, how you can change the default behavior you can read the
+help documentation by executing:
+
+```bash
+$ gom -h
+```
+
 ## Contributing
 
 We are welcome to any contributions. Just fork the

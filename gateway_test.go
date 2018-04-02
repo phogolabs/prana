@@ -6,6 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	lk "github.com/ulule/loukoum"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/phogolabs/gom"
@@ -61,7 +62,7 @@ var _ = Describe("Gateway", func() {
 
 		Describe("Select", func() {
 			It("executes a query successfully", func() {
-				query := gom.Select("first_name", "last_name", "email").From("users")
+				query := lk.Select("first_name", "last_name", "email").From("users")
 
 				persons := []Person{}
 				Expect(db.Select(&persons, query)).To(Succeed())
@@ -73,7 +74,7 @@ var _ = Describe("Gateway", func() {
 
 			Context("when the query fails", func() {
 				It("returns an error", func() {
-					query := gom.Select("name").From("categories")
+					query := lk.Select("name").From("categories")
 
 					persons := []Person{}
 					Expect(db.Select(&persons, query)).To(MatchError("no such table: categories"))
@@ -111,7 +112,7 @@ var _ = Describe("Gateway", func() {
 
 		Describe("SelectOne", func() {
 			It("executes a query successfully", func() {
-				query := gom.Select("first_name", "last_name", "email").From("users")
+				query := lk.Select("first_name", "last_name", "email").From("users")
 
 				person := Person{}
 				Expect(db.SelectOne(&person, query)).To(Succeed())
@@ -119,7 +120,7 @@ var _ = Describe("Gateway", func() {
 
 			Context("when the query fails", func() {
 				It("returns an error", func() {
-					query := gom.Select("name").From("categories")
+					query := lk.Select("name").From("categories")
 
 					person := Person{}
 					Expect(db.SelectOne(&person, query)).To(MatchError("no such table: categories"))
@@ -129,7 +130,7 @@ var _ = Describe("Gateway", func() {
 
 		Describe("Query", func() {
 			It("executes a query successfully", func() {
-				query := gom.Select("first_name", "last_name", "email").From("users")
+				query := lk.Select("first_name", "last_name", "email").From("users")
 
 				var (
 					firstName string
@@ -152,7 +153,7 @@ var _ = Describe("Gateway", func() {
 
 			Context("when the query fails", func() {
 				It("returns an error", func() {
-					query := gom.Select("name").From("categories")
+					query := lk.Select("name").From("categories")
 
 					rows, err := db.Query(query)
 					Expect(err).To(MatchError("no such table: categories"))
@@ -163,7 +164,7 @@ var _ = Describe("Gateway", func() {
 
 		Describe("QueryRow", func() {
 			It("executes a query successfully", func() {
-				query := gom.Select("first_name", "last_name", "email").From("users")
+				query := lk.Select("first_name", "last_name", "email").From("users")
 
 				row, err := db.QueryRow(query)
 				Expect(err).To(BeNil())
@@ -183,7 +184,7 @@ var _ = Describe("Gateway", func() {
 
 			Context("when the query fails", func() {
 				It("returns an error", func() {
-					query := gom.Select("name").From("categories")
+					query := lk.Select("name").From("categories")
 
 					row, err := db.QueryRow(query)
 					Expect(err).To(MatchError("no such table: categories"))
@@ -194,7 +195,7 @@ var _ = Describe("Gateway", func() {
 
 		Describe("Exec", func() {
 			It("executes a query successfully", func() {
-				query := gom.Delete("users")
+				query := lk.Delete("users")
 
 				_, err := db.Exec(query)
 				Expect(err).To(Succeed())
@@ -208,7 +209,7 @@ var _ = Describe("Gateway", func() {
 
 			Context("when the query fails", func() {
 				It("returns an error", func() {
-					query := gom.Delete("categories")
+					query := lk.Delete("categories")
 					_, err := db.Exec(query)
 					Expect(err).To(MatchError("no such table: categories"))
 				})

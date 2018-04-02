@@ -4,12 +4,12 @@ package cmd
 import (
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"strings"
 
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/json"
+	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/gom"
 	"github.com/urfave/cli"
 )
@@ -21,6 +21,8 @@ const (
 	ErrCodeMigration = 103
 	// ErrCodeCommand when the SQL command operation fails.
 	ErrCodeCommand = 104
+	// ErrCodeSchema when the SQL schema operation fails.
+	ErrCodeSchema = 105
 )
 
 type logHandler struct {
@@ -49,21 +51,16 @@ func BeforeEach(ctx *cli.Context) error {
 	return nil
 }
 
-func gateway(ctx *cli.Context) (*gom.Gateway, error) {
-	conn := ctx.GlobalString("database-url")
-
-	uri, err := url.Parse(conn)
+func open(ctx *cli.Context) (*sqlx.DB, error) {
+	driver, conn, err := gom.ParseURL(ctx.GlobalString("database-url"))
 	if err != nil {
 		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 
-	driver := uri.Scheme
-	source := strings.Replace(conn, fmt.Sprintf("%s://", driver), "", -1)
-
-	gateway, err := gom.Open(driver, source)
+	db, err := sqlx.Open(driver, conn)
 	if err != nil {
 		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 
-	return gateway, nil
+	return db, nil
 }

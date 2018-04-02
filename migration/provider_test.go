@@ -8,9 +8,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
 )
 
@@ -21,13 +21,13 @@ var _ = Describe("Provider", func() {
 		dir, err := ioutil.TempDir("", "gom_runner")
 		Expect(err).To(BeNil())
 
-		db := filepath.Join(dir, "gom.db")
-		gateway, err := gom.Open("sqlite3", db)
+		conn := filepath.Join(dir, "gom.db")
+		db, err := sqlx.Open("sqlite3", conn)
 		Expect(err).To(BeNil())
 
 		provider = &migration.Provider{
-			Dir:     dir,
-			Gateway: gateway,
+			Dir: dir,
+			DB:  db,
 		}
 	})
 
@@ -39,24 +39,19 @@ var _ = Describe("Provider", func() {
 		fmt.Fprintln(query, " created_at  TIMESTAMP NOT NULL")
 		fmt.Fprintln(query, ");")
 
-		_, err := provider.Gateway.DB().Exec(query.String())
+		_, err := provider.DB.Exec(query.String())
 		Expect(err).To(BeNil())
 
 		path := filepath.Join(provider.Dir, "20060102150405_schema.sql")
 		Expect(ioutil.WriteFile(path, []byte{}, 0700)).To(Succeed())
 
-		insert := gom.Insert("migrations").Set(
-			gom.Pair("id", "20060102150405"),
-			gom.Pair("description", "schema"),
-			gom.Pair("created_at", time.Now()),
-		)
-
-		_, err = provider.Gateway.Exec(insert)
+		insert := "INSERT INTO migrations(id, description, created_at) VALUES(?,?,?)"
+		_, err = provider.DB.Exec(insert, "20060102150405", "schema", time.Now())
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	AfterEach(func() {
-		provider.Gateway.Close()
+		provider.DB.Close()
 	})
 
 	Describe("Insert", func() {
@@ -69,9 +64,9 @@ var _ = Describe("Provider", func() {
 			Expect(provider.Insert(&item)).To(Succeed())
 
 			items := []migration.Item{}
-			query := gom.Select().From("migrations").OrderBy(gom.Order("id", gom.Asc))
+			query := "SELECT * FROM migrations ORDER BY id ASC"
 
-			Expect(provider.Gateway.Select(&items, query)).To(Succeed())
+			Expect(provider.DB.Select(&items, query)).To(Succeed())
 			Expect(items).To(HaveLen(2))
 
 			Expect(items[0].Id).To(Equal("20060102150405"))
@@ -83,7 +78,7 @@ var _ = Describe("Provider", func() {
 
 		Context("when the database is not available", func() {
 			JustBeforeEach(func() {
-				Expect(provider.Gateway.Close()).To(Succeed())
+				Expect(provider.DB.Close()).To(Succeed())
 			})
 
 			It("returns an error", func() {
@@ -104,15 +99,15 @@ var _ = Describe("Provider", func() {
 			Expect(provider.Delete(&item)).To(Succeed())
 
 			items := []migration.Item{}
-			query := gom.Select().From("migrations")
+			query := "SELECT * FROM migrations"
 
-			Expect(provider.Gateway.Select(&items, query)).To(Succeed())
+			Expect(provider.DB.Select(&items, query)).To(Succeed())
 			Expect(items).To(BeEmpty())
 		})
 
 		Context("when the database is not available", func() {
 			JustBeforeEach(func() {
-				Expect(provider.Gateway.Close()).To(Succeed())
+				Expect(provider.DB.Close()).To(Succeed())
 			})
 
 			It("returns an error", func() {
@@ -175,7 +170,7 @@ var _ = Describe("Provider", func() {
 
 		Context("when the database is not available", func() {
 			JustBeforeEach(func() {
-				Expect(provider.Gateway.Close()).To(Succeed())
+				Expect(provider.DB.Close()).To(Succeed())
 			})
 
 			It("returns an error", func() {
