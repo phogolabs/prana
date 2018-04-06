@@ -6,6 +6,9 @@ services:
   - postgresql
   - mysql
 
+addons:
+  postgresql: "9.4"
+
 before_script:
   - mysql -e 'CREATE DATABASE gom;'
   - psql -c 'CREATE DATABASE gom;' -U postgres
