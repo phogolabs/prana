@@ -49,7 +49,7 @@ func main() {
 		HelpName:             "gom",
 		Usage:                "Golang Object Mapper",
 		UsageText:            "gom [global options]",
-		Version:              "0.1",
+		Version:              "1.0",
 		BashComplete:         cli.DefaultAppComplete,
 		EnableBashCompletion: true,
 		Writer:               os.Stdout,
