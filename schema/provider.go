@@ -167,7 +167,7 @@ type SQLiteProvider struct {
 func (m *SQLiteProvider) Tables(schema string) ([]string, error) {
 	tables := []string{}
 
-	rows, err := m.DB.Query("SELECT tbl_name FROM sqlite_master", schema)
+	rows, err := m.DB.Query("SELECT DISTINCT tbl_name FROM sqlite_master ORDER BY tbl_name")
 	if err != nil {
 		return tables, err
 	}
@@ -236,6 +236,7 @@ func (m *SQLiteProvider) Schema(schema string, names ...string) (*Schema, error)
 	}
 
 	schemaDef := &Schema{
+		Name:      "default",
 		Tables:    tables,
 		IsDefault: true,
 	}

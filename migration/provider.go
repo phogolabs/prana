@@ -81,6 +81,18 @@ func (m *Provider) Migrations() ([]Item, error) {
 
 // Insert inserts exectued migration item in the migrations table.
 func (m *Provider) Insert(item *Item) error {
+	rows, err := m.DB.Query("SELECT id FROM migrations WHERE id = ?", item.Id)
+
+	if err != nil {
+		return err
+	}
+
+	defer rows.Close()
+
+	if rows.Next() {
+		return nil
+	}
+
 	item.CreatedAt = time.Now()
 
 	query := &bytes.Buffer{}

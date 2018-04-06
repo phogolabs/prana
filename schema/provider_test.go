@@ -417,7 +417,7 @@ var _ = Describe("SQLiteProvider", func() {
 			schema, err := provider.Schema("", "test")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(schema).NotTo(BeNil())
-			Expect(schema.Name).To(BeEmpty())
+			Expect(schema.Name).To(Equal("default"))
 			Expect(schema.Tables).To(HaveLen(1))
 
 			table := schema.Tables[0]

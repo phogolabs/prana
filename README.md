@@ -195,7 +195,7 @@ CREATE TABLE users (
   id INT PRIMARY KEY,
   first_name TEXT,
   last_name TEXT
-)
+);
 
 -- name: down
 DROP TABLE IF EXISTS users;
@@ -213,7 +213,9 @@ If you want to rollback the migration you have to revert it:
 $ gom migration revert
 ```
 
-## SQL Schema and Model Generation
+## SQL Schema and Code Generation
+
+Let's assume that we want to generate a mode for the `users` table.
 
 You can use the `gom` command line interface to generate a package that
 contains entities that maps to your database schema.
@@ -225,15 +227,33 @@ $ gom schema sync
 ```
 
 By default the command will place the entities in single `model.go` file in
-`$PWD/database/model` package for the default database schema. You can print
-the entities without generating a package by executing the following command:
+`$PWD/database/model` package for the default database schema.
+
+You can print the entities without generating a package by executing the
+following command:
 
 ```bash
-$ gom schema sync
+$ gom schema print
 ```
 
 Note that you can specify the desired schema or tables by providing the correct
 arguments.
+
+The entity representation of the users table is:
+
+```golang
+// User represents a data base table 'users' from 'default' schema
+type User struct {
+	// Id represents a database column 'id' of type 'INT NULL'
+	Id null.Int `db:"id" json:"id"`
+
+	// FirstName represents a database column 'first_name' of type 'TEXT NULL'
+	FirstName null.String `db:"first_name" json:"first_name"`
+
+	// LastName represents a database column 'last_name' of type 'TEXT NULL'
+	LastName null.String `db:"last_name" json:"last_name"`
+}
+```
 
 ### Command Line Interface Advance Usage
 

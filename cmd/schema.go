@@ -93,7 +93,7 @@ func (m *SQLSchema) before(ctx *cli.Context) error {
 		Provider: provider,
 		Composer: &schema.Generator{
 			Config: &schema.GeneratorConfig{
-				InlcudeDoc: ctx.GlobalBoolT("include-docs"),
+				InlcudeDoc: ctx.BoolT("include-docs"),
 			},
 		},
 	}

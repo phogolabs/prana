@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"time"
 )
@@ -86,4 +87,10 @@ func Parse(path string) (*Item, error) {
 		Id:          parts[0],
 		Description: parts[1],
 	}, nil
+}
+
+// IsMigrationExistErr returns true, if the error is migration already exists
+func IsMigrationExistErr(err error) bool {
+	pattern := regexp.MustCompile(`Migration '[\W\w]+' already exists`)
+	return pattern.MatchString(err.Error())
 }

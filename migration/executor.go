@@ -26,7 +26,7 @@ func (m *Executor) Setup() error {
 	}
 
 	up := &bytes.Buffer{}
-	fmt.Fprintln(up, "CREATE TABLE migrations (")
+	fmt.Fprintln(up, "CREATE TABLE IF NOT EXISTS migrations (")
 	fmt.Fprintln(up, " id          TEXT      NOT NULL PRIMARY KEY,")
 	fmt.Fprintln(up, " description TEXT      NOT NULL,")
 	fmt.Fprintln(up, " created_at  TIMESTAMP NOT NULL")
@@ -40,7 +40,9 @@ func (m *Executor) Setup() error {
 	}
 
 	if err := m.Generator.Write(migration, content); err != nil {
-		return err
+		if !IsMigrationExistErr(err) {
+			return err
+		}
 	}
 
 	if err := m.Runner.Run(migration); err != nil {

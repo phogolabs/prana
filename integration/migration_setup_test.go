@@ -26,7 +26,7 @@ var _ = Describe("Migration Setup", func() {
 		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
-		Eventually(session.Err).Should(gbytes.Say("Created directory at"))
+		Eventually(session.Err).Should(gbytes.Say("Setup project directory at"))
 
 		path := filepath.Join(cmd.Dir, "/database/migration/00060524000000_setup.sql")
 		Expect(path).To(BeARegularFile())
@@ -42,9 +42,9 @@ var _ = Describe("Migration Setup", func() {
 			Eventually(session).Should(gexec.Exit(0))
 
 			session, err = gexec.Start(setupCmd, GinkgoWriter, GinkgoWriter)
-			Eventually(session).Should(gexec.Exit(103))
+			Eventually(session).Should(gexec.Exit(0))
 
-			Expect(session.Err).To(gbytes.Say("/database/migration/00060524000000_setup.sql' already exists"))
+			Expect(session.Err).Should(gbytes.Say("Setup project directory at"))
 		})
 	})
 

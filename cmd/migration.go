@@ -126,7 +126,7 @@ func (m *SQLMigration) setup(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Infof("Created directory at: '%s'", m.dir)
+	log.Infof("Setup project directory at: '%s'", m.dir)
 	return nil
 }
 

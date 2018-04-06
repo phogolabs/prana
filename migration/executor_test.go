@@ -49,7 +49,7 @@ var _ = Describe("Executor", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			up := &bytes.Buffer{}
-			fmt.Fprintln(up, "CREATE TABLE migrations (")
+			fmt.Fprintln(up, "CREATE TABLE IF NOT EXISTS migrations (")
 			fmt.Fprintln(up, " id          TEXT      NOT NULL PRIMARY KEY,")
 			fmt.Fprintln(up, " description TEXT      NOT NULL,")
 			fmt.Fprintln(up, " created_at  TIMESTAMP NOT NULL")
