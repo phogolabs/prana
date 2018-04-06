@@ -35,7 +35,8 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 	}
 
 	if g.Config.InlcudeDoc {
-		fmt.Fprintln(buffer, "// Package contains an object model of database schema")
+		fmt.Fprintf(buffer, "// Package contains an object model of database schema '%s'", schema.Name)
+		fmt.Fprintln(buffer)
 		fmt.Fprintln(buffer, "// Auto-generated at", time.Now().Format(time.UnixDate))
 	}
 
@@ -44,13 +45,17 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 	fmt.Fprintln(buffer)
 
 	for _, table := range schema.Tables {
+		if table.Name == "migrations" {
+			continue
+		}
+
 		columns := table.Columns
 		length := len(columns)
 		typeName := g.tableName(&table)
 
 		if g.Config.InlcudeDoc {
 			fmt.Fprintln(buffer)
-			fmt.Fprintf(buffer, "// %s represents a data base table '%s' from '%s' schema", typeName, table.Name, schema.Name)
+			fmt.Fprintf(buffer, "// %s represents a data base table '%s'", typeName, table.Name)
 			fmt.Fprintln(buffer)
 		}
 

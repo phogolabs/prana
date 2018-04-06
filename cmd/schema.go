@@ -3,7 +3,6 @@ package cmd
 import (
 	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
@@ -127,13 +126,6 @@ func (m *SQLSchema) sync(ctx *cli.Context) error {
 		Dir:    ctx.GlobalString("schema-dir"),
 		Schema: ctx.GlobalString("schema-name"),
 	}
-
-	dir, err := filepath.Abs(spec.Dir)
-	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeSchema)
-	}
-
-	log.Infof("Syncing schema with directory '%s", dir)
 
 	path, err := m.executor.Create(spec)
 	if err != nil {

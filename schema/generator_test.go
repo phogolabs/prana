@@ -77,7 +77,7 @@ var _ = Describe("Generator", func() {
 
 			source := string(data)
 			Expect(source).To(ContainSubstring("// ID represents a database column 'ID' of type ' NOT NULL'"))
-			Expect(source).To(ContainSubstring("// Table1 represents a data base table 'table1' from 'schema' schema"))
+			Expect(source).To(ContainSubstring("// Table1 represents a data base table 'table1'"))
 		})
 	})
 
