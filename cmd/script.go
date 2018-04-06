@@ -71,7 +71,7 @@ func (m *SQLScript) before(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	m.dir = filepath.Join(dir, "/database/command")
+	m.dir = filepath.Join(dir, "/database/script")
 	return nil
 }
 

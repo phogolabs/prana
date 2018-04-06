@@ -28,7 +28,7 @@ var _ = Describe("Script Create", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
 
-		path := filepath.Join(cmd.Dir, "/database/command/commands.sql")
+		path := filepath.Join(cmd.Dir, "/database/script/commands.sql")
 		Expect(path).To(BeARegularFile())
 
 		data, err := ioutil.ReadFile(path)
@@ -45,7 +45,7 @@ var _ = Describe("Script Create", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
 
-			path := filepath.Join(cmd.Dir, "/database/command/commands.sql")
+			path := filepath.Join(cmd.Dir, "/database/script/commands.sql")
 			Expect(path).To(BeARegularFile())
 
 			data, err := ioutil.ReadFile(path)
@@ -63,7 +63,7 @@ var _ = Describe("Script Create", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
 
-			path := filepath.Join(cmd.Dir, "/database/command/my_commands.sql")
+			path := filepath.Join(cmd.Dir, "/database/script/my_commands.sql")
 			Expect(path).To(BeARegularFile())
 
 			data, err := ioutil.ReadFile(path)

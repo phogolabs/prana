@@ -104,13 +104,13 @@ command line interface:
 $ gom script create show-sqlite-master
 ```
 
-The command above will generate a script in your `$PWD/database/command`;
+The command above will generate a script in your `$PWD/database/script`;
 
 ```console
 $ tree database/
 
 database/
-└── command
+└── script
     └── 20180328184257.sql
 ```
 
@@ -144,7 +144,7 @@ Running command 'show-sqlite-master' completed successfully
 You can run the command by using the `Gateway API` as well:
 
 ```golang
-err := gom.LoadDir("./database/command")
+err := gom.LoadDir("./database/script")
 
 if err != nil {
 	return err
