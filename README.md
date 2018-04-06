@@ -284,6 +284,10 @@ help documentation by executing:
 $ gom -h
 ```
 
+### Example
+
+You can check our [Getting Started Example](/example).
+
 ## Contributing
 
 We are welcome to any contributions. Just fork the
