@@ -192,8 +192,8 @@ The `20180329162010_schema.sql` migration has similar to example below format:
 
 -- name: up
 CREATE TABLE users (
-  id INT PRIMARY KEY,
-  first_name TEXT,
+  id INT PRIMARY KEY NOT NULL,
+  first_name TEXT NOT NULL,
   last_name TEXT
 );
 
@@ -218,7 +218,7 @@ $ gom migration revert
 Let's assume that we want to generate a mode for the `users` table.
 
 You can use the `gom` command line interface to generate a package that
-contains entities that maps to your database schema.
+contains Golang structs, which represents each table from the desired schema.
 
 For that purpose you should call the following subcommand:
 
@@ -226,10 +226,10 @@ For that purpose you should call the following subcommand:
 $ gom schema sync
 ```
 
-By default the command will place the entities in single `model.go` file in
+By default the command will place the generated code in single `model.go` file in
 `$PWD/database/model` package for the default database schema.
 
-You can print the entities without generating a package by executing the
+You can print the source code without generating a package by executing the
 following command:
 
 ```bash
@@ -277,16 +277,16 @@ GOM uses a URL schema to determines the right database driver. If you want to
 pass the connection string via environment variable, you should export
 `GOM_DB_URL`.
 
+### Example
+
+You can check our [Getting Started Example](/example).
+
 For more information, how you can change the default behavior you can read the
 help documentation by executing:
 
 ```bash
 $ gom -h
 ```
-
-### Example
-
-You can check our [Getting Started Example](/example).
 
 ## Contributing
 
