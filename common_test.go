@@ -25,15 +25,10 @@ var _ = Describe("Command", func() {
 	It("returns a command", func() {
 		stmt := gom.Command(script)
 		Expect(stmt).NotTo(BeNil())
-		Expect(stmt.Params).To(BeEmpty())
-		Expect(stmt.Query).To(Equal("SELECT * FROM users"))
-	})
 
-	It("returns a command with params", func() {
-		stmt := gom.Command(script, 1)
-		Expect(stmt).NotTo(BeNil())
-		Expect(stmt.Params).To(ContainElement(1))
-		Expect(stmt.Query).To(Equal("SELECT * FROM users"))
+		query, params := stmt.Prepare()
+		Expect(query).To(Equal("SELECT * FROM users"))
+		Expect(params).To(BeEmpty())
 	})
 
 	Context("when the statement does not exits", func() {

@@ -8,11 +8,7 @@ import (
 
 var _ = Describe("Command", func() {
 	It("prepares the command correctly", func() {
-		stmt := &script.Cmd{
-			Query:  "SELECT * FROM users WHERE id = ?",
-			Params: []script.Param{1},
-		}
-
+		stmt := script.SQL("SELECT * FROM users WHERE id = ?", 1)
 		query, params := stmt.Prepare()
 		Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg0"))
 		Expect(params).To(HaveKeyWithValue("arg0", 1))

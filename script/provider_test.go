@@ -34,7 +34,8 @@ var _ = Describe("Provider", func() {
 			cmd, err := provider.Command("up")
 			Expect(err).To(BeNil())
 
-			Expect(cmd.Query).To(Equal("SELECT * FROM users;"))
+			query, _ := cmd.Prepare()
+			Expect(query).To(Equal("SELECT * FROM users;"))
 		})
 
 		Context("when the statement are duplicated", func() {
@@ -74,7 +75,8 @@ var _ = Describe("Provider", func() {
 			cmd, err := provider.Command("up")
 			Expect(err).To(BeNil())
 
-			Expect(cmd.Query).To(Equal("SELECT * FROM users;"))
+			query, _ := cmd.Prepare()
+			Expect(query).To(Equal("SELECT * FROM users;"))
 		})
 
 		Context("when the statement are duplicated", func() {
@@ -104,16 +106,30 @@ var _ = Describe("Provider", func() {
 			stmt, err := provider.Command("up")
 			Expect(err).To(BeNil())
 			Expect(stmt).NotTo(BeNil())
-			Expect(stmt.Params).To(BeEmpty())
-			Expect(stmt.Query).To(Equal("SELECT * FROM users"))
+
+			query, params := stmt.Prepare()
+			Expect(params).To(BeEmpty())
+			Expect(query).To(Equal("SELECT * FROM users"))
 		})
 
-		It("returns a command with params", func() {
-			stmt, err := provider.Command("up", 1)
-			Expect(err).To(BeNil())
-			Expect(stmt).NotTo(BeNil())
-			Expect(stmt.Params).To(ContainElement(1))
-			Expect(stmt.Query).To(Equal("SELECT * FROM users"))
+		Context("when the command has arguments", func() {
+			BeforeEach(func() {
+				buffer := bytes.NewBufferString("-- name: show-users")
+				fmt.Fprintln(buffer)
+				fmt.Fprintln(buffer, "SELECT * FROM users WHERE id = ?")
+
+				Expect(provider.Load(buffer)).To(Succeed())
+			})
+
+			It("returns a command with params", func() {
+				stmt, err := provider.Command("show-users", 1)
+				Expect(err).To(BeNil())
+				Expect(stmt).NotTo(BeNil())
+
+				query, params := stmt.Prepare()
+				Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg0"))
+				Expect(params).To(HaveKeyWithValue("arg0", 1))
+			})
 		})
 
 		Context("when not statements are found", func() {

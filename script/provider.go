@@ -80,8 +80,8 @@ func (p *Provider) Command(name string, params ...Param) (*Cmd, error) {
 
 	if query, ok := p.repository[name]; ok {
 		return &Cmd{
-			Query:  query,
-			Params: params,
+			query:  query,
+			params: params,
 		}, nil
 	}
 

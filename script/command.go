@@ -8,22 +8,26 @@ import (
 
 // Cme represents a single command from SQL script.
 type Cmd struct {
-	Query  string
-	Params []Param
+	query  string
+	params []Param
 }
 
 // Prepare prepares the command for execution.
 func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
-	query := cmd.Query
+	query := cmd.query
 	params := make(map[string]interface{})
 	buffer := &bytes.Buffer{}
 
 	var i, j int
 
 	for i = strings.Index(query, "?"); i != -1; i = strings.Index(query, "?") {
+		if j >= len(cmd.params) {
+			return "", nil
+		}
+
 		name := fmt.Sprintf("arg%d", j)
 		part := fmt.Sprintf("%s:%s", query[:i], name)
-		params[name] = cmd.Params[j]
+		params[name] = cmd.params[j]
 
 		if _, err := buffer.WriteString(part); err != nil {
 			return "", nil
@@ -44,7 +48,7 @@ func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
 // SQL create a new command from raw query
 func SQL(query string, params ...Param) *Cmd {
 	return &Cmd{
-		Query:  query,
-		Params: params,
+		query:  query,
+		params: params,
 	}
 }

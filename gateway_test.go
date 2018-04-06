@@ -84,10 +84,7 @@ var _ = Describe("Gateway", func() {
 
 			Context("when an embedded statement is used", func() {
 				It("executes a query successfully", func() {
-					query := &script.Cmd{
-						Query:  "SELECT * FROM users WHERE first_name = ?",
-						Params: []script.Param{"John"},
-					}
+					query := script.SQL("SELECT * FROM users WHERE first_name = ?", "John")
 
 					persons := []Person{}
 					Expect(db.Select(&persons, query)).To(Succeed())
@@ -99,9 +96,8 @@ var _ = Describe("Gateway", func() {
 
 				Context("when the query does not exist", func() {
 					It("returns an error", func() {
-						query := &script.Cmd{
-							Query: "SELECT * FROM categories",
-						}
+						query := script.SQL("SELECT * FROM categories")
+
 						persons := []Person{}
 						Expect(db.Select(&persons, query)).To(MatchError("no such table: categories"))
 						Expect(persons).To(BeEmpty())
