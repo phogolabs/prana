@@ -4,6 +4,7 @@ In order to run the example, you should first setup the database by using GOM CL
 
 ```bash
 $ gom migration setup
+$ gom migration run
 ```
 
 Then you can run the project by executing the `main.go`:
