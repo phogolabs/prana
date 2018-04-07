@@ -17,6 +17,23 @@ import (
 	"github.com/phogolabs/gom/script"
 )
 
+// Query represents an SQL Query that can be executed by Gateway.
+type Query interface {
+	// Prepare prepares the query for execution. It returns the actual query and
+	// a maps of its arguments.
+	Prepare() (string, map[string]interface{})
+}
+
+// Preparer prepares query for execution
+type Preparer interface {
+	// PrepareNamed returns a prepared named statement
+	PrepareNamed(query string) (*NamedStmt, error)
+}
+
+// NamedStmt is a prepared statement that executes named queries.  Prepare it
+// how you would execute a NamedQuery, but pass in a struct or map when executing.
+type NamedStmt = sqlx.NamedStmt
+
 // Entity is a destination object for given select operation.
 type Entity = interface{}
 
