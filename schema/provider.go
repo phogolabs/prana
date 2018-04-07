@@ -120,33 +120,26 @@ func (m *PostgreSQLProvider) nameOf(schema string) string {
 }
 
 func (m *PostgreSQLProvider) translate(columnType *ColumnType) string {
-	fType := "interface{}"
 	name := strings.Replace(strings.ToLower(columnType.Name), `"`, "", -1)
 
 	switch name {
 	case "user-defined":
-		fType = m.userDefType(columnType)
+		return m.userDefType(columnType)
 	default:
-		fType = translate(columnType)
+		return translate(columnType)
 	}
-
-	return fType
 }
 
 func (m *PostgreSQLProvider) userDefType(columnType *ColumnType) string {
-	fType := "interface{}"
-
 	nullable := columnType.IsNullable
 	name := sanitize(columnType.Name)
 
 	switch name {
 	case "hstore":
-		fType = HStoreDef.As(nullable)
+		return HStoreDef.As(nullable)
 	default:
-		fType = StringDef.As(nullable)
+		return StringDef.As(nullable)
 	}
-
-	return fType
 }
 
 type sqliteInf struct {
@@ -409,8 +402,6 @@ func sanitize(name string) string {
 }
 
 func translate(columnType *ColumnType) string {
-	fType := "interface{}"
-
 	nullable := columnType.IsNullable
 	name := strings.Replace(strings.ToLower(columnType.Name), `"`, "", -1)
 
@@ -419,64 +410,58 @@ func translate(columnType *ColumnType) string {
 		case "tinyint":
 			switch columnType.Precision {
 			case 1:
-				fType = BoolDef.As(nullable)
+				return BoolDef.As(nullable)
 			default:
-				fType = UInt8Def.As(nullable)
+				return UInt8Def.As(nullable)
 			}
 		case "smallint":
-			fType = UInt16Def.As(nullable)
+			return UInt16Def.As(nullable)
 		case "mediumint":
-			fType = UInt32Def.As(nullable)
+			return UInt32Def.As(nullable)
 		case "int", "integer":
-			fType = UIntDef.As(nullable)
+			return UIntDef.As(nullable)
 		case "bigint":
-			fType = UInt64Def.As(nullable)
-		default:
-			fType = translate(columnType)
+			return UInt64Def.As(nullable)
 		}
-
-		return fType
 	}
 
 	switch name {
 	case "tinyint":
 		switch columnType.Precision {
 		case 1:
-			fType = BoolDef.As(nullable)
+			return BoolDef.As(nullable)
 		default:
-			fType = Int8Def.As(nullable)
+			return Int8Def.As(nullable)
 		}
 	case "mediumint":
-		fType = Int32Def.As(nullable)
+		return Int32Def.As(nullable)
 	case "binary", "varbinary", "tinyblob", "blob", "mediumblob", "longblob":
-		fType = ByteDef.As(nullable)
+		return ByteDef.As(nullable)
 	case "bigint", "bigserial":
-		fType = Int64Def.As(nullable)
+		return Int64Def.As(nullable)
 	case "int", "integer", "serial":
-		fType = IntDef.As(nullable)
+		return IntDef.As(nullable)
 	case "smallint", "smallserial":
-		fType = Int16Def.As(nullable)
+		return Int16Def.As(nullable)
 	case "decimal", "numeric", "double precision":
-		fType = Float64Def.As(nullable)
+		return Float64Def.As(nullable)
 	case "real":
-		fType = Float32Def.As(nullable)
+		return Float32Def.As(nullable)
 	case "bit", "interval", "uuint", "bit varying", "character", "money", "character varying", "cidr", "inet", "macaddr", "text", "xml":
-		fType = StringDef.As(nullable)
+		return StringDef.As(nullable)
 	case "char":
-		fType = ByteDef.As(nullable)
+		return ByteDef.As(nullable)
 	case "json", "jsonb":
-		fType = JSONDef.As(nullable)
+		return JSONDef.As(nullable)
 	case "bytea":
-		fType = ByteSliceDef.As(nullable)
+		return ByteSliceDef.As(nullable)
 	case "boolean":
-		fType = BoolDef.As(nullable)
+		return BoolDef.As(nullable)
 	case "date", "time", "datetime", "timestamp", "timestamp without time zone", "timestamp with time zone", "time without time zone", "time with time zone":
-		fType = TimeDef.As(nullable)
+		return TimeDef.As(nullable)
 	case "uuid":
-		fType = UUIDDef.As(nullable)
+		return UUIDDef.As(nullable)
 	default:
-		fType = StringDef.As(nullable)
+		return StringDef.As(nullable)
 	}
-
-	return fType
 }
