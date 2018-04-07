@@ -39,23 +39,22 @@ var _ = Describe("Gateway", func() {
 			Expect(err).To(BeNil())
 
 			buffer := &bytes.Buffer{}
-			fmt.Fprintln(buffer, "-- name: create-person-table")
 			fmt.Fprintln(buffer, "CREATE TABLE users (")
-			fmt.Fprintln(buffer, "first_name text,")
-			fmt.Fprintln(buffer, "last_name text,")
-			fmt.Fprintln(buffer, "email text")
+			fmt.Fprintln(buffer, "  first_name text,")
+			fmt.Fprintln(buffer, "  last_name text,")
+			fmt.Fprintln(buffer, "  email text")
 			fmt.Fprintln(buffer, ");")
 			fmt.Fprintln(buffer)
 
-			_, err = db.DB().Exec(buffer.String())
+			_, err = db.Exec(gom.SQL(buffer.String()))
 			Expect(err).To(BeNil())
 
-			_, err = db.DB().Exec("INSERT INTO users VALUES('John', 'Doe', 'john@example.com')")
+			_, err = db.Exec(gom.SQL("INSERT INTO users VALUES(?, ?, ?)", "John", "Doe", "john@example.com"))
 			Expect(err).To(Succeed())
 		})
 
 		AfterEach(func() {
-			_, err := db.DB().Exec("DROP TABLE users")
+			_, err := db.Exec(gom.SQL("DROP TABLE users"))
 			Expect(err).To(BeNil())
 			Expect(db.Close()).To(Succeed())
 		})
@@ -196,7 +195,7 @@ var _ = Describe("Gateway", func() {
 				_, err := db.Exec(query)
 				Expect(err).To(Succeed())
 
-				rows, err := db.DB().Query("SELECT * FROM users")
+				rows, err := db.Query(gom.SQL("SELECT * FROM users"))
 				Expect(err).To(BeNil())
 				Expect(rows).NotTo(BeNil())
 				Expect(rows.Next()).To(BeFalse())

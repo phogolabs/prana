@@ -1,6 +1,8 @@
 package gom
 
 import (
+	"fmt"
+
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,11 +31,6 @@ func Open(driver, source string) (*Gateway, error) {
 // Close closes the connection to underlying database.
 func (g *Gateway) Close() error {
 	return g.db.Close()
-}
-
-// DB returns the underlying database.
-func (g *Gateway) DB() *sqlx.DB {
-	return g.db
 }
 
 // Select executes a given query and maps the result to the provided slice of entities.

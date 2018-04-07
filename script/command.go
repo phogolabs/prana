@@ -18,6 +18,10 @@ func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
 	params := make(map[string]interface{})
 	buffer := &bytes.Buffer{}
 
+	if len(cmd.params) == 0 {
+		return query, params
+	}
+
 	var i, j int
 
 	for i = strings.Index(query, "?"); i != -1; i = strings.Index(query, "?") {
