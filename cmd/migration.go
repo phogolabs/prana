@@ -34,7 +34,7 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 			cli.Command{
 				Name:        "setup",
 				Usage:       "Setup the migration for the current project",
-				Description: "Configures the current project by creating database directory hierarchy and initial migration",
+				Description: "Configure the current project by creating database directory hierarchy and initial migration",
 				Action:      m.setup,
 			},
 			cli.Command{
@@ -46,7 +46,7 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 			},
 			cli.Command{
 				Name:   "run",
-				Usage:  "Runs the pending migrations",
+				Usage:  "Run the pending migrations",
 				Action: m.run,
 				Flags: []cli.Flag{
 					cli.IntFlag{
@@ -70,12 +70,12 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 			},
 			cli.Command{
 				Name:   "reset",
-				Usage:  "Reverts and re-run all migrations",
+				Usage:  "Revert and re-run all migrations",
 				Action: m.reset,
 			},
 			cli.Command{
 				Name:   "status",
-				Usage:  "Lists all migrations, marking those that have been applied",
+				Usage:  "Show all migrations, marking those that have been applied",
 				Action: m.status,
 			},
 		},

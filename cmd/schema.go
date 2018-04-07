@@ -40,16 +40,12 @@ func (m *SQLSchema) CreateCommand() cli.Command {
 				Value: &cli.StringSlice{"migrations"},
 			},
 			cli.StringFlag{
-				Name:  "schema-dir, d",
-				Usage: "directory path to the package, for which the source code will be generated. the basename will be used as package name for default database schema.",
+				Name:  "package-dir, p",
+				Usage: "path to the package, where the source code will be generated",
 				Value: "./database/model",
 			},
-			cli.StringSliceFlag{
-				Name:  "tag, g",
-				Usage: "tag name that will be added to each of the struct's fields",
-			},
 			cli.BoolTFlag{
-				Name:  "include-docs, D",
+				Name:  "include-docs, d",
 				Usage: "include API documentation in generated source code",
 			},
 		},
@@ -113,7 +109,7 @@ func (m *SQLSchema) after(ctx *cli.Context) error {
 
 func (m *SQLSchema) print(ctx *cli.Context) error {
 	spec := &schema.Spec{
-		Dir:    ctx.GlobalString("schema-dir"),
+		Dir:    ctx.GlobalString("package-dir"),
 		Schema: ctx.GlobalString("schema-name"),
 		Tables: ctx.GlobalStringSlice("table-name"),
 	}
@@ -127,7 +123,7 @@ func (m *SQLSchema) print(ctx *cli.Context) error {
 
 func (m *SQLSchema) sync(ctx *cli.Context) error {
 	spec := &schema.Spec{
-		Dir:    ctx.GlobalString("schema-dir"),
+		Dir:    ctx.GlobalString("package-dir"),
 		Schema: ctx.GlobalString("schema-name"),
 		Tables: ctx.GlobalStringSlice("table-name"),
 	}

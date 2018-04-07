@@ -86,15 +86,16 @@ func (m *SQLScript) create(ctx *cli.Context) error {
 		Dir: m.dir,
 	}
 
-	container := strings.Replace(ctx.String("filename"), " ", "_", -1)
-	name := strings.Replace(args[0], " ", "-", -1)
+	filename := ctx.String("filename")
+	filename = strings.Replace(filename, " ", "_", -1)
+	command := strings.Replace(args[0], " ", "-", -1)
 
-	path, err := generator.Create(container, name)
+	path, err := generator.Create(filename, command)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
-	log.Infof("Created command '%s' at '%s'", name, path)
+	log.Infof("Created command '%s' at '%s'", command, path)
 	return nil
 }
 
