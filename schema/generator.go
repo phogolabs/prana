@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/format"
 	"io"
+	"sort"
 	"strings"
 	"time"
 
@@ -18,6 +19,8 @@ var _ Composer = &Generator{}
 type GeneratorConfig struct {
 	// InlcudeDoc determines whether to include documentation
 	InlcudeDoc bool
+	// IgnoreTables ecludes the those tables from generation
+	IgnoreTables []string
 }
 
 // Generator generates Golang structs from database schema
@@ -34,6 +37,9 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 		return buffer, nil
 	}
 
+	ignore := g.ignore()
+	processed := 0
+
 	if g.Config.InlcudeDoc {
 		fmt.Fprintf(buffer, "// Package contains an object model of database schema '%s'", schema.Name)
 		fmt.Fprintln(buffer)
@@ -45,10 +51,11 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 	fmt.Fprintln(buffer)
 
 	for _, table := range schema.Tables {
-		if table.Name == "migrations" {
+		if index := sort.SearchStrings(ignore, table.Name); index >= 0 && index < len(ignore) {
 			continue
 		}
 
+		processed = processed + 1
 		columns := table.Columns
 		length := len(columns)
 		typeName := g.tableName(&table)
@@ -89,11 +96,23 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 		}
 	}
 
-	if err := g.format(buffer); err != nil {
+	if processed == 0 {
+		buffer.Reset()
+	} else if err := g.format(buffer); err != nil {
 		return nil, err
 	}
 
 	return buffer, nil
+}
+
+func (g *Generator) ignore() []string {
+	ignore := g.Config.IgnoreTables
+
+	if !sort.StringsAreSorted(ignore) {
+		sort.Strings(ignore)
+	}
+
+	return ignore
 }
 
 func (g *Generator) tableName(table *Table) string {

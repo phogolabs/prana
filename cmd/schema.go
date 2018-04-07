@@ -30,6 +30,15 @@ func (m *SQLSchema) CreateCommand() cli.Command {
 				Usage: "name of the database schema",
 				Value: "",
 			},
+			cli.StringSliceFlag{
+				Name:  "table-name, t",
+				Usage: "name of the table in the database",
+			},
+			cli.StringSliceFlag{
+				Name:  "ignore-table-name, i",
+				Usage: "name of the table in the database that should be skipped",
+				Value: &cli.StringSlice{"migrations"},
+			},
 			cli.StringFlag{
 				Name:  "schema-dir, d",
 				Usage: "directory path to the package, for which the source code will be generated. the basename will be used as package name for default database schema.",
@@ -50,12 +59,6 @@ func (m *SQLSchema) CreateCommand() cli.Command {
 				Usage:       "Print the object model for given database schema or tables",
 				Description: "Print the object model for given database schema or tables",
 				Action:      m.print,
-				Flags: []cli.Flag{
-					cli.StringSliceFlag{
-						Name:  "table-name, t",
-						Usage: "name of the table in the database",
-					},
-				},
 			},
 			cli.Command{
 				Name:        "sync",
@@ -92,7 +95,8 @@ func (m *SQLSchema) before(ctx *cli.Context) error {
 		Provider: provider,
 		Composer: &schema.Generator{
 			Config: &schema.GeneratorConfig{
-				InlcudeDoc: ctx.BoolT("include-docs"),
+				InlcudeDoc:   ctx.BoolT("include-docs"),
+				IgnoreTables: ctx.StringSlice("ignore-table-name"),
 			},
 		},
 	}
@@ -111,7 +115,7 @@ func (m *SQLSchema) print(ctx *cli.Context) error {
 	spec := &schema.Spec{
 		Dir:    ctx.GlobalString("schema-dir"),
 		Schema: ctx.GlobalString("schema-name"),
-		Tables: ctx.StringSlice("table-name"),
+		Tables: ctx.GlobalStringSlice("table-name"),
 	}
 
 	if err := m.executor.WriteTo(os.Stdout, spec); err != nil {
@@ -125,6 +129,7 @@ func (m *SQLSchema) sync(ctx *cli.Context) error {
 	spec := &schema.Spec{
 		Dir:    ctx.GlobalString("schema-dir"),
 		Schema: ctx.GlobalString("schema-name"),
+		Tables: ctx.GlobalStringSlice("table-name"),
 	}
 
 	path, err := m.executor.Create(spec)

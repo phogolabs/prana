@@ -63,6 +63,21 @@ var _ = Describe("Generator", func() {
 		Expect(data).To(Equal(source.Bytes()))
 	})
 
+	Context("when the table is ignored", func() {
+		BeforeEach(func() {
+			generator.Config.IgnoreTables = []string{"table1"}
+		})
+
+		It("generates the schema successfully", func() {
+			reader, err := generator.Compose("model", schemaDef)
+			Expect(err).To(BeNil())
+
+			data, err := ioutil.ReadAll(reader)
+			Expect(err).To(BeNil())
+			Expect(data).To(BeEmpty())
+		})
+	})
+
 	Context("when including documentation is enabled", func() {
 		BeforeEach(func() {
 			generator.Config.InlcudeDoc = true
