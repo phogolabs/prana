@@ -13,8 +13,8 @@ scripts, as well as facilitating working with [loukoum][loukoum-url].
 ## Installation
 
 ```console
-go get -u github.com/phogolabs/gom
-go install -u github.com/phogolabs/gom/cmd/gom
+$ go get -u github.com/phogolabs/gom
+$ go install github.com/phogolabs/gom/cmd/gom
 ```
 
 ## Introduction
