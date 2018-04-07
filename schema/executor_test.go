@@ -176,8 +176,8 @@ var _ = Describe("Executor", func() {
 			Expect(err).To(Succeed())
 
 			Expect(spec.Dir).To(BeADirectory())
-			Expect(filepath.Join(spec.Dir, "model.go")).To(BeARegularFile())
-			Expect(path).To(Equal(filepath.Join(spec.Dir, "model.go")))
+			Expect(filepath.Join(spec.Dir, "schema.go")).To(BeARegularFile())
+			Expect(path).To(Equal(filepath.Join(spec.Dir, "schema.go")))
 
 			Expect(provider.TablesCallCount()).To(BeZero())
 			Expect(provider.SchemaCallCount()).To(Equal(1))
@@ -203,8 +203,8 @@ var _ = Describe("Executor", func() {
 				Expect(err).To(Succeed())
 
 				Expect(spec.Dir).To(BeADirectory())
-				Expect(filepath.Join(spec.Dir, "model.go")).To(BeARegularFile())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, "model.go")))
+				Expect(filepath.Join(spec.Dir, "schema.go")).To(BeARegularFile())
+				Expect(path).To(Equal(filepath.Join(spec.Dir, "schema.go")))
 
 				Expect(provider.TablesCallCount()).To(Equal(1))
 				Expect(provider.TablesArgsForCall(0)).To(Equal("public"))
@@ -244,8 +244,8 @@ var _ = Describe("Executor", func() {
 				Expect(err).To(Succeed())
 				Expect(spec.Dir).To(BeADirectory())
 
-				Expect(filepath.Join(spec.Dir, "public", "model.go")).To(BeARegularFile())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, "public", "model.go")))
+				Expect(filepath.Join(spec.Dir, "public", "schema.go")).To(BeARegularFile())
+				Expect(path).To(Equal(filepath.Join(spec.Dir, "public", "schema.go")))
 			})
 		})
 

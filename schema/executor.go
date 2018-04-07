@@ -96,7 +96,7 @@ func (e *Executor) fileOf(schema *Schema, spec *Spec) (string, error) {
 		return "", err
 	}
 
-	return filepath.Join(dir, "model.go"), nil
+	return filepath.Join(dir, "schema.go"), nil
 }
 
 func (e *Executor) packageOf(schema *Schema, spec *Spec) string {
