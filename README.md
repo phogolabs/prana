@@ -123,8 +123,8 @@ SELECT type,name,rootpage FROM sqlite_master;
 ```
 
 The `-- name: show-sqlite-master` comment define the name of the command in
-your SQL script. Any SQL statements afterwards are considered as the command
-body.
+your SQL script. The SQL statement afterwards is considered as the command
+body. Note that the command must have only one statement.
 
 Then you can use the `gom` command line interface to execute the command:
 
