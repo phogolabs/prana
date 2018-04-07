@@ -131,14 +131,13 @@ Then you can use the `gom` command line interface to execute the command:
 ```console
 $ gom script run show-sqlite-master
 
-Running command 'show-sqlite-master'
+Running command 'show-sqlite-master' from '$PWD/database/script'
 +-------+-------------------------------+----------+
 | TYPE  |             NAME              | ROOTPAGE |
 +-------+-------------------------------+----------+
 | table | migrations                    |        2 |
 | index | sqlite_autoindex_migrations_1 |        3 |
 +-------+-------------------------------+----------+
-Running command 'show-sqlite-master' completed successfully
 ```
 
 You can run the command by using the `Gateway API` as well:
