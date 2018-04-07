@@ -210,5 +210,56 @@ var _ = Describe("Gateway", func() {
 				})
 			})
 		})
+
+		Describe("Tx", func() {
+			var tx *gom.Tx
+
+			BeforeEach(func() {
+				var err error
+				tx, err = db.Begin()
+				Expect(err).To(Succeed())
+			})
+
+			AfterEach(func() {
+				Expect(tx.Commit()).To(Succeed())
+			})
+
+			Describe("Select", func() {
+				It("executes a query successfully", func() {
+					query := lk.Select("first_name", "last_name", "email").From("users")
+
+					persons := []Person{}
+					Expect(tx.Select(&persons, query)).To(Succeed())
+					Expect(persons).To(HaveLen(1))
+					Expect(persons[0].FirstName).To(Equal("John"))
+					Expect(persons[0].LastName).To(Equal("Doe"))
+					Expect(persons[0].Email).To(Equal("john@example.com"))
+				})
+			})
+
+			Describe("SelectOne", func() {
+				It("executes a query successfully", func() {
+					query := lk.Select("first_name", "last_name", "email").From("users")
+
+					person := Person{}
+					Expect(db.SelectOne(&person, query)).To(Succeed())
+				})
+			})
+
+			Describe("Exec", func() {
+				It("executes a query successfully", func() {
+					query := lk.Delete("users")
+
+					_, err := tx.Exec(query)
+					Expect(err).To(Succeed())
+
+					rows, err := tx.Query(gom.SQL("SELECT * FROM users"))
+					Expect(err).To(BeNil())
+					Expect(rows).NotTo(BeNil())
+					Expect(rows.Next()).To(BeFalse())
+					Expect(rows.Close()).To(Succeed())
+				})
+			})
+		})
 	})
 })

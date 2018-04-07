@@ -48,9 +48,6 @@ type Row = sqlx.Row
 // A Result summarizes an executed SQL command.
 type Result = sql.Result
 
-// Tx is an sqlx wrapper around sql.Tx with extra functionality
-type Tx = sqlx.Tx
-
 var provider *script.Provider
 
 func init() {
