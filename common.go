@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/gom/migration"
 	"github.com/phogolabs/gom/script"
 )
 
@@ -80,6 +81,11 @@ func Command(name string, params ...script.Param) *script.Cmd {
 // SQL create a new command from raw query
 func SQL(query string, params ...script.Param) *script.Cmd {
 	return script.SQL(query, params...)
+}
+
+// Migrate runs all pending migration
+func Migrate(db *sqlx.DB, fileSystem migration.FileSystem) error {
+	return migration.RunAll(db, fileSystem)
 }
 
 // ParseURL parses a URL and returns the database driver and connection string to the database
