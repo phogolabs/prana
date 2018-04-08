@@ -98,15 +98,15 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 	m.db = db
 	m.executor = &migration.Executor{
 		Provider: &migration.Provider{
-			Dir: dir,
-			DB:  db,
+			FileSystem: migration.Dir(dir),
+			DB:         db,
 		},
 		Runner: &migration.Runner{
-			Dir: dir,
-			DB:  db,
+			FileSystem: migration.Dir(dir),
+			DB:         db,
 		},
 		Generator: &migration.Generator{
-			Dir: dir,
+			FileSystem: migration.Dir(dir),
 		},
 	}
 

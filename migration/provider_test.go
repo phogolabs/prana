@@ -15,10 +15,15 @@ import (
 )
 
 var _ = Describe("Provider", func() {
-	var provider *migration.Provider
+	var (
+		provider *migration.Provider
+		dir      string
+	)
 
 	BeforeEach(func() {
-		dir, err := ioutil.TempDir("", "gom_runner")
+		var err error
+
+		dir, err = ioutil.TempDir("", "gom_runner")
 		Expect(err).To(BeNil())
 
 		conn := filepath.Join(dir, "gom.db")
@@ -26,8 +31,8 @@ var _ = Describe("Provider", func() {
 		Expect(err).To(BeNil())
 
 		provider = &migration.Provider{
-			Dir: dir,
-			DB:  db,
+			FileSystem: migration.Dir(dir),
+			DB:         db,
 		}
 	})
 
@@ -42,7 +47,7 @@ var _ = Describe("Provider", func() {
 		_, err := provider.DB.Exec(query.String())
 		Expect(err).To(BeNil())
 
-		path := filepath.Join(provider.Dir, "20060102150405_schema.sql")
+		path := filepath.Join(dir, "20060102150405_schema.sql")
 		Expect(ioutil.WriteFile(path, []byte{}, 0700)).To(Succeed())
 
 		insert := "INSERT INTO migrations(id, description, created_at) VALUES(?,?,?)"
@@ -122,7 +127,7 @@ var _ = Describe("Provider", func() {
 
 	Describe("Migrations", func() {
 		It("returns the migrations successfully", func() {
-			path := filepath.Join(provider.Dir, "20070102150405_setup.sql")
+			path := filepath.Join(dir, "20070102150405_setup.sql")
 			Expect(ioutil.WriteFile(path, []byte{}, 0700)).To(Succeed())
 
 			items, err := provider.Migrations()
@@ -139,12 +144,12 @@ var _ = Describe("Provider", func() {
 
 		Context("when the directory does not exist", func() {
 			JustBeforeEach(func() {
-				path := provider.Dir + "_old"
-				Expect(os.Rename(provider.Dir, path)).To(Succeed())
+				path := dir + "_old"
+				Expect(os.Rename(dir, path)).To(Succeed())
 			})
 
 			It("returns an error", func() {
-				msg := fmt.Sprintf("Directory '%s' does not exist", provider.Dir)
+				msg := fmt.Sprintf("Directory '%s' does not exist", dir)
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
 				Expect(err).To(MatchError(msg))
@@ -153,13 +158,13 @@ var _ = Describe("Provider", func() {
 
 		Context("when cannot parse a migration", func() {
 			JustBeforeEach(func() {
-				old := filepath.Join(provider.Dir, "20060102150405_schema.sql")
-				new := filepath.Join(provider.Dir, "id_schema.sql")
+				old := filepath.Join(dir, "20060102150405_schema.sql")
+				new := filepath.Join(dir, "id_schema.sql")
 				Expect(os.Rename(old, new)).To(Succeed())
 			})
 
 			It("returns an error", func() {
-				path := filepath.Join(provider.Dir, "id_schema.sql")
+				path := filepath.Join(dir, "id_schema.sql")
 				msg := fmt.Sprintf("Migration '%s' has an invalid file name", path)
 
 				items, err := provider.Migrations()
@@ -182,8 +187,8 @@ var _ = Describe("Provider", func() {
 
 		Context("when the migration has ID mismatch", func() {
 			JustBeforeEach(func() {
-				old := filepath.Join(provider.Dir, "20060102150405_schema.sql")
-				new := filepath.Join(provider.Dir, "20070102150405_schema.sql")
+				old := filepath.Join(dir, "20060102150405_schema.sql")
+				new := filepath.Join(dir, "20070102150405_schema.sql")
 				Expect(os.Rename(old, new)).To(Succeed())
 			})
 
@@ -196,8 +201,8 @@ var _ = Describe("Provider", func() {
 
 		Context("when the migration has Description mismatch", func() {
 			JustBeforeEach(func() {
-				old := filepath.Join(provider.Dir, "20060102150405_schema.sql")
-				new := filepath.Join(provider.Dir, "20060102150405_tables.sql")
+				old := filepath.Join(dir, "20060102150405_schema.sql")
+				new := filepath.Join(dir, "20060102150405_tables.sql")
 				Expect(os.Rename(old, new)).To(Succeed())
 			})
 

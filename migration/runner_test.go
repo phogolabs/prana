@@ -17,10 +17,13 @@ var _ = Describe("Runner", func() {
 	var (
 		runner *migration.Runner
 		item   *migration.Item
+		dir    string
 	)
 
 	BeforeEach(func() {
-		dir, err := ioutil.TempDir("", "gom_runner")
+		var err error
+
+		dir, err = ioutil.TempDir("", "gom_runner")
 		Expect(err).To(BeNil())
 
 		conn := filepath.Join(dir, "gom.db")
@@ -28,8 +31,8 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &migration.Runner{
-			Dir: dir,
-			DB:  db,
+			FileSystem: migration.Dir(dir),
+			DB:         db,
 		}
 
 		item = &migration.Item{
@@ -57,7 +60,7 @@ var _ = Describe("Runner", func() {
 		fmt.Fprintln(migration, "DROP TABLE IF EXISTS test;")
 		fmt.Fprintln(migration, "DROP TABLE IF EXISTS test2;")
 
-		path := filepath.Join(runner.Dir, item.Filename())
+		path := filepath.Join(dir, item.Filename())
 		Expect(ioutil.WriteFile(path, migration.Bytes(), 0700)).To(Succeed())
 	})
 
@@ -74,12 +77,12 @@ var _ = Describe("Runner", func() {
 
 		Context("when the migration does not exist", func() {
 			JustBeforeEach(func() {
-				path := filepath.Join(runner.Dir, item.Filename())
+				path := filepath.Join(dir, item.Filename())
 				Expect(os.Remove(path)).To(Succeed())
 			})
 
 			It("returns an error", func() {
-				path := filepath.Join(runner.Dir, item.Filename())
+				path := filepath.Join(dir, item.Filename())
 				msg := fmt.Sprintf("open %s: no such file or directory", path)
 				Expect(runner.Run(item)).To(MatchError(msg))
 			})
@@ -101,7 +104,7 @@ var _ = Describe("Runner", func() {
 				fmt.Fprintln(migration, "-- name: down")
 				fmt.Fprintln(migration, "DROP TABLE IF EXISTS test")
 
-				path := filepath.Join(runner.Dir, item.Filename())
+				path := filepath.Join(dir, item.Filename())
 				Expect(ioutil.WriteFile(path, migration.Bytes(), 0700)).To(Succeed())
 			})
 
@@ -112,7 +115,7 @@ var _ = Describe("Runner", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				runner.Dir = ""
+				runner.FileSystem = migration.Dir("")
 				Expect(runner.Run(item)).To(MatchError("open 20160102150_schema.sql: no such file or directory"))
 			})
 		})
@@ -127,12 +130,12 @@ var _ = Describe("Runner", func() {
 
 		Context("when the migration does not exist", func() {
 			JustBeforeEach(func() {
-				path := filepath.Join(runner.Dir, item.Filename())
+				path := filepath.Join(dir, item.Filename())
 				Expect(os.Remove(path)).To(Succeed())
 			})
 
 			It("returns an error", func() {
-				path := filepath.Join(runner.Dir, item.Filename())
+				path := filepath.Join(dir, item.Filename())
 				msg := fmt.Sprintf("open %s: no such file or directory", path)
 				Expect(runner.Revert(item)).To(MatchError(msg))
 			})
@@ -154,7 +157,7 @@ var _ = Describe("Runner", func() {
 				fmt.Fprintln(migration, "-- name: up")
 				fmt.Fprintln(migration, "CREATE TABLE test(id TEXT)")
 
-				path := filepath.Join(runner.Dir, item.Filename())
+				path := filepath.Join(dir, item.Filename())
 				Expect(ioutil.WriteFile(path, migration.Bytes(), 0700)).To(Succeed())
 			})
 
@@ -165,7 +168,7 @@ var _ = Describe("Runner", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				runner.Dir = ""
+				runner.FileSystem = migration.Dir("")
 				Expect(runner.Revert(item)).To(MatchError("open 20160102150_schema.sql: no such file or directory"))
 			})
 		})

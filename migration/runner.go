@@ -2,8 +2,6 @@ package migration
 
 import (
 	"fmt"
-	"os"
-	"path/filepath"
 	"strings"
 
 	"github.com/jmoiron/sqlx"
@@ -12,8 +10,8 @@ import (
 
 // Runner runs or reverts a given migration item.
 type Runner struct {
-	// Dir represents the project directory.
-	Dir string
+	// FileSystem represents the project directory file system.
+	FileSystem FileSystem
 	// DB is a client to underlying database.
 	DB *sqlx.DB
 }
@@ -51,8 +49,7 @@ func (r *Runner) exec(step string, m *Item) error {
 }
 
 func (r *Runner) command(name string, m *Item) ([]string, error) {
-	path := filepath.Join(r.Dir, m.Filename())
-	file, err := os.Open(path)
+	file, err := r.FileSystem.Open(m.Filename())
 	if err != nil {
 		return nil, err
 	}

@@ -118,4 +118,4 @@ func (fake *MigrationGenerator) recordInvocation(key string, args []interface{})
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ migration.FileGenerator = new(MigrationGenerator)
+var _ migration.ItemGenerator = new(MigrationGenerator)

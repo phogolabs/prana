@@ -4,16 +4,13 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"os"
-	"path/filepath"
 	"time"
 )
 
 // Generator generates a new migration file for given directory.
 type Generator struct {
-	// Dir is a directory where all migrations are created.
-	Dir string
+	// FileSystem is the file system where all migrations are created.
+	FileSystem FileSystem
 }
 
 // Create creates a new migration.
@@ -22,22 +19,11 @@ func (g *Generator) Create(m *Item) (string, error) {
 		return "", err
 	}
 
-	path := filepath.Join(g.Dir, m.Filename())
-	return path, nil
+	return g.FileSystem.Join(m.Filename()), nil
 }
 
 // Write creates a new migration for given content.
 func (g *Generator) Write(m *Item, content *Content) error {
-	if err := os.MkdirAll(g.Dir, 0700); err != nil {
-		return err
-	}
-
-	path := filepath.Join(g.Dir, m.Filename())
-
-	if _, err := os.Stat(path); err == nil {
-		return fmt.Errorf("Migration '%s' already exists", path)
-	}
-
 	buffer := &bytes.Buffer{}
 
 	fmt.Fprintln(buffer, "-- Auto-generated at", m.CreatedAt.Format(time.UnixDate))
@@ -61,7 +47,7 @@ func (g *Generator) Write(m *Item, content *Content) error {
 		}
 	}
 
-	if err := ioutil.WriteFile(path, buffer.Bytes(), 0600); err != nil {
+	if err := g.FileSystem.WriteFile(m.Filename(), buffer.Bytes(), 0600); err != nil {
 		return err
 	}
 

@@ -13,7 +13,7 @@ import (
 
 //go:generate counterfeiter -fake-name MigrationRunner -o ../fake/MigrationRunner.go . ItemRunner
 //go:generate counterfeiter -fake-name MigrationProvider -o ../fake/MigrationProvider.go . ItemProvider
-//go:generate counterfeiter -fake-name MigrationGenerator -o ../fake/MigrationGenerator.go . FileGenerator
+//go:generate counterfeiter -fake-name MigrationGenerator -o ../fake/MigrationGenerator.go . ItemGenerator
 
 var (
 	format = "20060102150405"
@@ -38,8 +38,8 @@ type ItemProvider interface {
 	Delete(item *Item) error
 }
 
-// FileGenerator generates a migration item file.
-type FileGenerator interface {
+// ItemGenerator generates a migration item file.
+type ItemGenerator interface {
 	// Create creates a new migration.
 	Create(m *Item) (string, error)
 	// Write creates a new migration for given content.

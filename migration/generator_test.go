@@ -16,16 +16,19 @@ var _ = Describe("Generator", func() {
 	var (
 		generator *migration.Generator
 		item      *migration.Item
+		dir       string
 	)
 
 	BeforeEach(func() {
-		dir, err := ioutil.TempDir("", "gom_generator")
+		var err error
+
+		dir, err = ioutil.TempDir("", "gom_generator")
 		Expect(err).To(BeNil())
 
 		dir = filepath.Join(dir, "migration")
 
 		generator = &migration.Generator{
-			Dir: dir,
+			FileSystem: migration.Dir(dir),
 		}
 
 		item = &migration.Item{
@@ -39,8 +42,8 @@ var _ = Describe("Generator", func() {
 			path, err := generator.Create(item)
 			Expect(err).To(BeNil())
 			Expect(path).To(BeARegularFile())
-			Expect(path).To(Equal(filepath.Join(generator.Dir, item.Filename())))
-			Expect(generator.Dir).To(BeADirectory())
+			Expect(path).To(Equal(filepath.Join(dir, item.Filename())))
+			Expect(dir).To(BeADirectory())
 
 			data, err := ioutil.ReadFile(path)
 			Expect(err).To(BeNil())
@@ -50,24 +53,9 @@ var _ = Describe("Generator", func() {
 			Expect(script).To(ContainSubstring("-- name: down"))
 		})
 
-		Context("when the migration exists", func() {
-			It("returns an error", func() {
-				var err error
-
-				path := filepath.Join(generator.Dir, item.Filename())
-				msg := fmt.Sprintf("Migration '%s' already exists", path)
-
-				_, err = generator.Create(item)
-				Expect(err).To(BeNil())
-
-				_, err = generator.Create(item)
-				Expect(err).To(MatchError(msg))
-			})
-		})
-
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				generator.Dir = ""
+				generator.FileSystem = migration.Dir("")
 				_, err := generator.Create(item)
 				Expect(err).To(MatchError("mkdir : no such file or directory"))
 			})
@@ -75,7 +63,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when the dir is the root dir", func() {
 			It("returns an error", func() {
-				generator.Dir = "/"
+				generator.FileSystem = migration.Dir("/")
 				_, err := generator.Create(item)
 				Expect(err).To(MatchError("open /20160102150_schema.sql: permission denied"))
 			})
@@ -90,9 +78,9 @@ var _ = Describe("Generator", func() {
 			}
 
 			Expect(generator.Write(item, content)).To(Succeed())
-			Expect(generator.Dir).To(BeADirectory())
+			Expect(dir).To(BeADirectory())
 
-			path := filepath.Join(generator.Dir, item.Filename())
+			path := filepath.Join(dir, item.Filename())
 			data, err := ioutil.ReadFile(path)
 			Expect(err).To(BeNil())
 
@@ -103,28 +91,13 @@ var _ = Describe("Generator", func() {
 			Expect(script).To(ContainSubstring("rollback"))
 		})
 
-		Context("when the migration exists", func() {
-			It("returns an error", func() {
-				content := &migration.Content{
-					UpCommand:   bytes.NewBufferString("upgrade"),
-					DownCommand: bytes.NewBufferString("rollback"),
-				}
-
-				Expect(generator.Write(item, content)).To(Succeed())
-
-				path := filepath.Join(generator.Dir, item.Filename())
-				msg := fmt.Sprintf("Migration '%s' already exists", path)
-				Expect(generator.Write(item, content)).To(MatchError(msg))
-			})
-		})
-
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
 				content := &migration.Content{
 					UpCommand:   bytes.NewBufferString("upgrade"),
 					DownCommand: bytes.NewBufferString("rollback"),
 				}
-				generator.Dir = ""
+				generator.FileSystem = migration.Dir("")
 				Expect(generator.Write(item, content)).To(MatchError("mkdir : no such file or directory"))
 			})
 		})

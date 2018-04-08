@@ -13,7 +13,7 @@ type Executor struct {
 	// Runner runs or reverts migrations for the current project.
 	Runner ItemRunner
 	// Generator generates a migration file.
-	Generator FileGenerator
+	Generator ItemGenerator
 }
 
 // Setups setups the current project for database migrations by creating
