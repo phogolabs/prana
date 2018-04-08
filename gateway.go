@@ -9,6 +9,11 @@ type Gateway struct {
 	db *sqlx.DB
 }
 
+// NewGateway creates a new gateway from a database connection
+func NewGateway(db *sqlx.DB) *Gateway {
+	return &Gateway{db: db}
+}
+
 // Open creates a new gateway connected to the provided source.
 func Open(driver, source string) (*Gateway, error) {
 	db, err := sqlx.Open(driver, source)
