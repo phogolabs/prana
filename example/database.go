@@ -2,6 +2,7 @@
 // sources:
 // database/migration/00060524000000_setup.sql
 // database/migration/20180406190015_users.sql
+// database/script/20180406191137.sql
 // DO NOT EDIT!
 
 package example
@@ -109,6 +110,26 @@ func databaseMigration20180406190015_usersSql() (*asset, error) {
 	return a, nil
 }
 
+var _databaseScript20180406191137Sql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xd2\xd5\x55\x70\x2c\x2d\xc9\xd7\x4d\x4f\xcd\x4b\x2d\x4a\x2c\x49\x4d\x51\x48\x2c\x51\x70\x2b\xca\x54\x70\x2c\x28\x52\x50\x30\x53\x30\xb4\xb4\x32\x34\xb4\x32\x36\x57\x70\x76\x0d\x0e\x51\x30\x32\x30\xb4\xe0\xd2\xd5\x55\xc8\x4b\xcc\x4d\xb5\x52\x28\xce\xc8\x2f\xd7\x2d\x2d\x4e\x2d\x2a\xe6\x0a\x76\xf5\x71\x75\x0e\x51\xd0\x52\x70\x0b\xf2\xf7\x55\x00\x8b\x59\x73\x71\x01\x02\x00\x00\xff\xff\x44\xc1\xfc\xff\x5d\x00\x00\x00")
+
+func databaseScript20180406191137SqlBytes() ([]byte, error) {
+	return bindataRead(
+		_databaseScript20180406191137Sql,
+		"database/script/20180406191137.sql",
+	)
+}
+
+func databaseScript20180406191137Sql() (*asset, error) {
+	bytes, err := databaseScript20180406191137SqlBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "database/script/20180406191137.sql", size: 93, mode: os.FileMode(384), modTime: time.Unix(1523035003, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
 // Asset loads and returns the asset for the given name.
 // It returns an error if the asset could not be found or
 // could not be loaded.
@@ -163,6 +184,7 @@ func AssetNames() []string {
 var _bindata = map[string]func() (*asset, error){
 	"database/migration/00060524000000_setup.sql": databaseMigration00060524000000_setupSql,
 	"database/migration/20180406190015_users.sql": databaseMigration20180406190015_usersSql,
+	"database/script/20180406191137.sql": databaseScript20180406191137Sql,
 }
 
 // AssetDir returns the file names below a certain
@@ -204,12 +226,14 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
-
 var _bintree = &bintree{nil, map[string]*bintree{
 	"database": &bintree{nil, map[string]*bintree{
 		"migration": &bintree{nil, map[string]*bintree{
 			"00060524000000_setup.sql": &bintree{databaseMigration00060524000000_setupSql, map[string]*bintree{}},
 			"20180406190015_users.sql": &bintree{databaseMigration20180406190015_usersSql, map[string]*bintree{}},
+		}},
+		"script": &bintree{nil, map[string]*bintree{
+			"20180406191137.sql": &bintree{databaseScript20180406191137Sql, map[string]*bintree{}},
 		}},
 	}},
 }}
@@ -260,3 +284,4 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
+
