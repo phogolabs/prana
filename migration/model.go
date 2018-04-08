@@ -1,4 +1,4 @@
-// Package provides structs and functions to create, execute and revert SQL
+// Package migration provides primitives and functions to work with SQL
 // migrations.
 package migration
 

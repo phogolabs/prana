@@ -1,5 +1,5 @@
-// Package provides structs and functions to work with SQL statements from
-// files.
+// Package script provides primitives and functions to work with raw SQL
+// statements and pre-defined SQL Scripts.
 package script
 
 import "github.com/jmoiron/sqlx"
