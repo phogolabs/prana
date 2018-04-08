@@ -168,12 +168,7 @@ func (m *SQLScript) print(rows *sqlx.Rows) error {
 		table.Append(row)
 	}
 
-	if table.NumLines() == 0 {
-		log.Info("Command does not have any rows to show")
-	} else {
-		table.Render()
-	}
-
+	table.Render()
 	return nil
 }
 

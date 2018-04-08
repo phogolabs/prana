@@ -133,6 +133,9 @@ func (m *SQLSchema) sync(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeSchema)
 	}
 
-	log.Infof("Generated a schema model at: '%s'", path)
+	if path != "" {
+		log.Infof("Generated a schema model at: '%s'", path)
+	}
+
 	return nil
 }

@@ -2,6 +2,7 @@ package schema
 
 import (
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -39,6 +40,20 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", err
 	}
 
+	reader, err := e.Composer.Compose(e.packageOf(schema, spec), schema)
+	if err != nil {
+		return "", err
+	}
+
+	body, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return "", err
+	}
+
+	if len(body) == 0 {
+		return "", nil
+	}
+
 	filepath, err := e.fileOf(schema, spec)
 	if err != nil {
 		return "", err
@@ -51,16 +66,10 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 
 	defer file.Close()
 
-	pkg := e.packageOf(schema, spec)
-	r, err := e.Composer.Compose(pkg, schema)
-
-	if err != nil {
+	if _, err = file.Write(body); err != nil {
 		return "", err
 	}
 
-	if _, err = io.Copy(file, r); err != nil {
-		return "", err
-	}
 	return filepath, nil
 }
 
