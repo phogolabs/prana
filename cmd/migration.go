@@ -153,9 +153,12 @@ func (m *SQLMigration) run(ctx *cli.Context) error {
 		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
 	}
 
-	log.Infof("Running %d pending migration(s)", count)
-	if err := m.executor.Run(count); err != nil {
+	log.Info("Running pending migration(s)")
+
+	if n, err := m.executor.Run(count); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
+	} else {
+		log.Infof("Run %d migration(s)", n)
 	}
 
 	return nil
@@ -167,9 +170,12 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
 	}
 
-	log.Infof("Reverting %d pending migration(s)", count)
-	if err := m.executor.Revert(count); err != nil {
+	log.Infof("Reverting migration(s)")
+
+	if n, err := m.executor.Revert(count); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
+	} else {
+		log.Infof("Reverted %d migration(s)", n)
 	}
 
 	return nil
@@ -177,13 +183,19 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 
 func (m *SQLMigration) reset(ctx *cli.Context) error {
 	log.Info("Reverting all migrations")
-	if err := m.executor.RevertAll(); err != nil {
+
+	if n, err := m.executor.RevertAll(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
+	} else {
+		log.Infof("Reverted %d migration(s)", n)
 	}
 
 	log.Info("Running all pending migrations")
-	if err := m.executor.RunAll(); err != nil {
+
+	if n, err := m.executor.RunAll(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
+	} else {
+		log.Infof("Run %d migration(s)", n)
 	}
 
 	return nil

@@ -128,7 +128,10 @@ var _ = Describe("Executor", func() {
 	Describe("Run", func() {
 		Context("when there are no migrations", func() {
 			It("does not run any migration", func() {
-				Expect(executor.Run(1)).To(Succeed())
+				cnt, err := executor.Run(1)
+				Expect(err).To(Succeed())
+				Expect(cnt).To(Equal(0))
+
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(BeZero())
 			})
@@ -153,7 +156,9 @@ var _ = Describe("Executor", func() {
 				}
 
 				provider.MigrationsReturns(migrations, nil)
-				Expect(executor.Run(1)).To(Succeed())
+				cnt, err := executor.Run(1)
+				Expect(err).To(Succeed())
+				Expect(cnt).To(Equal(1))
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(Equal(1))
@@ -191,7 +196,9 @@ var _ = Describe("Executor", func() {
 			})
 
 			It("runs all pending migrations", func() {
-				Expect(executor.Run(-1)).To(Succeed())
+				cnt, err := executor.Run(-1)
+				Expect(err).To(Succeed())
+				Expect(cnt).To(Equal(2))
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(Equal(2))
@@ -205,7 +212,11 @@ var _ = Describe("Executor", func() {
 			Context("when the runner fails", func() {
 				It("returns the error", func() {
 					runner.RunReturns(fmt.Errorf("Oh no!"))
-					Expect(executor.Run(-1)).To(MatchError("Oh no!"))
+
+					cnt, err := executor.Run(-1)
+					Expect(err).To(MatchError("Oh no!"))
+					Expect(cnt).To(Equal(0))
+
 					Expect(runner.RunCallCount()).To(Equal(1))
 				})
 			})
@@ -214,7 +225,10 @@ var _ = Describe("Executor", func() {
 				Context("when the insert fails", func() {
 					It("returns the error", func() {
 						provider.InsertReturns(fmt.Errorf("Oh no!"))
-						Expect(executor.Run(1)).To(MatchError("Oh no!"))
+
+						cnt, err := executor.Run(1)
+						Expect(err).To(MatchError("Oh no!"))
+						Expect(cnt).To(Equal(0))
 					})
 				})
 			})
@@ -223,7 +237,10 @@ var _ = Describe("Executor", func() {
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
 				provider.MigrationsReturns([]migration.Item{}, fmt.Errorf("Oh no!"))
-				Expect(executor.Run(1)).To(MatchError("Oh no!"))
+
+				cnt, err := executor.Run(1)
+				Expect(err).To(MatchError("Oh no!"))
+				Expect(cnt).To(Equal(0))
 			})
 		})
 	})
@@ -231,7 +248,10 @@ var _ = Describe("Executor", func() {
 	Describe("Revert", func() {
 		Context("when there are no migrations", func() {
 			It("does not revert any migration", func() {
-				Expect(executor.Revert(1)).To(Succeed())
+				cnt, err := executor.Revert(1)
+				Expect(err).To(Succeed())
+				Expect(cnt).To(Equal(0))
+
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RevertCallCount()).To(BeZero())
 			})
@@ -257,7 +277,10 @@ var _ = Describe("Executor", func() {
 				}
 
 				provider.MigrationsReturns(migrations, nil)
-				Expect(executor.Revert(1)).To(Succeed())
+
+				cnt, err := executor.Revert(1)
+				Expect(err).To(Succeed())
+				Expect(cnt).To(Equal(1))
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RevertCallCount()).To(Equal(1))
@@ -296,7 +319,9 @@ var _ = Describe("Executor", func() {
 			})
 
 			It("reverts all applied migrations", func() {
-				Expect(executor.Revert(-1)).To(Succeed())
+				cnt, err := executor.Revert(-1)
+				Expect(err).To(Succeed())
+				Expect(cnt).To(Equal(2))
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RevertCallCount()).To(Equal(2))
@@ -310,7 +335,11 @@ var _ = Describe("Executor", func() {
 			Context("when the runner fails", func() {
 				It("returns the error", func() {
 					runner.RevertReturns(fmt.Errorf("Oh no!"))
-					Expect(executor.Revert(-1)).To(MatchError("Oh no!"))
+
+					cnt, err := executor.Revert(1)
+					Expect(err).To(MatchError("Oh no!"))
+					Expect(cnt).To(Equal(0))
+
 					Expect(runner.RevertCallCount()).To(Equal(1))
 				})
 			})
@@ -319,7 +348,10 @@ var _ = Describe("Executor", func() {
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
 				provider.MigrationsReturns([]migration.Item{}, fmt.Errorf("Oh no!"))
-				Expect(executor.Revert(1)).To(MatchError("Oh no!"))
+
+				cnt, err := executor.Revert(1)
+				Expect(err).To(MatchError("Oh no!"))
+				Expect(cnt).To(Equal(0))
 			})
 
 			Context("when the delete fails", func() {
@@ -342,7 +374,10 @@ var _ = Describe("Executor", func() {
 
 					provider.MigrationsReturns(migrations, nil)
 					provider.DeleteReturns(fmt.Errorf("Oh no!"))
-					Expect(executor.Revert(1)).To(MatchError("Oh no!"))
+
+					cnt, err := executor.Revert(1)
+					Expect(err).To(MatchError("Oh no!"))
+					Expect(cnt).To(Equal(0))
 				})
 			})
 		})

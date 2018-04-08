@@ -68,20 +68,21 @@ func (m *Executor) Create(name string) (string, error) {
 
 // Run runs a pending migration for given count. If the count is negative number, it
 // will execute all pending migrations.
-func (m *Executor) Run(step int) error {
+func (m *Executor) Run(step int) (int, error) {
+	run := 0
 	migrations, err := m.Migrations()
 	if err != nil {
-		return err
+		return run, err
 	}
 
 	for _, migration := range migrations {
 		if step == 0 {
-			return nil
+			return run, nil
 		}
 
 		timestamp, err := time.Parse(format, migration.Id)
 		if err != nil {
-			return err
+			return run, err
 		}
 
 		if !migration.CreatedAt.IsZero() || timestamp == min {
@@ -91,37 +92,39 @@ func (m *Executor) Run(step int) error {
 		op := migration
 
 		if err := m.Runner.Run(&op); err != nil {
-			return err
+			return run, err
 		}
 
 		if err := m.Provider.Insert(&op); err != nil {
-			return err
+			return run, err
 		}
 
 		step = step - 1
+		run = run + 1
 	}
 
-	return nil
+	return run, nil
 }
 
 // RunAll runs all pending migrations.
-func (m *Executor) RunAll() error {
+func (m *Executor) RunAll() (int, error) {
 	return m.Run(-1)
 }
 
 // Revert reverts an applied migration for given count. If the count is
 // negative number, it will revert all applied migrations.
-func (m *Executor) Revert(step int) error {
+func (m *Executor) Revert(step int) (int, error) {
+	reverted := 0
 	migrations, err := m.Migrations()
 	if err != nil {
-		return err
+		return reverted, err
 	}
 
 	for i := len(migrations) - 1; i >= 0; i-- {
 		migration := migrations[i]
 
 		if step == 0 {
-			return nil
+			return reverted, nil
 		}
 
 		if migration.CreatedAt.IsZero() {
@@ -130,27 +133,28 @@ func (m *Executor) Revert(step int) error {
 
 		timestamp, err := time.Parse(format, migration.Id)
 		if err != nil || timestamp == min {
-			return err
+			return reverted, err
 		}
 
 		op := migration
 
 		if err := m.Runner.Revert(&op); err != nil {
-			return err
+			return reverted, err
 		}
 
 		if err := m.Provider.Delete(&op); err != nil {
-			return err
+			return reverted, err
 		}
 
 		step = step - 1
+		reverted = reverted + 1
 	}
 
-	return nil
+	return reverted, nil
 }
 
 // RevertAll reverts all applied migrations.
-func (m *Executor) RevertAll() error {
+func (m *Executor) RevertAll() (int, error) {
 	return m.Revert(-1)
 }
 
