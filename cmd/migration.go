@@ -207,6 +207,37 @@ func (m *SQLMigration) status(ctx *cli.Context) error {
 		return err
 	}
 
+	if strings.EqualFold("json", ctx.GlobalString("log-format")) {
+		m.log(migrations)
+		return nil
+	}
+
+	m.table(migrations)
+	return nil
+}
+
+func (m *SQLMigration) log(migrations []migration.Item) {
+	for _, m := range migrations {
+		status := "pending"
+		timestamp := ""
+
+		if !m.CreatedAt.IsZero() {
+			status = "executed"
+			timestamp = m.CreatedAt.Format(time.UnixDate)
+		}
+
+		fields := log.Fields{
+			"Id":          m.Id,
+			"Description": m.Description,
+			"Status":      status,
+			"CreatedAt":   timestamp,
+		}
+
+		log.WithFields(fields).Info("Migration")
+	}
+}
+
+func (m *SQLMigration) table(migrations []migration.Item) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Id", "Description", "Status", "Created At"})
 
@@ -224,5 +255,4 @@ func (m *SQLMigration) status(ctx *cli.Context) error {
 	}
 
 	table.Render()
-	return nil
 }
