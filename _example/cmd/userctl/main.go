@@ -11,8 +11,8 @@ import (
 
 	"github.com/apex/log"
 	"github.com/phogolabs/gom"
-	"github.com/phogolabs/gom/example"
-	"github.com/phogolabs/gom/example/database/model"
+	"github.com/phogolabs/gom/_example"
+	"github.com/phogolabs/gom/_example/database/model"
 	lk "github.com/ulule/loukoum"
 )
 
