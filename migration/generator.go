@@ -28,10 +28,6 @@ func (g *Generator) Create(m *Item) (string, error) {
 
 // Write creates a new migration for given content.
 func (g *Generator) Write(m *Item, content *Content) error {
-	if err := g.FileSystem.MkdirAll(g.Dir, 0700); err != nil {
-		return err
-	}
-
 	buffer := &bytes.Buffer{}
 
 	fmt.Fprintln(buffer, "-- Auto-generated at", m.CreatedAt.Format(time.UnixDate))

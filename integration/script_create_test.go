@@ -2,6 +2,7 @@ package integration_test
 
 import (
 	"io/ioutil"
+	"os"
 	"os/exec"
 	"path/filepath"
 
@@ -20,6 +21,8 @@ var _ = Describe("Script Create", func() {
 
 		cmd = exec.Command(gomPath, "script", "create")
 		cmd.Dir = dir
+
+		Expect(os.MkdirAll(filepath.Join(dir, "database", "script"), 0700)).To(Succeed())
 	})
 
 	It("generates command successfully", func() {

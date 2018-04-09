@@ -17,10 +17,6 @@ type Generator struct {
 
 // Create crates a new file and command for given file name and command name.
 func (g *Generator) Create(container, name string) (string, error) {
-	if err := g.FileSystem.MkdirAll(g.Dir, 0700); err != nil {
-		return "", err
-	}
-
 	provider := &Provider{}
 
 	if err := provider.ReadDir(g.Dir, g.FileSystem); err != nil {

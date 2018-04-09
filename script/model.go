@@ -30,6 +30,4 @@ type FileSystem interface {
 	Walk(dir string, fn filepath.WalkFunc) error
 	// OpenFile is the generalized open call; most users will use Open
 	OpenFile(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error)
-	// MkdirAll creates a directory named path
-	MkdirAll(dir string, perm os.FileMode) error
 }

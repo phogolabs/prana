@@ -31,15 +31,6 @@ type ScriptFileSystem struct {
 		result1 io.ReadWriteCloser
 		result2 error
 	}
-	MkdirAllStub        func(dir string, perm os.FileMode) error
-	mkdirAllMutex       sync.RWMutex
-	mkdirAllArgsForCall []struct {
-		dir  string
-		perm os.FileMode
-	}
-	mkdirAllReturns struct {
-		result1 error
-	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -112,39 +103,6 @@ func (fake *ScriptFileSystem) OpenFileReturns(result1 io.ReadWriteCloser, result
 	}{result1, result2}
 }
 
-func (fake *ScriptFileSystem) MkdirAll(dir string, perm os.FileMode) error {
-	fake.mkdirAllMutex.Lock()
-	fake.mkdirAllArgsForCall = append(fake.mkdirAllArgsForCall, struct {
-		dir  string
-		perm os.FileMode
-	}{dir, perm})
-	fake.recordInvocation("MkdirAll", []interface{}{dir, perm})
-	fake.mkdirAllMutex.Unlock()
-	if fake.MkdirAllStub != nil {
-		return fake.MkdirAllStub(dir, perm)
-	}
-	return fake.mkdirAllReturns.result1
-}
-
-func (fake *ScriptFileSystem) MkdirAllCallCount() int {
-	fake.mkdirAllMutex.RLock()
-	defer fake.mkdirAllMutex.RUnlock()
-	return len(fake.mkdirAllArgsForCall)
-}
-
-func (fake *ScriptFileSystem) MkdirAllArgsForCall(i int) (string, os.FileMode) {
-	fake.mkdirAllMutex.RLock()
-	defer fake.mkdirAllMutex.RUnlock()
-	return fake.mkdirAllArgsForCall[i].dir, fake.mkdirAllArgsForCall[i].perm
-}
-
-func (fake *ScriptFileSystem) MkdirAllReturns(result1 error) {
-	fake.MkdirAllStub = nil
-	fake.mkdirAllReturns = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *ScriptFileSystem) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -152,8 +110,6 @@ func (fake *ScriptFileSystem) Invocations() map[string][][]interface{} {
 	defer fake.walkMutex.RUnlock()
 	fake.openFileMutex.RLock()
 	defer fake.openFileMutex.RUnlock()
-	fake.mkdirAllMutex.RLock()
-	defer fake.mkdirAllMutex.RUnlock()
 	return fake.invocations
 }
 
