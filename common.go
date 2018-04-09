@@ -55,15 +55,20 @@ func init() {
 	provider = &script.Provider{}
 }
 
-// Load loads all commands from a given script.
-func Load(r io.Reader) error {
-	return provider.Load(r)
+// Migrate runs all pending migration
+func Migrate(db *sqlx.DB, fileSystem migration.FileSystem) error {
+	return migration.RunAll(db, fileSystem, "/")
 }
 
-// LoadDir loads all script commands from a given directory. Note that all
+// LoadSQLCommandFromReader loads all commands from a given reader.
+func LoadSQLCommandFromReader(r io.Reader) error {
+	return provider.ReadFrom(r)
+}
+
+// LoadSQLCommandFrom loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
-func LoadDir(dir string) error {
-	return provider.LoadDir(dir)
+func LoadSQLCommandFrom(fs script.FileSystem) error {
+	return provider.ReadDir("/", fs)
 }
 
 // Command returns a command for given name and parameters. The operation can
@@ -81,11 +86,6 @@ func Command(name string, params ...script.Param) *script.Cmd {
 // SQL create a new command from raw query
 func SQL(query string, params ...script.Param) *script.Cmd {
 	return script.SQL(query, params...)
-}
-
-// Migrate runs all pending migration
-func Migrate(db *sqlx.DB, fileSystem migration.FileSystem) error {
-	return migration.RunAll(db, fileSystem)
 }
 
 // ParseURL parses a URL and returns the database driver and connection string to the database

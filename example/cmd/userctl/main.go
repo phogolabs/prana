@@ -22,7 +22,7 @@ func main() {
 		log.WithError(err).Fatal("Failed to load embedded resource")
 	}
 
-	if err := gom.Load(bytes.NewBuffer(script)); err != nil {
+	if err := gom.LoadSQLCommandFromReader(bytes.NewBuffer(script)); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 

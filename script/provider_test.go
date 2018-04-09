@@ -3,12 +3,11 @@ package script_test
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
-	"path/filepath"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/phogolabs/gom/fake"
 	"github.com/phogolabs/gom/script"
 )
 
@@ -19,7 +18,7 @@ var _ = Describe("Provider", func() {
 		provider = &script.Provider{}
 	})
 
-	Describe("Load", func() {
+	Describe("ReadFrom", func() {
 		var buffer *bytes.Buffer
 
 		BeforeEach(func() {
@@ -29,7 +28,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("loads the provider successfully", func() {
-			Expect(provider.Load(buffer)).To(Succeed())
+			Expect(provider.ReadFrom(buffer)).To(Succeed())
 
 			cmd, err := provider.Command("up")
 			Expect(err).To(BeNil())
@@ -40,55 +39,36 @@ var _ = Describe("Provider", func() {
 
 		Context("when the statement are duplicated", func() {
 			It("returns an error", func() {
-				Expect(provider.Load(buffer)).To(Succeed())
+				Expect(provider.ReadFrom(buffer)).To(Succeed())
 
 				buffer = bytes.NewBufferString("-- name: up")
 				fmt.Fprintln(buffer)
 				fmt.Fprintln(buffer, "SELECT * FROM categories;")
 
-				Expect(provider.Load(buffer)).To(MatchError("Command 'up' already exists"))
+				Expect(provider.ReadFrom(buffer)).To(MatchError("Command 'up' already exists"))
 			})
 		})
 	})
 
-	Describe("LoadDir", func() {
-		var dir string
+	Describe("ReadDir", func() {
+		var fileSystem *fake.ScriptFileSystem
 
 		BeforeEach(func() {
-			var err error
-
-			dir, err = ioutil.TempDir("", "gom_generator")
-			Expect(err).To(BeNil())
-
-			path := filepath.Join(dir, "commands.sql")
-
-			buffer := bytes.NewBufferString("-- name: up")
-			fmt.Fprintln(buffer)
-			fmt.Fprintln(buffer, "SELECT * FROM users;")
-
-			Expect(ioutil.WriteFile(path, buffer.Bytes(), 0700)).To(Succeed())
+			fileSystem = &fake.ScriptFileSystem{}
 		})
 
 		It("loads the provider successfully", func() {
-			Expect(provider.LoadDir(dir)).To(Succeed())
+			Expect(provider.ReadDir("home", fileSystem)).To(Succeed())
+			Expect(fileSystem.WalkCallCount()).To(Equal(1))
 
-			cmd, err := provider.Command("up")
-			Expect(err).To(BeNil())
-
-			query, _ := cmd.Prepare()
-			Expect(query).To(Equal("SELECT * FROM users;"))
+			dir, _ := fileSystem.WalkArgsForCall(0)
+			Expect(dir).To(Equal("home"))
 		})
 
-		Context("when the statement are duplicated", func() {
+		Context("when the file system fails ", func() {
 			It("returns an error", func() {
-				path := filepath.Join(dir, "another.sql")
-
-				buffer := bytes.NewBufferString("-- name: up")
-				fmt.Fprintln(buffer)
-				fmt.Fprintln(buffer, "SELECT * FROM users;")
-
-				Expect(ioutil.WriteFile(path, buffer.Bytes(), 0700)).To(Succeed())
-				Expect(provider.LoadDir(dir)).To(MatchError("Command 'up' already exists"))
+				fileSystem.WalkReturns(fmt.Errorf("Oh no!"))
+				Expect(provider.ReadDir("home", fileSystem)).To(MatchError("Oh no!"))
 			})
 		})
 	})
@@ -99,7 +79,7 @@ var _ = Describe("Provider", func() {
 			fmt.Fprintln(buffer)
 			fmt.Fprintln(buffer, "SELECT * FROM users")
 
-			Expect(provider.Load(buffer)).To(Succeed())
+			Expect(provider.ReadFrom(buffer)).To(Succeed())
 		})
 
 		It("returns a command", func() {
@@ -118,7 +98,7 @@ var _ = Describe("Provider", func() {
 				fmt.Fprintln(buffer)
 				fmt.Fprintln(buffer, "SELECT * FROM users WHERE id = ?")
 
-				Expect(provider.Load(buffer)).To(Succeed())
+				Expect(provider.ReadFrom(buffer)).To(Succeed())
 			})
 
 			It("returns a command with params", func() {

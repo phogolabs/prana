@@ -3,25 +3,38 @@ package script_test
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/gom/fake"
 	"github.com/phogolabs/gom/script"
 )
 
 var _ = Describe("Generator", func() {
-	var generator *script.Generator
+	var (
+		generator  *script.Generator
+		fileSystem *fake.ScriptFileSystem
+	)
 
 	BeforeEach(func() {
+		fileSystem = &fake.ScriptFileSystem{}
+		fileSystem.WalkStub = filepath.Walk
+		fileSystem.OpenFileStub = func(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error) {
+			return os.OpenFile(name, flag, perm)
+		}
+
 		dir, err := ioutil.TempDir("", "gom_generator")
 		Expect(err).To(BeNil())
 
 		generator = &script.Generator{
-			Dir: dir,
+			Dir:        dir,
+			FileSystem: fileSystem,
 		}
 	})
 
@@ -98,9 +111,9 @@ var _ = Describe("Generator", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				generator.Dir = ""
+				generator.Dir = "\\0"
 				_, err := generator.Create("commands", "update")
-				Expect(err).To(MatchError("mkdir : no such file or directory"))
+				Expect(err).To(MatchError("Directory '\\0' does not exist"))
 			})
 		})
 	})

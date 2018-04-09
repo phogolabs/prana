@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/gom/script"
 )
 
-type MigrationFileSystem struct {
+type ScriptFileSystem struct {
 	WalkStub        func(dir string, fn filepath.WalkFunc) error
 	walkMutex       sync.RWMutex
 	walkArgsForCall []struct {
@@ -44,7 +44,7 @@ type MigrationFileSystem struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *MigrationFileSystem) Walk(dir string, fn filepath.WalkFunc) error {
+func (fake *ScriptFileSystem) Walk(dir string, fn filepath.WalkFunc) error {
 	fake.walkMutex.Lock()
 	fake.walkArgsForCall = append(fake.walkArgsForCall, struct {
 		dir string
@@ -58,26 +58,26 @@ func (fake *MigrationFileSystem) Walk(dir string, fn filepath.WalkFunc) error {
 	return fake.walkReturns.result1
 }
 
-func (fake *MigrationFileSystem) WalkCallCount() int {
+func (fake *ScriptFileSystem) WalkCallCount() int {
 	fake.walkMutex.RLock()
 	defer fake.walkMutex.RUnlock()
 	return len(fake.walkArgsForCall)
 }
 
-func (fake *MigrationFileSystem) WalkArgsForCall(i int) (string, filepath.WalkFunc) {
+func (fake *ScriptFileSystem) WalkArgsForCall(i int) (string, filepath.WalkFunc) {
 	fake.walkMutex.RLock()
 	defer fake.walkMutex.RUnlock()
 	return fake.walkArgsForCall[i].dir, fake.walkArgsForCall[i].fn
 }
 
-func (fake *MigrationFileSystem) WalkReturns(result1 error) {
+func (fake *ScriptFileSystem) WalkReturns(result1 error) {
 	fake.WalkStub = nil
 	fake.walkReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *MigrationFileSystem) OpenFile(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error) {
+func (fake *ScriptFileSystem) OpenFile(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error) {
 	fake.openFileMutex.Lock()
 	fake.openFileArgsForCall = append(fake.openFileArgsForCall, struct {
 		name string
@@ -92,19 +92,19 @@ func (fake *MigrationFileSystem) OpenFile(name string, flag int, perm os.FileMod
 	return fake.openFileReturns.result1, fake.openFileReturns.result2
 }
 
-func (fake *MigrationFileSystem) OpenFileCallCount() int {
+func (fake *ScriptFileSystem) OpenFileCallCount() int {
 	fake.openFileMutex.RLock()
 	defer fake.openFileMutex.RUnlock()
 	return len(fake.openFileArgsForCall)
 }
 
-func (fake *MigrationFileSystem) OpenFileArgsForCall(i int) (string, int, os.FileMode) {
+func (fake *ScriptFileSystem) OpenFileArgsForCall(i int) (string, int, os.FileMode) {
 	fake.openFileMutex.RLock()
 	defer fake.openFileMutex.RUnlock()
 	return fake.openFileArgsForCall[i].name, fake.openFileArgsForCall[i].flag, fake.openFileArgsForCall[i].perm
 }
 
-func (fake *MigrationFileSystem) OpenFileReturns(result1 io.ReadWriteCloser, result2 error) {
+func (fake *ScriptFileSystem) OpenFileReturns(result1 io.ReadWriteCloser, result2 error) {
 	fake.OpenFileStub = nil
 	fake.openFileReturns = struct {
 		result1 io.ReadWriteCloser
@@ -112,7 +112,7 @@ func (fake *MigrationFileSystem) OpenFileReturns(result1 io.ReadWriteCloser, res
 	}{result1, result2}
 }
 
-func (fake *MigrationFileSystem) MkdirAll(dir string, perm os.FileMode) error {
+func (fake *ScriptFileSystem) MkdirAll(dir string, perm os.FileMode) error {
 	fake.mkdirAllMutex.Lock()
 	fake.mkdirAllArgsForCall = append(fake.mkdirAllArgsForCall, struct {
 		dir  string
@@ -126,26 +126,26 @@ func (fake *MigrationFileSystem) MkdirAll(dir string, perm os.FileMode) error {
 	return fake.mkdirAllReturns.result1
 }
 
-func (fake *MigrationFileSystem) MkdirAllCallCount() int {
+func (fake *ScriptFileSystem) MkdirAllCallCount() int {
 	fake.mkdirAllMutex.RLock()
 	defer fake.mkdirAllMutex.RUnlock()
 	return len(fake.mkdirAllArgsForCall)
 }
 
-func (fake *MigrationFileSystem) MkdirAllArgsForCall(i int) (string, os.FileMode) {
+func (fake *ScriptFileSystem) MkdirAllArgsForCall(i int) (string, os.FileMode) {
 	fake.mkdirAllMutex.RLock()
 	defer fake.mkdirAllMutex.RUnlock()
 	return fake.mkdirAllArgsForCall[i].dir, fake.mkdirAllArgsForCall[i].perm
 }
 
-func (fake *MigrationFileSystem) MkdirAllReturns(result1 error) {
+func (fake *ScriptFileSystem) MkdirAllReturns(result1 error) {
 	fake.MkdirAllStub = nil
 	fake.mkdirAllReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *MigrationFileSystem) Invocations() map[string][][]interface{} {
+func (fake *ScriptFileSystem) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.walkMutex.RLock()
@@ -157,7 +157,7 @@ func (fake *MigrationFileSystem) Invocations() map[string][][]interface{} {
 	return fake.invocations
 }
 
-func (fake *MigrationFileSystem) recordInvocation(key string, args []interface{}) {
+func (fake *ScriptFileSystem) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -169,4 +169,4 @@ func (fake *MigrationFileSystem) recordInvocation(key string, args []interface{}
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ migration.FileSystem = new(MigrationFileSystem)
+var _ script.FileSystem = new(ScriptFileSystem)

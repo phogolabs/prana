@@ -8,6 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/fake"
 	"github.com/phogolabs/gom/migration"
 )
@@ -25,10 +26,9 @@ var _ = Describe("Generator", func() {
 		dir, err = ioutil.TempDir("", "gom_generator")
 		Expect(err).To(BeNil())
 
-		dir = filepath.Join(dir, "migration")
-
 		generator = &migration.Generator{
-			FileSystem: migration.Dir(dir),
+			Dir:        "/migration",
+			FileSystem: gom.Dir(dir),
 		}
 
 		item = &migration.Item{
@@ -41,8 +41,11 @@ var _ = Describe("Generator", func() {
 		It("creates a migration successfully", func() {
 			path, err := generator.Create(item)
 			Expect(err).To(BeNil())
+
+			path = filepath.Join(dir, path)
 			Expect(path).To(BeARegularFile())
-			Expect(path).To(Equal(filepath.Join(dir, item.Filename())))
+
+			dir = filepath.Join(dir, "migration")
 			Expect(dir).To(BeADirectory())
 
 			data, err := ioutil.ReadFile(path)
@@ -55,17 +58,17 @@ var _ = Describe("Generator", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				generator.FileSystem = migration.Dir("")
+				generator.FileSystem = gom.Dir("")
 				_, err := generator.Create(item)
-				Expect(err).To(MatchError("mkdir : no such file or directory"))
+				Expect(err).To(MatchError("mkdir /migration: permission denied"))
 			})
 		})
 
 		Context("when the dir is the root dir", func() {
 			It("returns an error", func() {
-				generator.FileSystem = migration.Dir("/")
+				generator.FileSystem = gom.Dir("/")
 				_, err := generator.Create(item)
-				Expect(err).To(MatchError("open /20160102150_schema.sql: permission denied"))
+				Expect(err.Error()).To(Equal("mkdir /migration: permission denied"))
 			})
 		})
 	})
@@ -78,9 +81,13 @@ var _ = Describe("Generator", func() {
 			}
 
 			Expect(generator.Write(item, content)).To(Succeed())
+
+			dir = filepath.Join(dir, "migration")
 			Expect(dir).To(BeADirectory())
 
 			path := filepath.Join(dir, item.Filename())
+			Expect(path).To(BeARegularFile())
+
 			data, err := ioutil.ReadFile(path)
 			Expect(err).To(BeNil())
 
@@ -97,8 +104,8 @@ var _ = Describe("Generator", func() {
 					UpCommand:   bytes.NewBufferString("upgrade"),
 					DownCommand: bytes.NewBufferString("rollback"),
 				}
-				generator.FileSystem = migration.Dir("")
-				Expect(generator.Write(item, content)).To(MatchError("mkdir : no such file or directory"))
+				generator.FileSystem = gom.Dir("")
+				Expect(generator.Write(item, content)).To(MatchError("mkdir /migration: permission denied"))
 			})
 		})
 

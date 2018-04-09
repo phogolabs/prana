@@ -16,8 +16,8 @@ type Provider struct {
 
 // LoadDir loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
-func (p *Provider) LoadDir(dir string) error {
-	return filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+func (p *Provider) ReadDir(dir string, fs FileSystem) error {
+	return fs.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		if info == nil {
 			return fmt.Errorf("Directory '%s' does not exist", dir)
 		}
@@ -31,7 +31,7 @@ func (p *Provider) LoadDir(dir string) error {
 			return err
 		}
 
-		file, err := os.Open(path)
+		file, err := fs.OpenFile(path, os.O_RDONLY, 0)
 		if err != nil {
 			return err
 		}
@@ -42,7 +42,7 @@ func (p *Provider) LoadDir(dir string) error {
 			}
 		}()
 
-		if err = p.Load(file); err != nil {
+		if err = p.ReadFrom(file); err != nil {
 			return err
 		}
 
@@ -50,7 +50,8 @@ func (p *Provider) LoadDir(dir string) error {
 	})
 }
 
-func (p *Provider) Load(r io.Reader) error {
+// ReadFrom reads the script from a reader
+func (p *Provider) ReadFrom(r io.Reader) error {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 

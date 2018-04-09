@@ -10,6 +10,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
+	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
 	"github.com/urfave/cli"
 )
@@ -18,7 +19,6 @@ import (
 type SQLMigration struct {
 	executor *migration.Executor
 	db       *sqlx.DB
-	dir      string
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
@@ -83,30 +83,31 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 }
 
 func (m *SQLMigration) before(ctx *cli.Context) error {
-	dir, err := os.Getwd()
+	cwd, err := os.Getwd()
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	dir = filepath.Join(dir, "/database/migration")
 	db, err := open(ctx)
 	if err != nil {
 		return err
 	}
 
-	m.dir = dir
 	m.db = db
 	m.executor = &migration.Executor{
 		Provider: &migration.Provider{
-			FileSystem: migration.Dir(dir),
+			Dir:        "database/migration",
+			FileSystem: gom.Dir(cwd),
 			DB:         db,
 		},
 		Runner: &migration.Runner{
-			FileSystem: migration.Dir(dir),
+			Dir:        "database/migration",
+			FileSystem: gom.Dir(cwd),
 			DB:         db,
 		},
 		Generator: &migration.Generator{
-			FileSystem: migration.Dir(dir),
+			Dir:        "database/migration",
+			FileSystem: gom.Dir(cwd),
 		},
 	}
 
@@ -126,7 +127,12 @@ func (m *SQLMigration) setup(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Infof("Setup project directory at: '%s'", m.dir)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeMigration)
+	}
+
+	log.Infof("Setup project directory at: '%s'", filepath.Join(cwd, "database/migration"))
 	return nil
 }
 
@@ -143,7 +149,12 @@ func (m *SQLMigration) create(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Infof("Created migration at: '%s'", path)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeMigration)
+	}
+
+	log.Infof("Created migration at: '%s'", filepath.Join(cwd, path))
 	return nil
 }
 

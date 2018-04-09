@@ -1,5 +1,5 @@
 // Package contains an object model of database schema 'default'
-// Auto-generated at Fri Apr  6 19:18:17 CEST 2018
+// Auto-generated at Mon Apr  9 16:19:24 CEST 2018
 package model
 
 import null "gopkg.in/volatiletech/null.v6"

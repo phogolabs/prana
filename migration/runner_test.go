@@ -10,6 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
 )
 
@@ -31,7 +32,8 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &migration.Runner{
-			FileSystem: migration.Dir(dir),
+			Dir:        "/",
+			FileSystem: gom.Dir(dir),
 			DB:         db,
 		}
 
@@ -115,8 +117,8 @@ var _ = Describe("Runner", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				runner.FileSystem = migration.Dir("")
-				Expect(runner.Run(item)).To(MatchError("open 20160102150_schema.sql: no such file or directory"))
+				runner.FileSystem = gom.Dir("")
+				Expect(runner.Run(item).Error()).To(Equal("open /20160102150_schema.sql: no such file or directory"))
 			})
 		})
 	})
@@ -168,8 +170,8 @@ var _ = Describe("Runner", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				runner.FileSystem = migration.Dir("")
-				Expect(runner.Revert(item)).To(MatchError("open 20160102150_schema.sql: no such file or directory"))
+				runner.FileSystem = gom.Dir("")
+				Expect(runner.Revert(item)).To(MatchError("open /20160102150_schema.sql: no such file or directory"))
 			})
 		})
 	})

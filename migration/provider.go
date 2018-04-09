@@ -12,6 +12,8 @@ import (
 
 // Provider provides all migration for given project.
 type Provider struct {
+	// Dir where the migration can be found
+	Dir string
 	// FileSystem represents the project directory file system.
 	FileSystem FileSystem
 	// DB is a client to underlying database.
@@ -22,7 +24,7 @@ type Provider struct {
 func (m *Provider) Migrations() ([]Item, error) {
 	migrations := []Item{}
 
-	err := m.FileSystem.Walk(func(path string, info os.FileInfo, err error) error {
+	err := m.FileSystem.Walk(m.Dir, func(path string, info os.FileInfo, err error) error {
 		if info == nil {
 			return fmt.Errorf("Directory '%s' does not exist", path)
 		}

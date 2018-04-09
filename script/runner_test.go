@@ -3,6 +3,7 @@ package script_test
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -10,13 +11,23 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/gom/fake"
 	"github.com/phogolabs/gom/script"
 )
 
 var _ = Describe("Runner", func() {
-	var runner *script.Runner
+	var (
+		runner     *script.Runner
+		fileSystem *fake.ScriptFileSystem
+	)
 
 	BeforeEach(func() {
+		fileSystem = &fake.ScriptFileSystem{}
+		fileSystem.WalkStub = filepath.Walk
+		fileSystem.OpenFileStub = func(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error) {
+			return os.OpenFile(name, flag, perm)
+		}
+
 		dir, err := ioutil.TempDir("", "gom_runner")
 		Expect(err).To(BeNil())
 
@@ -25,8 +36,9 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &script.Runner{
-			Dir: dir,
-			DB:  gateway,
+			Dir:        dir,
+			FileSystem: fileSystem,
+			DB:         gateway,
 		}
 	})
 

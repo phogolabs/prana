@@ -11,6 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
 )
 
@@ -31,7 +32,8 @@ var _ = Describe("Provider", func() {
 		Expect(err).To(BeNil())
 
 		provider = &migration.Provider{
-			FileSystem: migration.Dir(dir),
+			Dir:        "/",
+			FileSystem: gom.Dir(dir),
 			DB:         db,
 		}
 	})
@@ -149,10 +151,9 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				msg := fmt.Sprintf("Directory '%s' does not exist", dir)
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError(msg))
+				Expect(err).To(MatchError("Directory '.' does not exist"))
 			})
 		})
 
@@ -164,12 +165,9 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				path := filepath.Join(dir, "id_schema.sql")
-				msg := fmt.Sprintf("Migration '%s' has an invalid file name", path)
-
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError(msg))
+				Expect(err).To(MatchError("Migration 'id_schema.sql' has an invalid file name"))
 			})
 		})
 

@@ -61,17 +61,13 @@ func (m *SQLScript) CreateCommand() cli.Command {
 }
 
 func (m *SQLScript) before(ctx *cli.Context) error {
-	dir, err := os.Getwd()
+	var err error
+
+	m.dir, err = os.Getwd()
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	dir, err = filepath.Abs(dir)
-	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	}
-
-	m.dir = filepath.Join(dir, "/database/script")
 	return nil
 }
 
@@ -83,7 +79,8 @@ func (m *SQLScript) create(ctx *cli.Context) error {
 	}
 
 	generator := &script.Generator{
-		Dir: m.dir,
+		Dir:        "database/script",
+		FileSystem: gom.Dir(m.dir),
 	}
 
 	filename := ctx.String("filename")
@@ -95,7 +92,7 @@ func (m *SQLScript) create(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
-	log.Infof("Created command '%s' at '%s'", command, path)
+	log.Infof("Created command '%s' at '%s'", command, filepath.Join(m.dir, path))
 	return nil
 }
 
@@ -109,7 +106,8 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 
 	name := args[0]
 
-	log.Infof("Running command '%s' from '%s'", name, m.dir)
+	log.Infof("Running command '%s' from '%s'", name, filepath.Join(m.dir, "database/script"))
+
 	db, err := open(ctx)
 	if err != nil {
 		return err
@@ -122,8 +120,9 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 	}()
 
 	runner := &script.Runner{
-		Dir: m.dir,
-		DB:  db,
+		Dir:        "database/script",
+		FileSystem: gom.Dir(m.dir),
+		DB:         db,
 	}
 
 	rows := &gom.Rows{}

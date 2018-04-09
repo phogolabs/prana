@@ -19,7 +19,7 @@ var _ = Describe("Command", func() {
 		buffer := bytes.NewBufferString(fmt.Sprintf("-- name: %v", script))
 		fmt.Fprintln(buffer)
 		fmt.Fprintln(buffer, "SELECT * FROM users")
-		Expect(gom.Load(buffer)).To(Succeed())
+		Expect(gom.LoadSQLCommandFromReader(buffer)).To(Succeed())
 	})
 
 	It("returns a command", func() {
