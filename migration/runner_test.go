@@ -110,7 +110,7 @@ var _ = Describe("Runner", func() {
 			})
 
 			It("return an error", func() {
-				Expect(runner.Run(item)).To(MatchError("Command 'up' not found"))
+				Expect(runner.Run(item)).To(MatchError("Command 'up' not found for migration '20160102150_schema.sql'"))
 			})
 		})
 
@@ -163,7 +163,7 @@ var _ = Describe("Runner", func() {
 			})
 
 			It("return an error", func() {
-				Expect(runner.Revert(item)).To(MatchError("Command 'down' not found"))
+				Expect(runner.Revert(item)).To(MatchError("Command 'down' not found for migration '20160102150_schema.sql'"))
 			})
 		})
 

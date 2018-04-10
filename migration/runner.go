@@ -67,7 +67,7 @@ func (r *Runner) command(name string, m *Item) ([]string, error) {
 	statements, ok := queries[name]
 
 	if !ok {
-		return []string{}, fmt.Errorf("Command '%s' not found", name)
+		return []string{}, fmt.Errorf("Command '%s' not found for migration '%s'", name, m.Filename())
 	}
 
 	commands := strings.Split(statements, ";")

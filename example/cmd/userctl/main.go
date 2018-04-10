@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
 	"time"
 
@@ -11,28 +10,27 @@ import (
 
 	"github.com/apex/log"
 	"github.com/phogolabs/gom"
-	"github.com/phogolabs/gom/example"
+	"github.com/phogolabs/gom/example/database"
 	"github.com/phogolabs/gom/example/database/model"
 	lk "github.com/ulule/loukoum"
 )
 
 func main() {
-	script, err := example.Asset("database/script/20180406191137.sql")
-	if err != nil {
-		log.WithError(err).Fatal("Failed to load embedded resource")
-	}
-
-	if err := gom.LoadSQLCommandFromReader(bytes.NewBuffer(script)); err != nil {
-		log.WithError(err).Fatal("Failed to load script")
-	}
-
 	gateway, err := gom.Open("sqlite3", "./gom.db")
-
 	if err != nil {
 		log.WithError(err).Fatal("Failed to open database connection")
 	}
-
 	defer gateway.Close()
+
+	resource := database.ResourceManager
+
+	if err := gom.LoadSQLCommandsFrom(resource.Group("script")); err != nil {
+		log.WithError(err).Fatal("Failed to load script")
+	}
+
+	if err := gom.Migrate(gateway, resource.Group("migration")); err != nil {
+		log.WithError(err).Fatal("Failed to load script")
+	}
 
 	for i := 0; i < 10; i++ {
 		var lastName interface{}

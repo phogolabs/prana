@@ -56,8 +56,8 @@ func init() {
 }
 
 // Migrate runs all pending migration
-func Migrate(db *sqlx.DB, fileSystem migration.FileSystem) error {
-	return migration.RunAll(db, fileSystem)
+func Migrate(gateway *Gateway, fileSystem migration.FileSystem) error {
+	return migration.RunAll(gateway.db, fileSystem)
 }
 
 // LoadSQLCommandsFromReader loads all commands from a given reader.
