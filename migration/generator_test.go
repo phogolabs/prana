@@ -26,8 +26,9 @@ var _ = Describe("Generator", func() {
 		dir, err = ioutil.TempDir("", "gom_generator")
 		Expect(err).To(BeNil())
 
+		dir = filepath.Join(dir, "migration")
+
 		generator = &migration.Generator{
-			Dir:        "/migration",
 			FileSystem: gom.Dir(dir),
 		}
 
@@ -39,13 +40,11 @@ var _ = Describe("Generator", func() {
 
 	Describe("Create", func() {
 		It("creates a migration successfully", func() {
-			path, err := generator.Create(item)
+			err := generator.Create(item)
 			Expect(err).To(BeNil())
 
-			path = filepath.Join(dir, path)
+			path := filepath.Join(dir, item.Filename())
 			Expect(path).To(BeARegularFile())
-
-			dir = filepath.Join(dir, "migration")
 			Expect(dir).To(BeADirectory())
 
 			data, err := ioutil.ReadFile(path)
@@ -56,19 +55,11 @@ var _ = Describe("Generator", func() {
 			Expect(script).To(ContainSubstring("-- name: down"))
 		})
 
-		Context("when the dir is not valid", func() {
-			It("returns an error", func() {
-				generator.FileSystem = gom.Dir("")
-				_, err := generator.Create(item)
-				Expect(err).To(MatchError("mkdir /migration: permission denied"))
-			})
-		})
-
 		Context("when the dir is the root dir", func() {
 			It("returns an error", func() {
 				generator.FileSystem = gom.Dir("/")
-				_, err := generator.Create(item)
-				Expect(err.Error()).To(Equal("mkdir /migration: permission denied"))
+				err := generator.Create(item)
+				Expect(err.Error()).To(Equal("open /20160102150_schema.sql: permission denied"))
 			})
 		})
 	})
@@ -81,8 +72,6 @@ var _ = Describe("Generator", func() {
 			}
 
 			Expect(generator.Write(item, content)).To(Succeed())
-
-			dir = filepath.Join(dir, "migration")
 			Expect(dir).To(BeADirectory())
 
 			path := filepath.Join(dir, item.Filename())
@@ -104,8 +93,8 @@ var _ = Describe("Generator", func() {
 					UpCommand:   bytes.NewBufferString("upgrade"),
 					DownCommand: bytes.NewBufferString("rollback"),
 				}
-				generator.FileSystem = gom.Dir("")
-				Expect(generator.Write(item, content)).To(MatchError("mkdir /migration: permission denied"))
+				generator.FileSystem = gom.Dir("/")
+				Expect(generator.Write(item, content)).To(MatchError("open /20160102150_schema.sql: permission denied"))
 			})
 		})
 

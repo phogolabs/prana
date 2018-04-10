@@ -32,7 +32,6 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &migration.Runner{
-			Dir:        "/",
 			FileSystem: gom.Dir(dir),
 			DB:         db,
 		}
@@ -117,7 +116,7 @@ var _ = Describe("Runner", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				runner.FileSystem = gom.Dir("")
+				runner.FileSystem = gom.Dir("/")
 				Expect(runner.Run(item).Error()).To(Equal("open /20160102150_schema.sql: no such file or directory"))
 			})
 		})
@@ -170,7 +169,7 @@ var _ = Describe("Runner", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				runner.FileSystem = gom.Dir("")
+				runner.FileSystem = gom.Dir("/")
 				Expect(runner.Revert(item)).To(MatchError("open /20160102150_schema.sql: no such file or directory"))
 			})
 		})

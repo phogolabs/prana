@@ -5,25 +5,18 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 	"time"
 )
 
 // Generator generates a new migration file for given directory.
 type Generator struct {
-	// Dir where the migration can be found
-	Dir string
 	// FileSystem is the file system where all migrations are created.
 	FileSystem FileSystem
 }
 
 // Create creates a new migration.
-func (g *Generator) Create(m *Item) (string, error) {
-	if err := g.Write(m, nil); err != nil {
-		return "", err
-	}
-
-	return filepath.Join(g.Dir, m.Filename()), nil
+func (g *Generator) Create(m *Item) error {
+	return g.Write(m, nil)
 }
 
 // Write creates a new migration for given content.
@@ -51,9 +44,7 @@ func (g *Generator) Write(m *Item, content *Content) error {
 		}
 	}
 
-	filepath := filepath.Join(g.Dir, m.Filename())
-
-	if err := g.write(filepath, buffer.Bytes(), 0600); err != nil {
+	if err := g.write(m.Filename(), buffer.Bytes(), 0600); err != nil {
 		return err
 	}
 

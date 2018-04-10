@@ -32,7 +32,6 @@ var _ = Describe("Provider", func() {
 		Expect(err).To(BeNil())
 
 		provider = &migration.Provider{
-			Dir:        "/",
 			FileSystem: gom.Dir(dir),
 			DB:         db,
 		}

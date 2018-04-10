@@ -8,14 +8,13 @@ import (
 )
 
 type MigrationGenerator struct {
-	CreateStub        func(m *migration.Item) (string, error)
+	CreateStub        func(m *migration.Item) error
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
 		m *migration.Item
 	}
 	createReturns struct {
-		result1 string
-		result2 error
+		result1 error
 	}
 	WriteStub        func(m *migration.Item, content *migration.Content) error
 	writeMutex       sync.RWMutex
@@ -30,7 +29,7 @@ type MigrationGenerator struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *MigrationGenerator) Create(m *migration.Item) (string, error) {
+func (fake *MigrationGenerator) Create(m *migration.Item) error {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
 		m *migration.Item
@@ -40,7 +39,7 @@ func (fake *MigrationGenerator) Create(m *migration.Item) (string, error) {
 	if fake.CreateStub != nil {
 		return fake.CreateStub(m)
 	}
-	return fake.createReturns.result1, fake.createReturns.result2
+	return fake.createReturns.result1
 }
 
 func (fake *MigrationGenerator) CreateCallCount() int {
@@ -55,12 +54,11 @@ func (fake *MigrationGenerator) CreateArgsForCall(i int) *migration.Item {
 	return fake.createArgsForCall[i].m
 }
 
-func (fake *MigrationGenerator) CreateReturns(result1 string, result2 error) {
+func (fake *MigrationGenerator) CreateReturns(result1 error) {
 	fake.CreateStub = nil
 	fake.createReturns = struct {
-		result1 string
-		result2 error
-	}{result1, result2}
+		result1 error
+	}{result1}
 }
 
 func (fake *MigrationGenerator) Write(m *migration.Item, content *migration.Content) error {

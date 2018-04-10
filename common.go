@@ -57,7 +57,7 @@ func init() {
 
 // Migrate runs all pending migration
 func Migrate(db *sqlx.DB, fileSystem migration.FileSystem) error {
-	return migration.RunAll(db, fileSystem, "/")
+	return migration.RunAll(db, fileSystem)
 }
 
 // LoadSQLCommandFromReader loads all commands from a given reader.
@@ -67,8 +67,8 @@ func LoadSQLCommandFromReader(r io.Reader) error {
 
 // LoadSQLCommandFrom loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
-func LoadSQLCommandFrom(fs script.FileSystem) error {
-	return provider.ReadDir("/", fs)
+func LoadSQLCommandFrom(fileSystem script.FileSystem) error {
+	return provider.ReadDir("/", fileSystem)
 }
 
 // Command returns a command for given name and parameters. The operation can

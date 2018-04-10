@@ -3,6 +3,7 @@ package migration
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -54,7 +55,9 @@ func (m *Executor) Setup() error {
 
 // Create creates a migration script successfully if the project has already
 // been setup, otherwise returns an error.
-func (m *Executor) Create(name string) (string, error) {
+func (m *Executor) Create(name string) (*Item, error) {
+	name = strings.Replace(name, " ", "_", -1)
+
 	timestamp := time.Now()
 
 	migration := &Item{
@@ -63,7 +66,11 @@ func (m *Executor) Create(name string) (string, error) {
 		CreatedAt:   timestamp,
 	}
 
-	return m.Generator.Create(migration)
+	if err := m.Generator.Create(migration); err != nil {
+		return nil, err
+	}
+
+	return migration, nil
 }
 
 // Run runs a pending migration for given count. If the count is negative number, it

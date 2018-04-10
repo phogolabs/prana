@@ -52,7 +52,7 @@ type ItemProvider interface {
 // ItemGenerator generates a migration item file.
 type ItemGenerator interface {
 	// Create creates a new migration.
-	Create(m *Item) (string, error)
+	Create(m *Item) error
 	// Write creates a new migration for given content.
 	Write(m *Item, content *Content) error
 }

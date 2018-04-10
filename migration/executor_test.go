@@ -85,16 +85,15 @@ var _ = Describe("Executor", func() {
 	Describe("Create", func() {
 		It("creates migration successfully", func() {
 			format := "20060102150405"
-			generator.CreateReturns("/my/path", nil)
 
-			path, err := executor.Create("schema")
+			migration, err := executor.Create("schema")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(generator.CreateCallCount()).To(Equal(1))
 
 			item := generator.CreateArgsForCall(0)
 			Expect(item.Id).To(Equal(item.CreatedAt.Format(format)))
 			Expect(item.Description).To(Equal("schema"))
-			Expect(path).To(Equal("/my/path"))
+			Expect(item).To(Equal(migration))
 		})
 
 		Context("when the generator fails", func() {

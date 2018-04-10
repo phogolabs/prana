@@ -19,6 +19,7 @@ import (
 type SQLMigration struct {
 	executor *migration.Executor
 	db       *sqlx.DB
+	cwd      string
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
@@ -93,21 +94,21 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 		return err
 	}
 
+	fs := gom.Dir(filepath.Join(cwd, "database/migration"))
+
+	m.cwd = string(fs)
 	m.db = db
 	m.executor = &migration.Executor{
 		Provider: &migration.Provider{
-			Dir:        "database/migration",
-			FileSystem: gom.Dir(cwd),
+			FileSystem: fs,
 			DB:         db,
 		},
 		Runner: &migration.Runner{
-			Dir:        "database/migration",
-			FileSystem: gom.Dir(cwd),
+			FileSystem: fs,
 			DB:         db,
 		},
 		Generator: &migration.Generator{
-			Dir:        "database/migration",
-			FileSystem: gom.Dir(cwd),
+			FileSystem: fs,
 		},
 	}
 
@@ -127,34 +128,23 @@ func (m *SQLMigration) setup(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	}
-
-	log.Infof("Setup project directory at: '%s'", filepath.Join(cwd, "database/migration"))
+	log.Infof("Setup project directory at: '%s'", m.cwd)
 	return nil
 }
 
 func (m *SQLMigration) create(ctx *cli.Context) error {
-	if len(ctx.Args()) != 1 {
+	args := ctx.Args()
+
+	if len(args) != 1 {
 		return cli.NewExitError("Create command expects a single argument", ErrCodeMigration)
 	}
 
-	name := ctx.Args()[0]
-	name = strings.Replace(name, " ", "_", -1)
-
-	path, err := m.executor.Create(name)
+	item, err := m.executor.Create(args[0])
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	}
-
-	log.Infof("Created migration at: '%s'", filepath.Join(cwd, path))
+	log.Infof("Created migration at: '%s'", filepath.Join(m.cwd, item.Filename()))
 	return nil
 }
 
@@ -165,12 +155,11 @@ func (m *SQLMigration) run(ctx *cli.Context) error {
 	}
 
 	log.Info("Running pending migration(s)")
-
-	if n, err := m.executor.Run(count); err != nil {
+	n, err := m.executor.Run(count)
+	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	} else {
-		log.Infof("Run %d migration(s)", n)
 	}
+	log.Infof("Run %d migration(s)", n)
 
 	return nil
 }
@@ -182,33 +171,29 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 	}
 
 	log.Infof("Reverting migration(s)")
-
-	if n, err := m.executor.Revert(count); err != nil {
+	n, err := m.executor.Revert(count)
+	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	} else {
-		log.Infof("Reverted %d migration(s)", n)
 	}
+	log.Infof("Reverted %d migration(s)", n)
 
 	return nil
 }
 
 func (m *SQLMigration) reset(ctx *cli.Context) error {
 	log.Info("Reverting all migrations")
-
-	if n, err := m.executor.RevertAll(); err != nil {
+	n, err := m.executor.RevertAll()
+	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	} else {
-		log.Infof("Reverted %d migration(s)", n)
 	}
+	log.Infof("Reverted %d migration(s)", n)
 
 	log.Info("Running all pending migrations")
-
-	if n, err := m.executor.RunAll(); err != nil {
+	n, err = m.executor.RunAll()
+	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	} else {
-		log.Infof("Run %d migration(s)", n)
 	}
-
+	log.Infof("Run %d migration(s)", n)
 	return nil
 }
 
