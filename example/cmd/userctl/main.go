@@ -10,7 +10,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/phogolabs/gom"
-	"github.com/phogolabs/gom/example/database"
+	"github.com/phogolabs/gom/example"
 	"github.com/phogolabs/gom/example/database/model"
 	lk "github.com/ulule/loukoum"
 )
@@ -22,13 +22,13 @@ func main() {
 	}
 	defer gateway.Close()
 
-	resource := database.ResourceManager
+	resource := example.ResourceManager
 
-	if err := gom.LoadSQLCommandsFrom(resource.Group("script")); err != nil {
+	if err := gom.LoadSQLCommandsFrom(resource.Group("database/script")); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 
-	if err := gom.Migrate(gateway, resource.Group("migration")); err != nil {
+	if err := gom.Migrate(gateway, resource.Group("database/migration")); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 
