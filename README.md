@@ -24,10 +24,10 @@ $ go install github.com/phogolabs/gom/cmd/gom
 
 ### SQL Migrations
 
-The SQL Migration are based on the SQL command approach. Each migration is a
+The SQL Migration are using SQL command API under the hood. Each migration is a
 SQL script that contains `up` and `down` commands.
 
-In order to prepare the project for migration, you have set it up:
+In order to prepare the project for migration, you have to set it up:
 
 ```console
 $ gom migration setup
@@ -120,6 +120,13 @@ type User struct {
 	LastName null.String `db:"last_name" json:"last_name"`
 }
 ```
+
+Note that the code generation depends on two packages. In order to produce a
+source code that compiles you should have in your `$GOPATH/src` directory
+installed:
+
+- [go.uuid](https://github.com/satori/go.uuid) package
+- [null](https://github.com/guregu/null) package
 
 ### SQL Queries with Loukoum
 
