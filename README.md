@@ -2,7 +2,8 @@
 
 [![Documentation][godoc-img]][godoc-url]
 ![License][license-img]
-[![Build Status](https://travis-ci.org/phogolabs/gom.svg?branch=master)](https://travis-ci.org/phogolabs/gom)
+[![Build Status][travis-img]][travis-url]
+[![Coverage][coveralls-img]][coveralls-url]
 
 ## Overview
 
@@ -292,6 +293,10 @@ $ gom -h
 We are welcome to any contributions. Just fork the
 [project](https://github.com/phogolabs/gom).
 
+[coveralls-url]: https://coveralls.io/github/phogolabs/gom
+[coveralls-img]: https://coveralls.io/repos/github/phogolabs/gom/badge.svg?branch=master
+[travis-img]: https://travis-ci.org/phogolabs/gom.svg?branch=master
+[travis-url]: https://travis-ci.org/phogolabs/gom
 [gom-url]: https://github.com/phogolabs/gom
 [godoc-url]: https://godoc.org/github.com/phogolabs/gom
 [godoc-img]: https://godoc.org/github.com/phogolabs/gom?status.svg
