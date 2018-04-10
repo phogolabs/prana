@@ -58,17 +58,17 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("loads the provider successfully", func() {
-			Expect(provider.ReadDir("home", fileSystem)).To(Succeed())
+			Expect(provider.ReadDir(fileSystem)).To(Succeed())
 			Expect(fileSystem.WalkCallCount()).To(Equal(1))
 
 			dir, _ := fileSystem.WalkArgsForCall(0)
-			Expect(dir).To(Equal("home"))
+			Expect(dir).To(Equal("/"))
 		})
 
 		Context("when the file system fails ", func() {
 			It("returns an error", func() {
 				fileSystem.WalkReturns(fmt.Errorf("Oh no!"))
-				Expect(provider.ReadDir("home", fileSystem)).To(MatchError("Oh no!"))
+				Expect(provider.ReadDir(fileSystem)).To(MatchError("Oh no!"))
 			})
 		})
 	})

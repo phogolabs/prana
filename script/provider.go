@@ -16,10 +16,10 @@ type Provider struct {
 
 // LoadDir loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
-func (p *Provider) ReadDir(dir string, fs FileSystem) error {
-	return fs.Walk(dir, func(path string, info os.FileInfo, err error) error {
+func (p *Provider) ReadDir(fs FileSystem) error {
+	return fs.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info == nil {
-			return fmt.Errorf("Directory '%s' does not exist", dir)
+			return fmt.Errorf("Directory does not exist")
 		}
 
 		if info.IsDir() {

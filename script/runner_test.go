@@ -3,7 +3,6 @@ package script_test
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -11,24 +10,20 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom/fake"
+	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/script"
 )
 
 var _ = Describe("Runner", func() {
 	var (
-		runner     *script.Runner
-		fileSystem *fake.ScriptFileSystem
+		runner *script.Runner
+		dir    string
 	)
 
 	BeforeEach(func() {
-		fileSystem = &fake.ScriptFileSystem{}
-		fileSystem.WalkStub = filepath.Walk
-		fileSystem.OpenFileStub = func(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error) {
-			return os.OpenFile(name, flag, perm)
-		}
+		var err error
 
-		dir, err := ioutil.TempDir("", "gom_runner")
+		dir, err = ioutil.TempDir("", "gom_runner")
 		Expect(err).To(BeNil())
 
 		db := filepath.Join(dir, "gom.db")
@@ -36,8 +31,7 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &script.Runner{
-			Dir:        dir,
-			FileSystem: fileSystem,
+			FileSystem: gom.Dir(dir),
 			DB:         gateway,
 		}
 	})
@@ -47,7 +41,7 @@ var _ = Describe("Runner", func() {
 		fmt.Fprintln(command, "-- name: system-tables")
 		fmt.Fprintln(command, "SELECT * FROM sqlite_master")
 
-		path := filepath.Join(runner.Dir, "commands.sql")
+		path := filepath.Join(dir, "commands.sql")
 		Expect(ioutil.WriteFile(path, command.Bytes(), 0700)).To(Succeed())
 	})
 
@@ -74,7 +68,7 @@ var _ = Describe("Runner", func() {
 			fmt.Fprintln(command, "-- name: system-tables")
 			fmt.Fprintln(command, "SELECT ? AS Param FROM sqlite_master")
 
-			path := filepath.Join(runner.Dir, "commands.sql")
+			path := filepath.Join(dir, "commands.sql")
 			Expect(ioutil.WriteFile(path, command.Bytes(), 0700)).To(Succeed())
 		})
 
@@ -90,7 +84,7 @@ var _ = Describe("Runner", func() {
 
 	Context("when the command does not exist", func() {
 		JustBeforeEach(func() {
-			path := filepath.Join(runner.Dir, "commands.sql")
+			path := filepath.Join(dir, "commands.sql")
 			Expect(os.Remove(path)).To(Succeed())
 		})
 

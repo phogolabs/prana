@@ -3,39 +3,39 @@ package script
 import (
 	"fmt"
 	"os"
-	"path/filepath"
+	"strings"
 	"time"
 )
 
 // Generator generates a new command.
 type Generator struct {
-	// Dir where the generates script will be stored
-	Dir string
 	// FileSystem represents the project directory file system.
 	FileSystem FileSystem
 }
 
 // Create crates a new file and command for given file name and command name.
-func (g *Generator) Create(container, name string) (string, error) {
+func (g *Generator) Create(path, name string) (string, string, error) {
+	path = strings.Replace(path, " ", "_", -1)
+	name = strings.Replace(name, " ", "-", -1)
+
 	provider := &Provider{}
 
-	if err := provider.ReadDir(g.Dir, g.FileSystem); err != nil {
-		return "", err
+	if err := provider.ReadDir(g.FileSystem); err != nil {
+		return "", "", err
 	}
 
 	if _, err := provider.Command(name); err == nil {
-		return "", fmt.Errorf("Command '%s' already exists", name)
+		return "", "", fmt.Errorf("Command '%s' already exists", name)
 	}
 
-	if container == "" {
-		container = time.Now().Format(format)
+	if path == "" {
+		path = time.Now().Format(format)
 	}
 
-	path := filepath.Join(g.Dir, fmt.Sprintf("%s.sql", container))
-
+	path = fmt.Sprintf("%s.sql", path)
 	file, err := g.FileSystem.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
 	defer func() {
@@ -50,5 +50,5 @@ func (g *Generator) Create(container, name string) (string, error) {
 	fmt.Fprintln(file)
 	fmt.Fprintln(file)
 
-	return path, err
+	return name, path, err
 }

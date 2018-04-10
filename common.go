@@ -68,7 +68,7 @@ func LoadSQLCommandFromReader(r io.Reader) error {
 // LoadSQLCommandFrom loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
 func LoadSQLCommandFrom(fileSystem script.FileSystem) error {
-	return provider.ReadDir("/", fileSystem)
+	return provider.ReadDir(fileSystem)
 }
 
 // Command returns a command for given name and parameters. The operation can

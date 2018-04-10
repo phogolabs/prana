@@ -2,8 +2,7 @@
 // sources:
 // database/migration/00060524000000_setup.sql
 // database/migration/20180406190015_users.sql
-// database/migration/20180409135434_test.sql
-// database/migration/20180409135523_test.sql
+// database/migration/20180409161824_test.sql
 // database/script/20180406191137.sql
 // DO NOT EDIT!
 
@@ -72,7 +71,7 @@ func (fi bindataFileInfo) Sys() interface{} {
 	return nil
 }
 
-var _databaseMigration00060524000000_setupSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8f\x41\x4b\xc3\x40\x10\x85\xef\xf3\x2b\xde\x51\xa1\x01\x5b\x54\x4a\x7a\x5a\xeb\x16\x82\x49\x1b\x92\x15\xda\x93\xac\xc9\x90\x2e\xd8\xdd\xb0\x99\xe0\xdf\x97\x45\x68\x0f\x3a\xa7\xe1\xf1\x3d\xf8\x5e\x96\x41\xcd\x12\xb2\x81\x3d\x47\x2b\xdc\xc3\x0a\x76\xd1\x41\x8d\x11\x78\xc6\x72\x9d\x3f\x3e\xe5\xcb\x15\xb6\xba\x35\x58\x3d\x2c\xd7\x94\x65\xa8\xbf\xd8\x4e\x8c\x3e\xc0\x07\x41\x77\xb6\x7e\x60\xc8\x99\xe1\xed\x85\x61\x45\xa2\xfb\x9c\x85\x27\x4a\x70\xca\x72\xcc\x23\xd1\xb6\xd1\xca\x68\x18\xf5\x52\x6a\x14\x3b\xec\x0f\x06\xfa\x58\xb4\xa6\xc5\xc5\x0d\xd1\x8a\x0b\x7e\xc2\x1d\xc1\xf5\xb8\x9e\xd1\x47\xf3\xfb\x25\x7c\xff\x5e\x96\xa8\x9b\xa2\x52\xcd\x09\x6f\xfa\xb4\x20\xf4\x3c\x75\xd1\x8d\xa9\xfc\x0f\xbc\x20\x74\x91\xd3\xb2\x0f\x2b\x80\x29\x2a\xdd\x1a\x55\xd5\x57\x80\xee\x37\x37\xcb\x3e\x7c\x7b\xa2\xd7\xe6\x50\xdf\x2c\xff\x18\x6e\x7e\x02\x00\x00\xff\xff\x8f\xe2\x55\x2d\x35\x01\x00\x00")
+var _databaseMigration00060524000000_setupSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x6c\x8f\x41\x4b\xc3\x40\x10\x85\xef\xf3\x2b\xde\x51\xa1\x81\xc6\x83\xd8\xf4\xb4\xd6\x15\x82\x49\x1b\x92\x15\xda\x93\xac\xc9\x90\x2e\xd8\xdd\xb0\x99\xe0\xdf\x97\x45\x68\x0f\x3a\xa7\xe1\xf1\x3d\xf8\x5e\x96\x41\x2d\x12\xb2\x91\x3d\x47\x2b\x3c\xc0\x0a\xea\xe0\xa1\xa6\x08\x6c\x90\x3f\x16\xf9\xa6\xc8\xd7\xd8\xe9\xce\xe0\x61\x9d\x3f\x51\x96\xa1\xf9\x62\x3b\x33\x86\x00\x1f\x04\xfd\xd9\xfa\x91\x21\x67\x86\xb7\x17\x86\x15\x89\xee\x73\x11\x9e\x29\xc1\x29\x2b\xb0\x4c\x44\xbb\x56\x2b\xa3\x61\xd4\x73\xa5\x51\xbe\x62\x7f\x30\xd0\xc7\xb2\x33\x1d\x2e\x6e\x8c\x56\x5c\xf0\x33\xee\x08\x6e\xc0\xf5\x8c\x3e\x9a\xdf\x2f\xe1\xfb\xf7\xaa\x42\xd3\x96\xb5\x6a\x4f\x78\xd3\xa7\x15\x61\xe0\xb9\x8f\x6e\x4a\xe5\x7f\xe0\x15\xa1\x8f\x9c\x96\x7d\x58\x01\x4c\x59\xeb\xce\xa8\xba\xb9\x02\x74\xbf\xbd\x59\x0e\xe1\xdb\x13\xbd\xb4\x87\xe6\x66\xf9\xc7\x70\xfb\x13\x00\x00\xff\xff\x49\x7a\x4e\x2e\x35\x01\x00\x00")
 
 func databaseMigration00060524000000_setupSqlBytes() ([]byte, error) {
 	return bindataRead(
@@ -87,7 +86,7 @@ func databaseMigration00060524000000_setupSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "database/migration/00060524000000_setup.sql", size: 309, mode: os.FileMode(384), modTime: time.Unix(1523033112, 0)}
+	info := bindataFileInfo{name: "database/migration/00060524000000_setup.sql", size: 309, mode: os.FileMode(420), modTime: time.Unix(1523283550, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -107,47 +106,27 @@ func databaseMigration20180406190015_usersSql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "database/migration/20180406190015_users.sql", size: 252, mode: os.FileMode(384), modTime: time.Unix(1523035034, 0)}
+	info := bindataFileInfo{name: "database/migration/20180406190015_users.sql", size: 252, mode: os.FileMode(420), modTime: time.Unix(1523283515, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _databaseMigration20180409135434_testSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x4c\xca\x41\xaa\xc2\x40\x10\x45\xd1\x79\xaf\xe2\x6d\xa0\xe0\xe7\x27\x82\xf6\x2c\x88\x43\x41\xd0\x0d\x94\xf6\x23\x11\xb4\x2a\x74\xaa\x71\xfb\x92\x99\xc3\x7b\x39\x22\x18\x5b\xb8\x4c\x34\x56\x0d\x16\x68\xe0\xec\x86\x71\xa9\xc0\x01\x5d\x9f\x77\x43\xee\x07\x1c\x4f\xd7\x1b\xfe\xff\xba\x7d\x12\xc1\xe5\x45\x5d\x89\xe2\x30\x0f\x3c\x66\xb5\x89\x88\x99\x30\x7d\x13\x1a\x51\x9f\xf7\x16\x5c\xd3\x86\xb7\x97\xd1\x96\x9f\x28\xfe\xb1\x94\xbe\x01\x00\x00\xff\xff\xd1\x83\xe3\xbe\x7c\x00\x00\x00")
+var _databaseMigration20180409161824_testSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x4c\xca\x31\x0a\xc2\x40\x10\x85\xe1\x7e\x4f\xf1\x2e\x30\x60\x82\x48\xdc\x2e\x88\xa5\x20\xe8\x05\x46\xf7\x91\x08\x3a\x13\x36\xb3\x78\x7d\x49\x67\xf9\xff\x7c\x22\x18\x5b\xb8\x4c\x34\x56\x0d\x16\x68\xe0\xe2\x86\x71\xa9\xc0\x11\xdd\x21\x77\x43\xee\xf7\x38\x9d\x6f\x77\xf4\xbb\x6e\x48\x22\xb8\xbe\xa9\x2b\x51\x1c\xe6\x81\xe7\xac\x36\x11\x31\x13\xa6\x1f\x42\x23\xea\xeb\xd1\x82\x6b\xda\xf0\xf6\x32\xda\xf2\x17\xc5\xbf\x96\xd2\x2f\x00\x00\xff\xff\x84\xa4\xd4\x4f\x7c\x00\x00\x00")
 
-func databaseMigration20180409135434_testSqlBytes() ([]byte, error) {
+func databaseMigration20180409161824_testSqlBytes() ([]byte, error) {
 	return bindataRead(
-		_databaseMigration20180409135434_testSql,
-		"database/migration/20180409135434_test.sql",
+		_databaseMigration20180409161824_testSql,
+		"database/migration/20180409161824_test.sql",
 	)
 }
 
-func databaseMigration20180409135434_testSql() (*asset, error) {
-	bytes, err := databaseMigration20180409135434_testSqlBytes()
+func databaseMigration20180409161824_testSql() (*asset, error) {
+	bytes, err := databaseMigration20180409161824_testSqlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "database/migration/20180409135434_test.sql", size: 124, mode: os.FileMode(384), modTime: time.Unix(1523274874, 0)}
-	a := &asset{bytes: bytes, info: info}
-	return a, nil
-}
-
-var _databaseMigration20180409135523_testSql = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x4c\xca\x41\xaa\xc2\x40\x10\x45\xd1\x79\xaf\xe2\x6d\xa0\xe0\x27\x21\xf0\xed\x59\x10\x87\x82\xa0\x1b\x28\xed\x47\x22\x68\x55\xe8\x54\xe3\xf6\x25\x33\x87\xf7\x72\x44\x30\xb5\x70\x99\x69\xac\x1a\x2c\xd0\xc0\xd9\x0d\xd3\x5a\x81\x03\xba\x21\x8f\x63\xee\x07\x1c\x4f\xd7\x1b\xfa\xbf\xee\x3f\x89\xe0\xf2\xa2\x6e\x44\x71\x98\x07\x1e\x8b\xda\x4c\xc4\x42\x98\xbe\x09\x8d\xa8\xcf\x7b\x0b\x6e\x69\xc7\xfb\xcb\x68\xeb\x4f\x14\xff\x58\x4a\xdf\x00\x00\x00\xff\xff\x25\xee\x17\x41\x7c\x00\x00\x00")
-
-func databaseMigration20180409135523_testSqlBytes() ([]byte, error) {
-	return bindataRead(
-		_databaseMigration20180409135523_testSql,
-		"database/migration/20180409135523_test.sql",
-	)
-}
-
-func databaseMigration20180409135523_testSql() (*asset, error) {
-	bytes, err := databaseMigration20180409135523_testSqlBytes()
-	if err != nil {
-		return nil, err
-	}
-
-	info := bindataFileInfo{name: "database/migration/20180409135523_test.sql", size: 124, mode: os.FileMode(384), modTime: time.Unix(1523274923, 0)}
+	info := bindataFileInfo{name: "database/migration/20180409161824_test.sql", size: 124, mode: os.FileMode(384), modTime: time.Unix(1523283504, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -167,7 +146,7 @@ func databaseScript20180406191137Sql() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "database/script/20180406191137.sql", size: 93, mode: os.FileMode(384), modTime: time.Unix(1523035003, 0)}
+	info := bindataFileInfo{name: "database/script/20180406191137.sql", size: 93, mode: os.FileMode(420), modTime: time.Unix(1523283515, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -226,8 +205,7 @@ func AssetNames() []string {
 var _bindata = map[string]func() (*asset, error){
 	"database/migration/00060524000000_setup.sql": databaseMigration00060524000000_setupSql,
 	"database/migration/20180406190015_users.sql": databaseMigration20180406190015_usersSql,
-	"database/migration/20180409135434_test.sql": databaseMigration20180409135434_testSql,
-	"database/migration/20180409135523_test.sql": databaseMigration20180409135523_testSql,
+	"database/migration/20180409161824_test.sql": databaseMigration20180409161824_testSql,
 	"database/script/20180406191137.sql": databaseScript20180406191137Sql,
 }
 
@@ -275,8 +253,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"migration": &bintree{nil, map[string]*bintree{
 			"00060524000000_setup.sql": &bintree{databaseMigration00060524000000_setupSql, map[string]*bintree{}},
 			"20180406190015_users.sql": &bintree{databaseMigration20180406190015_usersSql, map[string]*bintree{}},
-			"20180409135434_test.sql": &bintree{databaseMigration20180409135434_testSql, map[string]*bintree{}},
-			"20180409135523_test.sql": &bintree{databaseMigration20180409135523_testSql, map[string]*bintree{}},
+			"20180409161824_test.sql": &bintree{databaseMigration20180409161824_testSql, map[string]*bintree{}},
 		}},
 		"script": &bintree{nil, map[string]*bintree{
 			"20180406191137.sql": &bintree{databaseScript20180406191137Sql, map[string]*bintree{}},
