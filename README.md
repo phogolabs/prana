@@ -11,7 +11,7 @@ Golang.  It has a command line interface that provides:
 
 - SQL Migrations
 - Embedded SQL Scripts
-- Mode generation from SQL schema
+- Model generation from SQL schema
 
 ## Installation
 
@@ -21,7 +21,6 @@ $ go install github.com/phogolabs/gom/cmd/gom
 ```
 
 ## Introduction
-
 
 ### SQL Migrations
 
@@ -106,7 +105,7 @@ $ gom schema print
 Note that you can specify the desired schema or tables by providing the correct
 arguments.
 
-The entity representation of the users table is:
+The model representation of the users table is:
 
 ```golang
 // User represents a data base table 'users'
