@@ -16,7 +16,12 @@ import (
 )
 
 func main() {
-	gateway, err := gom.Open("sqlite3", "./gom.db")
+	driver, source, err := gom.ParseURL("sqlite3://gom.db")
+	if err != nil {
+		log.WithError(err).Fatal("Failed to parse database connection string")
+	}
+
+	gateway, err := gom.Open(driver, source)
 	if err != nil {
 		log.WithError(err).Fatal("Failed to open database connection")
 	}
