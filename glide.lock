@@ -1,5 +1,5 @@
 hash: 3fdeea8edb6db538316c09d1863119ec22a49ae1da2284e70fca799d27d5a8e3
-updated: 2018-04-06T18:15:23.880079+02:00
+updated: 2018-04-10T15:11:01.183396+02:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -9,12 +9,18 @@ imports:
   version: 507f6050b8568533fb3f5504de8e5205fa62a114
 - name: github.com/gchaincl/dotsql
   version: 5487b6a5fc12870425fc14d9e05a3fabddd91d7e
+- name: github.com/go-playground/locales
+  version: f63010822830b6fe52288ee52d5a1151088ce039
+  subpackages:
+  - currency
+- name: github.com/go-playground/universal-translator
+  version: 71201497bace774495daed26a3874fd339e0b538
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/jinzhu/inflection
   version: 04140366298a54a039076d798123ffa108fff46c
 - name: github.com/jmoiron/sqlx
-  version: cf35089a197953c69420c8d0cecda90809764b1d
+  version: 2aeb6a910c2b94f2d5eb53d9895d80e27264ec41
   subpackages:
   - reflectx
 - name: github.com/lib/pq
@@ -26,11 +32,15 @@ imports:
 - name: github.com/mattn/go-isatty
   version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
 - name: github.com/mattn/go-runewidth
-  version: a9d6d1e4dc51df2130326793d49971f238839169
+  version: ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb
 - name: github.com/mattn/go-sqlite3
   version: 6c771bb9887719704b210e87e934f08be014bdb1
 - name: github.com/olekukonko/tablewriter
   version: b8a9be070da40449e501c3c4730a889e42d87a9e
+- name: github.com/Pallinder/go-randomdata
+  version: dab270d296c6c8fb98de3b4334bbd7d7b0ceca53
+- name: github.com/phogolabs/embedo
+  version: 6afb3ac15111e250985d545aa81cfb5f64dd8b94
 - name: github.com/pkg/errors
   version: 816c9085562cd7ee03e7f8188a1cfd942858cded
 - name: github.com/ulule/loukoum
@@ -50,10 +60,16 @@ imports:
   subpackages:
   - unix
 - name: golang.org/x/tools
-  version: ac136b6c2db7c4d43955e4bc7174db36dc0539c0
+  version: 5dfd8930f264888dd5fe26820a0ac605a384dd33
   subpackages:
   - go/ast/astutil
   - imports
+- name: gopkg.in/go-playground/validator.v9
+  version: 14984d91328f9612b58443cbdf4a077d4fd71091
+- name: gopkg.in/volatiletech/null.v6
+  version: 0bef4e07ae1b27a2a4efa23bbb3006c8c3d2e01d
+  subpackages:
+  - convert
 testImports:
 - name: github.com/onsi/ginkgo
   version: 9eda700730cba42af70d53180f9dcce9266bc2bc
@@ -92,13 +108,13 @@ testImports:
   - matchers/support/goraph/util
   - types
 - name: golang.org/x/net
-  version: b3c676e531a6dc479fa1b35ac961c13f5e2b4d2e
+  version: 61147c48b25b599e5b561d2e9c4f3e1ef489ca41
   subpackages:
   - html
   - html/atom
   - html/charset
 - name: golang.org/x/text
-  version: 2cb43934f0eece38629746959acc633cba083fe4
+  version: 367d765ae293e2b5781a597dd9d433117e82fc51
   subpackages:
   - encoding
   - encoding/charmap
