@@ -60,14 +60,14 @@ func Migrate(db *sqlx.DB, fileSystem migration.FileSystem) error {
 	return migration.RunAll(db, fileSystem)
 }
 
-// LoadSQLCommandFromReader loads all commands from a given reader.
-func LoadSQLCommandFromReader(r io.Reader) error {
+// LoadSQLCommandsFromReader loads all commands from a given reader.
+func LoadSQLCommandsFromReader(r io.Reader) error {
 	return provider.ReadFrom(r)
 }
 
-// LoadSQLCommandFrom loads all script commands from a given directory. Note that all
+// LoadSQLCommandsFrom loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
-func LoadSQLCommandFrom(fileSystem script.FileSystem) error {
+func LoadSQLCommandsFrom(fileSystem script.FileSystem) error {
 	return provider.ReadDir(fileSystem)
 }
 

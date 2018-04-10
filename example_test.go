@@ -149,7 +149,7 @@ func ExampleGateway_Exec() {
 }
 
 func ExampleCommand() {
-	err := gom.LoadSQLCommandFrom(gom.Dir("./database/command"))
+	err := gom.LoadSQLCommandsFrom(gom.Dir("./database/command"))
 
 	if err != nil {
 		fmt.Println(err)
