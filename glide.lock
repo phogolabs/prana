@@ -1,5 +1,5 @@
 hash: 3fdeea8edb6db538316c09d1863119ec22a49ae1da2284e70fca799d27d5a8e3
-updated: 2018-04-10T15:11:01.183396+02:00
+updated: 2018-04-10T16:14:01.356593+02:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -40,7 +40,7 @@ imports:
 - name: github.com/Pallinder/go-randomdata
   version: dab270d296c6c8fb98de3b4334bbd7d7b0ceca53
 - name: github.com/phogolabs/embedo
-  version: 6afb3ac15111e250985d545aa81cfb5f64dd8b94
+  version: 31e7bfd657c5bc171b375bb3ac7b7a24d336d67c
 - name: github.com/pkg/errors
   version: 816c9085562cd7ee03e7f8188a1cfd942858cded
 - name: github.com/ulule/loukoum
