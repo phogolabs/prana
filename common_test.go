@@ -3,6 +3,8 @@ package gom_test
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -67,5 +69,17 @@ var _ = Describe("ParseURL", func() {
 			Expect(source).To(BeEmpty())
 			Expect(err).To(MatchError("parse ::: missing protocol scheme"))
 		})
+	})
+})
+
+var _ = Describe("Migrate", func() {
+	It("passes the migrations to underlying migration executor", func() {
+		dir, err := ioutil.TempDir("", "gom_generator")
+		Expect(err).To(BeNil())
+
+		url := filepath.Join(dir, "gom.db")
+		db, err := gom.Open("sqlite3", url)
+		Expect(err).To(BeNil())
+		Expect(gom.Migrate(db, gom.Dir(dir))).To(Succeed())
 	})
 })

@@ -37,6 +37,7 @@ var _ = Describe("Gateway", func() {
 			var err error
 			db, err = gom.Open("sqlite3", "/tmp/gom.db")
 			Expect(err).To(BeNil())
+			Expect(db.DriverName()).To(Equal("sqlite3"))
 
 			buffer := &bytes.Buffer{}
 			fmt.Fprintln(buffer, "CREATE TABLE users (")
@@ -220,10 +221,6 @@ var _ = Describe("Gateway", func() {
 				Expect(err).To(Succeed())
 			})
 
-			AfterEach(func() {
-				Expect(tx.Commit()).To(Succeed())
-			})
-
 			Describe("Select", func() {
 				It("executes a query successfully", func() {
 					query := lk.Select("first_name", "last_name", "email").From("users")
@@ -234,6 +231,7 @@ var _ = Describe("Gateway", func() {
 					Expect(persons[0].FirstName).To(Equal("John"))
 					Expect(persons[0].LastName).To(Equal("Doe"))
 					Expect(persons[0].Email).To(Equal("john@example.com"))
+					Expect(tx.Commit()).To(Succeed())
 				})
 			})
 
@@ -242,7 +240,16 @@ var _ = Describe("Gateway", func() {
 					query := lk.Select("first_name", "last_name", "email").From("users")
 
 					person := Person{}
-					Expect(db.SelectOne(&person, query)).To(Succeed())
+					Expect(tx.SelectOne(&person, query)).To(Succeed())
+					Expect(tx.Commit()).To(Succeed())
+				})
+			})
+
+			Describe("QueryRow", func() {
+				It("executes a query successfully", func() {
+					query := lk.Select("first_name", "last_name", "email").From("users")
+					_, err := tx.QueryRow(query)
+					Expect(err).To(Succeed())
 				})
 			})
 
@@ -258,6 +265,17 @@ var _ = Describe("Gateway", func() {
 					Expect(rows).NotTo(BeNil())
 					Expect(rows.Next()).To(BeFalse())
 					Expect(rows.Close()).To(Succeed())
+					Expect(tx.Commit()).To(Succeed())
+				})
+			})
+
+			Describe("Rollback", func() {
+				It("rollbacks the transaction successfully", func() {
+					query := lk.Delete("users")
+
+					_, err := tx.Exec(query)
+					Expect(err).To(Succeed())
+					Expect(tx.Rollback()).To(Succeed())
 				})
 			})
 		})
