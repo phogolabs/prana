@@ -6,12 +6,13 @@ import (
 
 	randomdata "github.com/Pallinder/go-randomdata"
 	_ "github.com/mattn/go-sqlite3"
+	_ "github.com/phogolabs/gom/example"
 	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/apex/log"
 	"github.com/phogolabs/gom"
-	"github.com/phogolabs/gom/example"
 	"github.com/phogolabs/gom/example/database/model"
+	"github.com/phogolabs/parcel"
 	lk "github.com/ulule/loukoum"
 )
 
@@ -27,13 +28,11 @@ func main() {
 	}
 	defer gateway.Close()
 
-	resource := example.ResourceManager
-
-	if err := gom.LoadSQLCommandsFrom(resource.Group("database/script")); err != nil {
+	if err := gom.LoadSQLCommandsFrom(parcel.ResourceManager.Root("database/script")); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 
-	if err := gom.Migrate(gateway, resource.Group("database/migration")); err != nil {
+	if err := gom.Migrate(gateway, parcel.ResourceManager.Root("database/migration")); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 
