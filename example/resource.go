@@ -1,5 +1,5 @@
 // Package example contains embedded resources
-// Auto-generated at Fri Apr 13 09:27:51 CEST 2018
+// Auto-generated at Fri Apr 13 10:34:24 CEST 2018
 package example
 
 import "github.com/phogolabs/parcel"

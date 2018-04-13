@@ -1,5 +1,5 @@
 hash: 3fdeea8edb6db538316c09d1863119ec22a49ae1da2284e70fca799d27d5a8e3
-updated: 2018-04-10T16:14:01.356593+02:00
+updated: 2018-04-13T10:40:23.527289+02:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -39,8 +39,8 @@ imports:
   version: b8a9be070da40449e501c3c4730a889e42d87a9e
 - name: github.com/Pallinder/go-randomdata
   version: dab270d296c6c8fb98de3b4334bbd7d7b0ceca53
-- name: github.com/phogolabs/embedo
-  version: 31e7bfd657c5bc171b375bb3ac7b7a24d336d67c
+- name: github.com/phogolabs/parcel
+  version: fcf35a81b61c982d0a7cd76f06e2efd8eda79517
 - name: github.com/pkg/errors
   version: 816c9085562cd7ee03e7f8188a1cfd942858cded
 - name: github.com/ulule/loukoum
@@ -60,7 +60,7 @@ imports:
   subpackages:
   - unix
 - name: golang.org/x/tools
-  version: 5dfd8930f264888dd5fe26820a0ac605a384dd33
+  version: 1c0c7a8ccea464136be9160da64d04309e424a3b
   subpackages:
   - go/ast/astutil
   - imports
@@ -114,7 +114,7 @@ testImports:
   - html/atom
   - html/charset
 - name: golang.org/x/text
-  version: 367d765ae293e2b5781a597dd9d433117e82fc51
+  version: 7922cc490dd5a7dbaa7fd5d6196b49db59ac042f
   subpackages:
   - encoding
   - encoding/charmap
