@@ -3,7 +3,7 @@ package script_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/oak/script"
 )
 
 var _ = Describe("Command", func() {
