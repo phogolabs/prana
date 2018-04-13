@@ -99,6 +99,7 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 	m.cwd = string(fs)
 	m.db = db
 	m.executor = &migration.Executor{
+		Logger: log.Log,
 		Provider: &migration.Provider{
 			FileSystem: fs,
 			DB:         db,
@@ -154,12 +155,10 @@ func (m *SQLMigration) run(ctx *cli.Context) error {
 		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
 	}
 
-	log.Info("Running pending migration(s)")
-	n, err := m.executor.Run(count)
+	_, err := m.executor.Run(count)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
-	log.Infof("Run %d migration(s)", n)
 
 	return nil
 }
@@ -170,30 +169,25 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
 	}
 
-	log.Infof("Reverting migration(s)")
-	n, err := m.executor.Revert(count)
+	_, err := m.executor.Revert(count)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
-	log.Infof("Reverted %d migration(s)", n)
 
 	return nil
 }
 
 func (m *SQLMigration) reset(ctx *cli.Context) error {
-	log.Info("Reverting all migrations")
-	n, err := m.executor.RevertAll()
+	_, err := m.executor.RevertAll()
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
-	log.Infof("Reverted %d migration(s)", n)
 
-	log.Info("Running all pending migrations")
-	n, err = m.executor.RunAll()
+	_, err = m.executor.RunAll()
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
-	log.Infof("Run %d migration(s)", n)
+
 	return nil
 }
 

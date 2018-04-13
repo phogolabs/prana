@@ -5,10 +5,14 @@ import (
 	"fmt"
 	"strings"
 	"time"
+
+	"github.com/apex/log"
 )
 
 // Executor provides a group of operations that works with migrations.
 type Executor struct {
+	// Logger logs each execution step
+	Logger log.Interface
 	// Provider provides all migrations for the current project.
 	Provider ItemProvider
 	// Runner runs or reverts migrations for the current project.
@@ -82,6 +86,7 @@ func (m *Executor) Run(step int) (int, error) {
 		return run, err
 	}
 
+	m.logf("Running migration(s)")
 	for _, migration := range migrations {
 		if step == 0 {
 			return run, nil
@@ -98,6 +103,8 @@ func (m *Executor) Run(step int) (int, error) {
 
 		op := migration
 
+		m.logf("Running migration '%s'", migration.Filename())
+
 		if err := m.Runner.Run(&op); err != nil {
 			return run, err
 		}
@@ -110,6 +117,7 @@ func (m *Executor) Run(step int) (int, error) {
 		run = run + 1
 	}
 
+	m.logf("Run %d migration(s)", run)
 	return run, nil
 }
 
@@ -127,6 +135,7 @@ func (m *Executor) Revert(step int) (int, error) {
 		return reverted, err
 	}
 
+	m.logf("Reverting migration(s)")
 	for i := len(migrations) - 1; i >= 0; i-- {
 		migration := migrations[i]
 
@@ -145,6 +154,7 @@ func (m *Executor) Revert(step int) (int, error) {
 
 		op := migration
 
+		m.logf("Reverting migration '%s'", migration.Filename())
 		if err := m.Runner.Revert(&op); err != nil {
 			return reverted, err
 		}
@@ -157,6 +167,7 @@ func (m *Executor) Revert(step int) (int, error) {
 		reverted = reverted + 1
 	}
 
+	m.logf("Reverted %d migration(s)", reverted)
 	return reverted, nil
 }
 
@@ -168,4 +179,10 @@ func (m *Executor) RevertAll() (int, error) {
 // Migrations returns all migrations.
 func (m *Executor) Migrations() ([]Item, error) {
 	return m.Provider.Migrations()
+}
+
+func (m *Executor) logf(text string, args ...interface{}) {
+	if m.Logger != nil {
+		m.Logger.Infof(text, args...)
+	}
 }
