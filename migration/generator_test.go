@@ -8,9 +8,9 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/fake"
 	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/parcel"
 )
 
 var _ = Describe("Generator", func() {
@@ -29,7 +29,7 @@ var _ = Describe("Generator", func() {
 		dir = filepath.Join(dir, "migration")
 
 		generator = &migration.Generator{
-			FileSystem: gom.Dir(dir),
+			FileSystem: parcel.Dir(dir),
 		}
 
 		item = &migration.Item{
@@ -57,7 +57,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when the dir is the root dir", func() {
 			It("returns an error", func() {
-				generator.FileSystem = gom.Dir("/")
+				generator.FileSystem = parcel.Dir("/")
 				err := generator.Create(item)
 				Expect(err.Error()).To(Equal("open /20160102150_schema.sql: permission denied"))
 			})
@@ -93,7 +93,7 @@ var _ = Describe("Generator", func() {
 					UpCommand:   bytes.NewBufferString("upgrade"),
 					DownCommand: bytes.NewBufferString("rollback"),
 				}
-				generator.FileSystem = gom.Dir("/")
+				generator.FileSystem = parcel.Dir("/")
 				Expect(generator.Write(item, content)).To(MatchError("open /20160102150_schema.sql: permission denied"))
 			})
 		})

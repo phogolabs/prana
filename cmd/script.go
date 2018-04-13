@@ -10,6 +10,7 @@ import (
 	"github.com/olekukonko/tablewriter"
 	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/parcel"
 	"github.com/urfave/cli"
 )
 
@@ -77,7 +78,7 @@ func (m *SQLScript) create(ctx *cli.Context) error {
 	}
 
 	generator := &script.Generator{
-		FileSystem: gom.Dir(m.dir),
+		FileSystem: parcel.Dir(m.dir),
 	}
 
 	name, path, err := generator.Create(ctx.String("filename"), args[0])
@@ -113,7 +114,7 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 	}()
 
 	runner := &script.Runner{
-		FileSystem: gom.Dir(m.dir),
+		FileSystem: parcel.Dir(m.dir),
 		DB:         db,
 	}
 

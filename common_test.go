@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/phogolabs/gom"
+	"github.com/phogolabs/parcel"
 )
 
 var _ = Describe("Command", func() {
@@ -80,6 +81,6 @@ var _ = Describe("Migrate", func() {
 		url := filepath.Join(dir, "gom.db")
 		db, err := gom.Open("sqlite3", url)
 		Expect(err).To(BeNil())
-		Expect(gom.Migrate(db, gom.Dir(dir))).To(Succeed())
+		Expect(gom.Migrate(db, parcel.Dir(dir))).To(Succeed())
 	})
 })

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/phogolabs/gom"
+	"github.com/phogolabs/parcel"
 	lk "github.com/ulule/loukoum"
 )
 
@@ -149,7 +150,7 @@ func ExampleGateway_Exec() {
 }
 
 func ExampleCommand() {
-	err := gom.LoadSQLCommandsFrom(gom.Dir("./database/command"))
+	err := gom.LoadSQLCommandsFrom(parcel.Dir("./database/command"))
 
 	if err != nil {
 		fmt.Println(err)

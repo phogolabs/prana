@@ -10,8 +10,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/parcel"
 )
 
 var _ = Describe("Runner", func() {
@@ -31,7 +31,7 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &script.Runner{
-			FileSystem: gom.Dir(dir),
+			FileSystem: parcel.Dir(dir),
 			DB:         gateway,
 		}
 	})

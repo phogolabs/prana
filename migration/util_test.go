@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/parcel"
 )
 
 var _ = Describe("Util", func() {
@@ -27,7 +27,7 @@ var _ = Describe("Util", func() {
 			db, err = sqlx.Open("sqlite3", conn)
 			Expect(err).To(BeNil())
 
-			fs = gom.Dir(dir)
+			fs = parcel.Dir(dir)
 		})
 
 		AfterEach(func() {
@@ -40,7 +40,7 @@ var _ = Describe("Util", func() {
 
 		Context("when the file system fails", func() {
 			BeforeEach(func() {
-				fs = gom.Dir("/")
+				fs = parcel.Dir("/")
 			})
 
 			It("returns an error", func() {

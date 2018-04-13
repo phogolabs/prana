@@ -16,7 +16,12 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/gom/migration"
 	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/parcel"
 )
+
+// Dir implements FileSystem using the native file system restricted to a
+// specific directory tree.
+type Dir = parcel.Dir
 
 // Query represents an SQL Query that can be executed by Gateway.
 type Query interface {

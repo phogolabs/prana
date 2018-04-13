@@ -11,8 +11,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/parcel"
 )
 
 var _ = Describe("Provider", func() {
@@ -32,7 +32,7 @@ var _ = Describe("Provider", func() {
 		Expect(err).To(BeNil())
 
 		provider = &migration.Provider{
-			FileSystem: gom.Dir(dir),
+			FileSystem: parcel.Dir(dir),
 			DB:         db,
 		}
 	})

@@ -10,8 +10,8 @@ import (
 	"github.com/fatih/color"
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
-	"github.com/phogolabs/gom"
 	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/parcel"
 	"github.com/urfave/cli"
 )
 
@@ -94,7 +94,7 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 		return err
 	}
 
-	fs := gom.Dir(filepath.Join(cwd, "database/migration"))
+	fs := parcel.Dir(filepath.Join(cwd, "database/migration"))
 
 	m.cwd = string(fs)
 	m.db = db
