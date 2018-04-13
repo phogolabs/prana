@@ -10,7 +10,7 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/phogolabs/gom/schema"
+	"github.com/phogolabs/oak/schema"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -642,7 +642,7 @@ func ExpectColumnsForPostgreSQL(columns []schema.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("gom.JSON"))
+	Expect(column.ScanType).To(Equal("[]byte"))
 
 	column = columns[57]
 	Expect(column.Name).To(Equal("xml_field_null"))
@@ -1626,7 +1626,7 @@ func ExpectColumnsForSQLite(columns []schema.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("gom.JSON"))
+	Expect(column.ScanType).To(Equal("[]byte"))
 
 	column = columns[56]
 	Expect(column.Name).To(Equal("xml_field_null"))

@@ -6,7 +6,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/gom/schema"
+	"github.com/phogolabs/oak/schema"
 	"github.com/urfave/cli"
 )
 

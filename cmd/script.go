@@ -8,8 +8,8 @@ import (
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
-	"github.com/phogolabs/gom"
-	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/oak"
+	"github.com/phogolabs/oak/script"
 	"github.com/phogolabs/parcel"
 	"github.com/urfave/cli"
 )
@@ -118,7 +118,7 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 		DB:         db,
 	}
 
-	rows := &gom.Rows{}
+	rows := &oak.Rows{}
 	rows, err = runner.Run(name, params...)
 
 	if err != nil {

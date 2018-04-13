@@ -1,4 +1,4 @@
-package gom_test
+package oak_test
 
 import (
 	"bytes"
@@ -9,17 +9,17 @@ import (
 	lk "github.com/ulule/loukoum"
 
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/phogolabs/gom"
-	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/oak"
+	"github.com/phogolabs/oak/script"
 )
 
 var _ = Describe("Gateway", func() {
-	var db *gom.Gateway
+	var db *oak.Gateway
 
 	Describe("Open", func() {
 		Context("when cannot open the database", func() {
 			It("returns an error", func() {
-				db, err := gom.Open("sqlite4", "/tmp/gom.db")
+				db, err := oak.Open("sqlite4", "/tmp/oak.db")
 				Expect(db).To(BeNil())
 				Expect(err).To(MatchError(`sql: unknown driver "sqlite4" (forgotten import?)`))
 			})
@@ -35,7 +35,7 @@ var _ = Describe("Gateway", func() {
 
 		BeforeEach(func() {
 			var err error
-			db, err = gom.Open("sqlite3", "/tmp/gom.db")
+			db, err = oak.Open("sqlite3", "/tmp/oak.db")
 			Expect(err).To(BeNil())
 			Expect(db.DriverName()).To(Equal("sqlite3"))
 
@@ -47,15 +47,15 @@ var _ = Describe("Gateway", func() {
 			fmt.Fprintln(buffer, ");")
 			fmt.Fprintln(buffer)
 
-			_, err = db.Exec(gom.SQL(buffer.String()))
+			_, err = db.Exec(oak.SQL(buffer.String()))
 			Expect(err).To(BeNil())
 
-			_, err = db.Exec(gom.SQL("INSERT INTO users VALUES(?, ?, ?)", "John", "Doe", "john@example.com"))
+			_, err = db.Exec(oak.SQL("INSERT INTO users VALUES(?, ?, ?)", "John", "Doe", "john@example.com"))
 			Expect(err).To(Succeed())
 		})
 
 		AfterEach(func() {
-			_, err := db.Exec(gom.SQL("DROP TABLE users"))
+			_, err := db.Exec(oak.SQL("DROP TABLE users"))
 			Expect(err).To(BeNil())
 			Expect(db.Close()).To(Succeed())
 		})
@@ -196,7 +196,7 @@ var _ = Describe("Gateway", func() {
 				_, err := db.Exec(query)
 				Expect(err).To(Succeed())
 
-				rows, err := db.Query(gom.SQL("SELECT * FROM users"))
+				rows, err := db.Query(oak.SQL("SELECT * FROM users"))
 				Expect(err).To(BeNil())
 				Expect(rows).NotTo(BeNil())
 				Expect(rows.Next()).To(BeFalse())
@@ -213,7 +213,7 @@ var _ = Describe("Gateway", func() {
 		})
 
 		Describe("Tx", func() {
-			var tx *gom.Tx
+			var tx *oak.Tx
 
 			BeforeEach(func() {
 				var err error
@@ -260,7 +260,7 @@ var _ = Describe("Gateway", func() {
 					_, err := tx.Exec(query)
 					Expect(err).To(Succeed())
 
-					rows, err := tx.Query(gom.SQL("SELECT * FROM users"))
+					rows, err := tx.Query(oak.SQL("SELECT * FROM users"))
 					Expect(err).To(BeNil())
 					Expect(rows).NotTo(BeNil())
 					Expect(rows.Next()).To(BeFalse())

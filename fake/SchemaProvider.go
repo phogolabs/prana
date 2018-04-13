@@ -4,7 +4,7 @@ package fake
 import (
 	"sync"
 
-	"github.com/phogolabs/gom/schema"
+	"github.com/phogolabs/oak/schema"
 )
 
 type SchemaProvider struct {

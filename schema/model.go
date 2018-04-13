@@ -81,7 +81,7 @@ var (
 		NullableType: "uuid.NullUUID",
 	}
 	JSONDef = &TypeDef{
-		Type:         "gom.JSON",
+		Type:         "[]byte",
 		NullableType: "null.JSON",
 	}
 	HStoreDef = &TypeDef{

@@ -7,7 +7,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom/schema"
+	"github.com/phogolabs/oak/schema"
 	"golang.org/x/tools/imports"
 )
 

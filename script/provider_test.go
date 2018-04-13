@@ -7,8 +7,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/gom/fake"
-	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/oak/fake"
+	"github.com/phogolabs/oak/script"
 )
 
 var _ = Describe("Provider", func() {

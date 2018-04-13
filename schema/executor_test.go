@@ -8,8 +8,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom/fake"
-	"github.com/phogolabs/gom/schema"
+	"github.com/phogolabs/oak/fake"
+	"github.com/phogolabs/oak/schema"
 )
 
 var _ = Describe("Executor", func() {
@@ -39,7 +39,7 @@ var _ = Describe("Executor", func() {
 			},
 		}
 
-		dir, err := ioutil.TempDir("", "gom")
+		dir, err := ioutil.TempDir("", "oak")
 		Expect(err).To(BeNil())
 
 		spec = &schema.Spec{

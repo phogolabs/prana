@@ -1,4 +1,4 @@
-package gom
+package oak
 
 import "github.com/jmoiron/sqlx"
 

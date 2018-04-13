@@ -8,7 +8,7 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/phogolabs/gom/cmd"
+	"github.com/phogolabs/oak/cmd"
 	"github.com/urfave/cli"
 )
 
@@ -17,19 +17,19 @@ var flags = []cli.Flag{
 		Name:   "log-level",
 		Value:  "info",
 		Usage:  "level of logging",
-		EnvVar: "GOM_LOG_LEVEL",
+		EnvVar: "OAK_LOG_LEVEL",
 	},
 	cli.StringFlag{
 		Name:   "log-format",
 		Value:  "",
 		Usage:  "format of the logs",
-		EnvVar: "GOM_LOG_FORMAT",
+		EnvVar: "OAK_LOG_FORMAT",
 	},
 	cli.StringFlag{
 		Name:   "database-url",
-		Value:  "sqlite3://gom.db",
+		Value:  "sqlite3://oak.db",
 		Usage:  "Database URL",
-		EnvVar: "GOM_DB_URL",
+		EnvVar: "OAK_DB_URL",
 	},
 }
 
@@ -45,10 +45,10 @@ func main() {
 	}
 
 	app := &cli.App{
-		Name:                 "gom",
-		HelpName:             "gom",
-		Usage:                "Golang Object Mapper",
-		UsageText:            "gom [global options]",
+		Name:                 "oak",
+		HelpName:             "oak",
+		Usage:                "Golang Database Object Manager",
+		UsageText:            "oak [global options]",
 		Version:              "1.0",
 		BashComplete:         cli.DefaultAppComplete,
 		EnableBashCompletion: true,

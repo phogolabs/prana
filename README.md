@@ -1,13 +1,17 @@
-# GOM
+# OAK
 
 [![Documentation][godoc-img]][godoc-url]
 ![License][license-img]
 [![Build Status][travis-img]][travis-url]
 [![Coverage][coveralls-img]][coveralls-url]
 
+*A Golang Database Manager*
+
+[![OAK][oak-img]][oak-url]
+
 ## Overview
 
-GOM is a package for rapid application development with relational databases in
+OAK is a package for rapid application development with relational databases in
 Golang.  It has a command line interface that provides:
 
 - SQL Migrations
@@ -17,8 +21,8 @@ Golang.  It has a command line interface that provides:
 ## Installation
 
 ```console
-$ go get -u github.com/phogolabs/gom
-$ go install github.com/phogolabs/gom/cmd/gom
+$ go get -u github.com/phogolabs/oak
+$ go install github.com/phogolabs/oak/cmd/oak
 ```
 
 ## Introduction
@@ -31,13 +35,13 @@ SQL script that contains `up` and `down` commands.
 In order to prepare the project for migration, you have to set it up:
 
 ```console
-$ gom migration setup
+$ oak migration setup
 ```
 
 Then you can create a migration with the following command:
 
 ```console
-$ gom migration create schema
+$ oak migration create schema
 ```
 
 The command will create the following migration file in `/database/migration`:
@@ -71,26 +75,26 @@ DROP TABLE IF EXISTS users;
 You can run the migration with the following command:
 
 ```console
-$ gom migration run
+$ oak migration run
 ```
 
 If you want to rollback the migration you have to revert it:
 
 ```console
-$ gom migration revert
+$ oak migration revert
 ```
 
 ## SQL Schema and Code Generation
 
 Let's assume that we want to generate a mode for the `users` table.
 
-You can use the `gom` command line interface to generate a package that
+You can use the `oak` command line interface to generate a package that
 contains Golang structs, which represents each table from the desired schema.
 
 For that purpose you should call the following subcommand:
 
 ```bash
-$ gom schema sync
+$ oak schema sync
 ```
 
 By default the command will place the generated code in single `model.go` file in
@@ -100,7 +104,7 @@ You can print the source code without generating a package by executing the
 following command:
 
 ```bash
-$ gom schema print
+$ oak schema print
 ```
 
 Note that you can specify the desired schema or tables by providing the correct
@@ -138,14 +142,14 @@ import the desired packages:
 ```golang
 import (
   lk "github.com/ulule/loukoum"
-  "github.com/phogolabs/gom"
+  "github.com/phogolabs/oak"
 )
 ```
 
 Let's first establish the connection:
 
 ```golang
-gateway, err := gom.Open("sqlite3", "example.db")
+gateway, err := oak.Open("sqlite3", "example.db")
 if err != nil {
  return err
 }
@@ -182,7 +186,7 @@ if err := gateway.Select(&users, query); err != nil {
 ```golang
 query := lk.Select("id", "first_name", "last_name").
 	From("users").
-	Where(gom.Condition("first_name").Equal("John"))
+	Where(oak.Condition("first_name").Equal("John"))
 
 user := User{}
 
@@ -197,11 +201,11 @@ Also, it provides a way to work with embeddable SQL scripts by exposing them as
 SQL Commands. First of all you have create a script that contains your SQL
 statements.
 
-The easies way to generate a SQL script with correct format is by using `gom`
+The easies way to generate a SQL script with correct format is by using `oak`
 command line interface:
 
 ```console
-$ gom script create show-sqlite-master
+$ oak script create show-sqlite-master
 ```
 
 The command above will generate a script in your `$PWD/database/script`;
@@ -226,10 +230,10 @@ The `-- name: show-sqlite-master` comment define the name of the command in
 your SQL script. The SQL statement afterwards is considered as the command
 body. Note that the command must have only one statement.
 
-Then you can use the `gom` command line interface to execute the command:
+Then you can use the `oak` command line interface to execute the command:
 
 ```console
-$ gom script run show-sqlite-master
+$ oak script run show-sqlite-master
 
 Running command 'show-sqlite-master' from '$PWD/database/script'
 +-------+-------------------------------+----------+
@@ -243,13 +247,13 @@ Running command 'show-sqlite-master' from '$PWD/database/script'
 You can run the command by using the `Gateway API` as well:
 
 ```golang
-err := gom.LoadDir("./database/script")
+err := oak.LoadDir("./database/script")
 
 if err != nil {
 	return err
 }
 
-cmd := gom.Command("show-sqlite-master")
+cmd := oak.Command("show-sqlite-master")
 
 _, err = gateway.Exec(cmd)
 return err
@@ -257,10 +261,10 @@ return err
 
 ### Command Line Interface Advance Usage
 
-By default the CLI work with `sqlite3` database called `gom.db` at your current
+By default the CLI work with `sqlite3` database called `oak.db` at your current
 directory.
 
-GOM supports:
+oak supports:
 
 - PostgreSQL
 - MySQL
@@ -270,12 +274,12 @@ If you want to change the default connection, you can pass it via command line
 argument:
 
 ```bash
-$ gom --database-url mysql://root@./gom_demo [command]
+$ oak --database-url mysql://root@./oak_demo [command]
 ```
 
-GOM uses a URL schema to determines the right database driver. If you want to
+oak uses a URL schema to determines the right database driver. If you want to
 pass the connection string via environment variable, you should export
-`GOM_DB_URL`.
+`OAK_DB_URL`.
 
 ### Example
 
@@ -285,21 +289,27 @@ For more information, how you can change the default behavior you can read the
 help documentation by executing:
 
 ```bash
-$ gom -h
+$ oak -h
 ```
 
 ## Contributing
 
 We are welcome to any contributions. Just fork the
-[project](https://github.com/phogolabs/gom).
+[project](https://github.com/phogolabs/oak).
 
-[coveralls-url]: https://coveralls.io/github/phogolabs/gom
-[coveralls-img]: https://coveralls.io/repos/github/phogolabs/gom/badge.svg?branch=master
-[travis-img]: https://travis-ci.org/phogolabs/gom.svg?branch=master
-[travis-url]: https://travis-ci.org/phogolabs/gom
-[gom-url]: https://github.com/phogolabs/gom
-[godoc-url]: https://godoc.org/github.com/phogolabs/gom
-[godoc-img]: https://godoc.org/github.com/phogolabs/gom?status.svg
+*logo made by [Free Pik][logo-author-url]*
+
+[logo-author-url]: https://www.freepik.com/free-photos-vectors/tree
+[logo-license]: http://creativecommons.org/licenses/by/3.0/
+[oak-url]: https://github.com/phogolabs/oak
+[oak-img]: doc/img/logo.jpg
+[coveralls-url]: https://coveralls.io/github/phogolabs/oak
+[coveralls-img]: https://coveralls.io/repos/github/phogolabs/oak/badge.svg?branch=master
+[travis-img]: https://travis-ci.org/phogolabs/oak.svg?branch=master
+[travis-url]: https://travis-ci.org/phogolabs/oak
+[oak-url]: https://github.com/phogolabs/oak
+[godoc-url]: https://godoc.org/github.com/phogolabs/oak
+[godoc-img]: https://godoc.org/github.com/phogolabs/oak?status.svg
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
 [software-license-url]: LICENSE
 [loukoum-url]: https://github.com/ulule/loukoum

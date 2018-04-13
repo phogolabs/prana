@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/gom/schema"
+	"github.com/phogolabs/oak/schema"
 )
 
 var _ = Describe("PostgreSQLProvider", func() {
@@ -22,7 +22,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 	BeforeEach(func() {
 		var err error
 
-		db, err = sqlx.Open("postgres", "postgres://localhost/gom?sslmode=disable")
+		db, err = sqlx.Open("postgres", "postgres://localhost/oak?sslmode=disable")
 		Expect(err).NotTo(HaveOccurred())
 
 		provider = &schema.PostgreSQLProvider{
@@ -71,7 +71,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				db, err := sqlx.Open("postgres", "postgres://localhost/gom?sslmode=disable")
+				db, err := sqlx.Open("postgres", "postgres://localhost/oak?sslmode=disable")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(db.Close()).To(Succeed())
 				provider.DB = db
@@ -155,7 +155,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				db, err := sqlx.Open("postgres", "postgres://localhost/gom?sslmode=disable")
+				db, err := sqlx.Open("postgres", "postgres://localhost/oak?sslmode=disable")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(db.Close()).To(Succeed())
 				provider.DB = db
@@ -179,7 +179,7 @@ var _ = Describe("MySQLProvider", func() {
 	BeforeEach(func() {
 		var err error
 
-		db, err = sqlx.Open("mysql", "root@/gom")
+		db, err = sqlx.Open("mysql", "root@/oak")
 		Expect(err).NotTo(HaveOccurred())
 
 		provider = &schema.MySQLProvider{
@@ -228,7 +228,7 @@ var _ = Describe("MySQLProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				db, err := sqlx.Open("mysql", "root@/gom")
+				db, err := sqlx.Open("mysql", "root@/oak")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(db.Close()).To(Succeed())
 				provider.DB = db
@@ -258,7 +258,7 @@ var _ = Describe("MySQLProvider", func() {
 			schema, err := provider.Schema("", "test")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(schema).NotTo(BeNil())
-			Expect(schema.Name).To(Equal("gom"))
+			Expect(schema.Name).To(Equal("oak"))
 			Expect(schema.Tables).To(HaveLen(1))
 
 			table := schema.Tables[0]
@@ -278,7 +278,7 @@ var _ = Describe("MySQLProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				db, err := sqlx.Open("mysql", "root@/gom")
+				db, err := sqlx.Open("mysql", "root@/oak")
 				Expect(err).NotTo(HaveOccurred())
 				Expect(db.Close()).To(Succeed())
 				provider.DB = db
@@ -302,10 +302,10 @@ var _ = Describe("SQLiteProvider", func() {
 	BeforeEach(func() {
 		var err error
 
-		dir, err := ioutil.TempDir("", "gom")
+		dir, err := ioutil.TempDir("", "oak")
 		Expect(err).To(BeNil())
 
-		conn := filepath.Join(dir, "gom.db")
+		conn := filepath.Join(dir, "oak.db")
 		db, err = sqlx.Open("sqlite3", conn)
 		Expect(err).NotTo(HaveOccurred())
 
@@ -355,10 +355,10 @@ var _ = Describe("SQLiteProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				dir, err := ioutil.TempDir("", "gom")
+				dir, err := ioutil.TempDir("", "oak")
 				Expect(err).To(BeNil())
 
-				conn := filepath.Join(dir, "gom.db")
+				conn := filepath.Join(dir, "oak.db")
 				db, err := sqlx.Open("sqlite3", conn)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(db.Close()).To(Succeed())
@@ -436,10 +436,10 @@ var _ = Describe("SQLiteProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				dir, err := ioutil.TempDir("", "gom")
+				dir, err := ioutil.TempDir("", "oak")
 				Expect(err).To(BeNil())
 
-				conn := filepath.Join(dir, "gom.db")
+				conn := filepath.Join(dir, "oak.db")
 				db, err := sqlx.Open("sqlite3", conn)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(db.Close()).To(Succeed())

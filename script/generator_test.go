@@ -10,7 +10,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/oak/script"
 	"github.com/phogolabs/parcel"
 )
 
@@ -22,7 +22,7 @@ var _ = Describe("Generator", func() {
 
 	BeforeEach(func() {
 		var err error
-		dir, err = ioutil.TempDir("", "gom_generator")
+		dir, err = ioutil.TempDir("", "oak_generator")
 		Expect(err).To(BeNil())
 
 		generator = &script.Generator{

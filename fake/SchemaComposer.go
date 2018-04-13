@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/phogolabs/gom/schema"
+	"github.com/phogolabs/oak/schema"
 )
 
 type SchemaComposer struct {

@@ -1,4 +1,4 @@
-package gom_test
+package oak_test
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/gom"
+	"github.com/phogolabs/oak"
 	"github.com/phogolabs/parcel"
 )
 
@@ -22,11 +22,11 @@ var _ = Describe("Command", func() {
 		buffer := bytes.NewBufferString(fmt.Sprintf("-- name: %v", script))
 		fmt.Fprintln(buffer)
 		fmt.Fprintln(buffer, "SELECT * FROM users")
-		Expect(gom.LoadSQLCommandsFromReader(buffer)).To(Succeed())
+		Expect(oak.LoadSQLCommandsFromReader(buffer)).To(Succeed())
 	})
 
 	It("returns a command", func() {
-		stmt := gom.Command(script)
+		stmt := oak.Command(script)
 		Expect(stmt).NotTo(BeNil())
 
 		query, params := stmt.Prepare()
@@ -36,36 +36,36 @@ var _ = Describe("Command", func() {
 
 	Context("when the statement does not exits", func() {
 		It("does not return a statement", func() {
-			Expect(func() { gom.Command("down") }).To(Panic())
+			Expect(func() { oak.Command("down") }).To(Panic())
 		})
 	})
 })
 
 var _ = Describe("ParseURL", func() {
 	It("parses the SQLite connection string successfully", func() {
-		driver, source, err := gom.ParseURL("sqlite3://./gom.db")
+		driver, source, err := oak.ParseURL("sqlite3://./oak.db")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(driver).To(Equal("sqlite3"))
-		Expect(source).To(Equal("./gom.db"))
+		Expect(source).To(Equal("./oak.db"))
 	})
 
 	It("parses the MySQL connection string successfully", func() {
-		driver, source, err := gom.ParseURL("mysql://root@/gom")
+		driver, source, err := oak.ParseURL("mysql://root@/oak")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(driver).To(Equal("mysql"))
-		Expect(source).To(Equal("root@/gom"))
+		Expect(source).To(Equal("root@/oak"))
 	})
 
 	It("parses the PostgreSQL connection string successfully", func() {
-		driver, source, err := gom.ParseURL("postgres://localhost/gom?sslmode=disable")
+		driver, source, err := oak.ParseURL("postgres://localhost/oak?sslmode=disable")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(driver).To(Equal("postgres"))
-		Expect(source).To(Equal("postgres://localhost/gom?sslmode=disable"))
+		Expect(source).To(Equal("postgres://localhost/oak?sslmode=disable"))
 	})
 
 	Context("when the URL is invalid", func() {
 		It("returns an error", func() {
-			driver, source, err := gom.ParseURL("::")
+			driver, source, err := oak.ParseURL("::")
 			Expect(driver).To(BeEmpty())
 			Expect(source).To(BeEmpty())
 			Expect(err).To(MatchError("parse ::: missing protocol scheme"))
@@ -75,12 +75,12 @@ var _ = Describe("ParseURL", func() {
 
 var _ = Describe("Migrate", func() {
 	It("passes the migrations to underlying migration executor", func() {
-		dir, err := ioutil.TempDir("", "gom_generator")
+		dir, err := ioutil.TempDir("", "oak_generator")
 		Expect(err).To(BeNil())
 
-		url := filepath.Join(dir, "gom.db")
-		db, err := gom.Open("sqlite3", url)
+		url := filepath.Join(dir, "oak.db")
+		db, err := oak.Open("sqlite3", url)
 		Expect(err).To(BeNil())
-		Expect(gom.Migrate(db, parcel.Dir(dir))).To(Succeed())
+		Expect(oak.Migrate(db, parcel.Dir(dir))).To(Succeed())
 	})
 })

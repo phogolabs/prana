@@ -10,7 +10,7 @@ import (
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/json"
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/gom"
+	"github.com/phogolabs/oak"
 	"github.com/urfave/cli"
 )
 
@@ -52,7 +52,7 @@ func BeforeEach(ctx *cli.Context) error {
 }
 
 func open(ctx *cli.Context) (*sqlx.DB, error) {
-	driver, conn, err := gom.ParseURL(ctx.GlobalString("database-url"))
+	driver, conn, err := oak.ParseURL(ctx.GlobalString("database-url"))
 	if err != nil {
 		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
 	}

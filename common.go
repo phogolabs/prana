@@ -1,10 +1,10 @@
-// GOM package provides a wrapper to work with loukoum built queries as well
+// Package oak provides a wrapper to work with loukoum built queries as well
 // maitaining database version by creating, executing and reverting SQL
 // migrations.
 //
 // The package allows executing embedded SQL statements from script for a given
 // name.
-package gom
+package oak
 
 import (
 	"database/sql"
@@ -14,8 +14,8 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/gom/migration"
-	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/oak/migration"
+	"github.com/phogolabs/oak/script"
 	"github.com/phogolabs/parcel"
 )
 

@@ -3,7 +3,7 @@ package migration_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/oak/migration"
 )
 
 var _ = Describe("Model", func() {

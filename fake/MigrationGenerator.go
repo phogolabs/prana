@@ -4,7 +4,7 @@ package fake
 import (
 	"sync"
 
-	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/oak/migration"
 )
 
 type MigrationGenerator struct {

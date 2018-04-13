@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/oak/migration"
 	"github.com/phogolabs/parcel"
 )
 
@@ -20,10 +20,10 @@ var _ = Describe("Util", func() {
 		)
 
 		BeforeEach(func() {
-			dir, err := ioutil.TempDir("", "gom_runner")
+			dir, err := ioutil.TempDir("", "oak_runner")
 			Expect(err).To(BeNil())
 
-			conn := filepath.Join(dir, "gom.db")
+			conn := filepath.Join(dir, "oak.db")
 			db, err = sqlx.Open("sqlite3", conn)
 			Expect(err).To(BeNil())
 

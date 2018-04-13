@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/oak/migration"
 )
 
 type MigrationFileSystem struct {

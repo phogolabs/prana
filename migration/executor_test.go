@@ -8,8 +8,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom/fake"
-	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/oak/fake"
+	"github.com/phogolabs/oak/migration"
 )
 
 var _ = Describe("Executor", func() {

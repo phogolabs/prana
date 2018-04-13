@@ -1,9 +1,9 @@
-package gom_test
+package oak_test
 
 import (
 	"fmt"
 
-	"github.com/phogolabs/gom"
+	"github.com/phogolabs/oak"
 	"github.com/phogolabs/parcel"
 	lk "github.com/ulule/loukoum"
 )
@@ -15,7 +15,7 @@ type User struct {
 }
 
 func ExampleGateway_SelectOne() {
-	gateway, err := gom.Open("sqlite3", "example.db")
+	gateway, err := oak.Open("sqlite3", "example.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -38,7 +38,7 @@ func ExampleGateway_SelectOne() {
 }
 
 func ExampleGateway_Select() {
-	gateway, err := gom.Open("sqlite3", "example.db")
+	gateway, err := oak.Open("sqlite3", "example.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -59,7 +59,7 @@ func ExampleGateway_Select() {
 }
 
 func ExampleGateway_QueryRow() {
-	gateway, err := gom.Open("sqlite3", "example.db")
+	gateway, err := oak.Open("sqlite3", "example.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -75,7 +75,7 @@ func ExampleGateway_QueryRow() {
 		From("users").
 		Where(lk.Condition("first_name").Equal("John"))
 
-	var row *gom.Row
+	var row *oak.Row
 
 	row, err = gateway.QueryRow(query)
 	if err != nil {
@@ -90,7 +90,7 @@ func ExampleGateway_QueryRow() {
 }
 
 func ExampleGateway_Query() {
-	gateway, err := gom.Open("sqlite3", "example.db")
+	gateway, err := oak.Open("sqlite3", "example.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -125,7 +125,7 @@ func ExampleGateway_Query() {
 }
 
 func ExampleGateway_Exec() {
-	gateway, err := gom.Open("sqlite3", "example.db")
+	gateway, err := oak.Open("sqlite3", "example.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -150,16 +150,16 @@ func ExampleGateway_Exec() {
 }
 
 func ExampleCommand() {
-	err := gom.LoadSQLCommandsFrom(parcel.Dir("./database/command"))
+	err := oak.LoadSQLCommandsFrom(parcel.Dir("./database/command"))
 
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 
-	cmd := gom.Command("show-sqlite-master")
+	cmd := oak.Command("show-sqlite-master")
 
-	gateway, err := gom.Open("sqlite3", "example.db")
+	gateway, err := oak.Open("sqlite3", "example.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -177,7 +177,7 @@ func ExampleCommand() {
 }
 
 func ExampleSQL() {
-	gateway, err := gom.Open("sqlite3", "example.db")
+	gateway, err := oak.Open("sqlite3", "example.db")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -189,7 +189,7 @@ func ExampleSQL() {
 		}
 	}()
 
-	query := gom.SQL("SELECT tbl_name FROM sqlite_master")
+	query := oak.SQL("SELECT tbl_name FROM sqlite_master")
 
 	rows, err := gateway.Query(query)
 	if err != nil {

@@ -1,4 +1,4 @@
-package gom_test
+package oak_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestGom(t *testing.T) {
+func TestOAK(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "GOM Suite")
+	RunSpecs(t, "OAK Suite")
 }

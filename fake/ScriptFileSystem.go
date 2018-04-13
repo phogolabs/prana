@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"sync"
 
-	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/oak/script"
 )
 
 type ScriptFileSystem struct {

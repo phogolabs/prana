@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/gom/script"
+	"github.com/phogolabs/oak/script"
 )
 
 // Runner runs or reverts a given migration item.

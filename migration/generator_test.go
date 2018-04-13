@@ -8,8 +8,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/gom/fake"
-	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/oak/fake"
+	"github.com/phogolabs/oak/migration"
 	"github.com/phogolabs/parcel"
 )
 
@@ -23,7 +23,7 @@ var _ = Describe("Generator", func() {
 	BeforeEach(func() {
 		var err error
 
-		dir, err = ioutil.TempDir("", "gom_generator")
+		dir, err = ioutil.TempDir("", "oak_generator")
 		Expect(err).To(BeNil())
 
 		dir = filepath.Join(dir, "migration")

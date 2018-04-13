@@ -6,33 +6,33 @@ import (
 
 	randomdata "github.com/Pallinder/go-randomdata"
 	_ "github.com/mattn/go-sqlite3"
-	_ "github.com/phogolabs/gom/example"
+	_ "github.com/phogolabs/oak/example"
 	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/apex/log"
-	"github.com/phogolabs/gom"
-	"github.com/phogolabs/gom/example/database/model"
+	"github.com/phogolabs/oak"
+	"github.com/phogolabs/oak/example/database/model"
 	"github.com/phogolabs/parcel"
 	lk "github.com/ulule/loukoum"
 )
 
 func main() {
-	driver, source, err := gom.ParseURL("sqlite3://gom.db")
+	driver, source, err := oak.ParseURL("sqlite3://oak.db")
 	if err != nil {
 		log.WithError(err).Fatal("Failed to parse database connection string")
 	}
 
-	gateway, err := gom.Open(driver, source)
+	gateway, err := oak.Open(driver, source)
 	if err != nil {
 		log.WithError(err).Fatal("Failed to open database connection")
 	}
 	defer gateway.Close()
 
-	if err := gom.LoadSQLCommandsFrom(parcel.ResourceManager.Root("database/script")); err != nil {
+	if err := oak.LoadSQLCommandsFrom(parcel.Root("database/script")); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 
-	if err := gom.Migrate(gateway, parcel.ResourceManager.Root("database/migration")); err != nil {
+	if err := oak.Migrate(gateway, parcel.Root("database/migration")); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 
@@ -57,7 +57,7 @@ func main() {
 
 	users := []model.User{}
 
-	if err = gateway.Select(&users, gom.Command("show-users")); err != nil {
+	if err = gateway.Select(&users, oak.Command("show-users")); err != nil {
 		log.WithError(err).Fatal("Failed to select all users")
 	}
 

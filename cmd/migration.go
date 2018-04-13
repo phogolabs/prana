@@ -10,7 +10,7 @@ import (
 	"github.com/fatih/color"
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
-	"github.com/phogolabs/gom/migration"
+	"github.com/phogolabs/oak/migration"
 	"github.com/phogolabs/parcel"
 	"github.com/urfave/cli"
 )
