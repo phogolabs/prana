@@ -141,6 +141,8 @@ type ColumnType struct {
 	Name string
 	// Underlying is the name of the column data type (the underlying type of the domain, if applicable)
 	Underlying string
+	// IsPrimaryKey returns true if the column is in primary key
+	IsPrimaryKey bool
 	// IsNullable determines whether the column allow null values
 	IsNullable bool
 	// IsUnsigned returns true if the numeric type is unassigned
@@ -163,6 +165,10 @@ func (t ColumnType) String() string {
 		name = fmt.Sprintf("%s(%d)", name, t.Precision)
 	} else if t.Precision > 0 && t.PrecisionScale > 0 {
 		name = fmt.Sprintf("%s(%d, %d)", name, t.Precision, t.PrecisionScale)
+	}
+
+	if t.IsPrimaryKey {
+		name = fmt.Sprintf("%s PRIMARY KEY", name)
 	}
 
 	if t.IsNullable {
@@ -198,4 +204,12 @@ type Spec struct {
 	Tables []string
 	// Dir is a path to root model package directory
 	Dir string
+}
+
+type sqliteInf struct {
+	CID          int
+	Type         string
+	NotNullable  int
+	DefaultValue interface{}
+	PK           int
 }

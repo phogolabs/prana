@@ -145,6 +145,34 @@ var _ = Describe("PostgreSQLProvider", func() {
 			ExpectColumnsForPostgreSQL(table.Columns)
 		})
 
+		Context("when the table has primary key", func() {
+			BeforeEach(func() {
+				_, err := db.Exec("CREATE TABLE my_table(id serial primary key)")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				_, err := db.Exec("DROP TABLE IF EXISTS my_table")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("returns the schema successfully", func() {
+				schema, err := provider.Schema("", "my_table")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(schema).NotTo(BeNil())
+				Expect(schema.Name).To(Equal("public"))
+				Expect(schema.Tables).To(HaveLen(1))
+
+				table := schema.Tables[0]
+				Expect(table.Name).To(Equal("my_table"))
+				Expect(table.Columns).To(HaveLen(1))
+
+				column := table.Columns[0]
+				Expect(column.Name).To(Equal("id"))
+				Expect(column.Type.IsPrimaryKey).To(BeTrue())
+			})
+		})
+
 		Context("when the table names are not provided", func() {
 			It("return an error", func() {
 				schema, err := provider.Schema("public")
@@ -265,7 +293,34 @@ var _ = Describe("MySQLProvider", func() {
 			Expect(table.Name).To(Equal("test"))
 			Expect(table.Columns).To(HaveLen(36))
 			ExpectColumnsForMySQL(table.Columns)
+		})
 
+		Context("when the table has primary key", func() {
+			BeforeEach(func() {
+				_, err := db.Exec("CREATE TABLE my_table(id serial primary key)")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				_, err := db.Exec("DROP TABLE IF EXISTS my_table")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("returns the schema successfully", func() {
+				schema, err := provider.Schema("", "my_table")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(schema).NotTo(BeNil())
+				Expect(schema.Name).To(Equal("oak"))
+				Expect(schema.Tables).To(HaveLen(1))
+
+				table := schema.Tables[0]
+				Expect(table.Name).To(Equal("my_table"))
+				Expect(table.Columns).To(HaveLen(1))
+
+				column := table.Columns[0]
+				Expect(column.Name).To(Equal("id"))
+				Expect(column.Type.IsPrimaryKey).To(BeTrue())
+			})
 		})
 
 		Context("when the table names are not provided", func() {
@@ -424,6 +479,34 @@ var _ = Describe("SQLiteProvider", func() {
 			Expect(table.Name).To(Equal("test"))
 			Expect(table.Columns).To(HaveLen(61))
 			ExpectColumnsForSQLite(table.Columns)
+		})
+
+		Context("when the table has primary key", func() {
+			BeforeEach(func() {
+				_, err := db.Exec("CREATE TABLE my_table(id serial primary key)")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			AfterEach(func() {
+				_, err := db.Exec("DROP TABLE IF EXISTS my_table")
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("returns the schema successfully", func() {
+				schema, err := provider.Schema("", "my_table")
+				Expect(err).NotTo(HaveOccurred())
+				Expect(schema).NotTo(BeNil())
+				Expect(schema.Name).To(Equal("default"))
+				Expect(schema.Tables).To(HaveLen(1))
+
+				table := schema.Tables[0]
+				Expect(table.Name).To(Equal("my_table"))
+				Expect(table.Columns).To(HaveLen(1))
+
+				column := table.Columns[0]
+				Expect(column.Name).To(Equal("id"))
+				Expect(column.Type.IsPrimaryKey).To(BeTrue())
+			})
 		})
 
 		Context("when the table names are not provided", func() {
