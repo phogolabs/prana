@@ -330,7 +330,7 @@ func (m *MySQLProvider) Schema(schema string, names ...string) (*Schema, error) 
 	}
 
 	query := &bytes.Buffer{}
-	query.WriteString("SELECT column_name, data_type, data_type, is_nullable = 'YES' AS is_nullable, ")
+	query.WriteString("SELECT column_name, data_type, REPLACE(column_type, ' unsigned', ''), is_nullable = 'YES' AS is_nullable, ")
 	query.WriteString("INSTR(column_type, 'unsigned') > 0 AS is_unsigned, ")
 	query.WriteString("CASE WHEN numeric_precision IS NULL THEN 0 ELSE numeric_precision END, ")
 	query.WriteString("CASE WHEN numeric_scale IS NULL THEN 0 ELSE numeric_scale END, ")
@@ -444,8 +444,8 @@ func translate(columnType *ColumnType) string {
 	if columnType.IsUnsigned {
 		switch name {
 		case "tinyint":
-			switch columnType.Precision {
-			case 1:
+			switch columnType.Underlying {
+			case "tinyint(1)":
 				return BoolDef.As(nullable)
 			default:
 				return UInt8Def.As(nullable)
@@ -463,8 +463,8 @@ func translate(columnType *ColumnType) string {
 
 	switch name {
 	case "tinyint":
-		switch columnType.Precision {
-		case 1:
+		switch columnType.Underlying {
+		case "tinyint(1)":
 			return BoolDef.As(nullable)
 		default:
 			return Int8Def.As(nullable)

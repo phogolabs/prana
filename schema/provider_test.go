@@ -273,6 +273,26 @@ var _ = Describe("MySQLProvider", func() {
 	Describe("Schema", func() {
 		BeforeEach(func() {
 			query := &bytes.Buffer{}
+
+			fmt.Fprintln(query, " bit_tinyint_field_unsigned_null       tinyint(1) UNSIGNED NULL,")
+			fmt.Fprintln(query, " bit_tinyint_field_unsigned_not_null   tinyint(1) UNSIGNED NOT NULL,")
+			fmt.Fprintln(query, " bit_tinyint_field_null                tinyint(1) NULL,")
+			fmt.Fprintln(query, " bit_tinyint_field_not_null            tinyint(1) NOT NULL,")
+			fmt.Fprintln(query, " tinyint_field_unsigned_null           tinyint(2) UNSIGNED NULL,")
+			fmt.Fprintln(query, " tinyint_field_unsigned_not_null       tinyint(2) UNSIGNED NOT NULL,")
+			fmt.Fprintln(query, " tinyint_field_null                    tinyint(2) NULL,")
+			fmt.Fprintln(query, " tinyint_field_not_null                tinyint(2) NOT NULL,")
+			fmt.Fprintln(query, " smallint_field_unsigned_null          smallint  UNSIGNED NULL,")
+			fmt.Fprintln(query, " smallint_field_unsigned_not_null      smallint  UNSIGNED NOT NULL,")
+			fmt.Fprintln(query, " mediumint_field_unsigned_null         mediumint  UNSIGNED NULL,")
+			fmt.Fprintln(query, " mediumint_field_unsigned_not_null     mediumint  UNSIGNED NOT NULL,")
+			fmt.Fprintln(query, " mediumint_field_null                  mediumint  NULL,")
+			fmt.Fprintln(query, " mediumint_field_not_null              mediumint  NOT NULL,")
+			fmt.Fprintln(query, " int_field_unsigned_null               int UNSIGNED NULL,")
+			fmt.Fprintln(query, " int_field_unsigned_not_null           int UNSIGNED NOT NULL,")
+			fmt.Fprintln(query, " varbinary_field_null                  varbinary(20) NULL,")
+			fmt.Fprintln(query, " varbinary_field_not_null              varbinary(20) NOT NULL")
+
 			_, err := db.Exec(CreateTable(query))
 			Expect(err).NotTo(HaveOccurred())
 		})
@@ -291,7 +311,7 @@ var _ = Describe("MySQLProvider", func() {
 
 			table := schema.Tables[0]
 			Expect(table.Name).To(Equal("test"))
-			Expect(table.Columns).To(HaveLen(36))
+			Expect(table.Columns).To(HaveLen(54))
 			ExpectColumnsForMySQL(table.Columns)
 		})
 
