@@ -3,6 +3,7 @@ package schema_test
 import (
 	"bytes"
 	"fmt"
+	"go/format"
 	"io/ioutil"
 
 	. "github.com/onsi/ginkgo"
@@ -14,7 +15,6 @@ import (
 var _ = Describe("Generator", func() {
 	var (
 		generator *schema.Generator
-		source    *bytes.Buffer
 		schemaDef *schema.Schema
 	)
 
@@ -26,8 +26,14 @@ var _ = Describe("Generator", func() {
 					Name: "table1",
 					Columns: []schema.Column{
 						schema.Column{
-							Name:     "ID",
+							Name:     "id",
 							ScanType: "string",
+							Type: schema.ColumnType{
+								Name:          "varchar",
+								IsPrimaryKey:  true,
+								IsNullable:    true,
+								CharMaxLength: 200,
+							},
 						},
 					},
 				},
@@ -39,28 +45,29 @@ var _ = Describe("Generator", func() {
 				InlcudeDoc: false,
 			},
 		}
+	})
 
-		source = &bytes.Buffer{}
+	It("generates the schema successfully", func() {
+		source := &bytes.Buffer{}
 		fmt.Fprintln(source, "package model")
 		fmt.Fprintln(source)
 		fmt.Fprintln(source, "type Table1 struct {")
-		fmt.Fprintln(source, "  ID string `db:\"ID\" json:\"ID\" validate:\"required\"`")
+		fmt.Fprintln(source, "        Id string `db:\"id,primary_key\" json:\"id\" validate:\"lte=200\"`")
 		fmt.Fprintln(source, "}")
 
 		data, err := imports.Process("model", source.Bytes(), nil)
 		Expect(err).To(BeNil())
 
-		source.Reset()
-		source.Write(data)
-	})
+		data, err = format.Source(data)
+		Expect(err).To(BeNil())
 
-	It("generates the schema successfully", func() {
 		reader, err := generator.Compose("model", schemaDef)
 		Expect(err).To(BeNil())
 
-		data, err := ioutil.ReadAll(reader)
+		generated, err := ioutil.ReadAll(reader)
 		Expect(err).To(BeNil())
-		Expect(data).To(Equal(source.Bytes()))
+
+		Expect(generated).To(Equal(data))
 	})
 
 	Context("when the table is ignored", func() {
@@ -78,7 +85,7 @@ var _ = Describe("Generator", func() {
 		})
 	})
 
-	Context("when including documentation is enabled", func() {
+	Context("when including documentation is disabled", func() {
 		BeforeEach(func() {
 			generator.Config.InlcudeDoc = true
 		})
@@ -91,8 +98,8 @@ var _ = Describe("Generator", func() {
 			Expect(err).To(BeNil())
 
 			source := string(data)
-			Expect(source).To(ContainSubstring("// ID represents a database column 'ID' of type ' NOT NULL'"))
 			Expect(source).To(ContainSubstring("// Table1 represents a data base table 'table1'"))
+			Expect(source).To(ContainSubstring("// Id represents a database column 'id' of type 'VARCHAR(200) PRIMARY KEY NULL'"))
 		})
 	})
 

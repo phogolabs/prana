@@ -6,7 +6,6 @@ import (
 	"go/format"
 	"io"
 	"sort"
-	"strings"
 	"time"
 
 	"github.com/go-openapi/inflect"
@@ -41,7 +40,7 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 	processed := 0
 
 	if g.Config.InlcudeDoc {
-		fmt.Fprintf(buffer, "// Package contains an object model of database schema '%s'", schema.Name)
+		fmt.Fprintf(buffer, "// Package %s contains an object model of database schema '%s'", pkg, schema.Name)
 		fmt.Fprintln(buffer)
 		fmt.Fprintln(buffer, "// Auto-generated at", time.Now().Format(time.UnixDate))
 	}
@@ -78,7 +77,7 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 				if index > 0 {
 					fmt.Fprintln(buffer)
 				}
-				fmt.Fprintf(buffer, "// %s represents a database column '%s' of type '%s'", fieldName, column.Name, column.Type)
+				fmt.Fprintf(buffer, "// %s represents a database column '%s' of type '%v'", fieldName, column.Name, column.Type)
 				fmt.Fprintln(buffer)
 			}
 
@@ -126,19 +125,31 @@ func (g *Generator) fieldType(column *Column) string {
 }
 
 func (g *Generator) fieldTag(column *Column) string {
-	tag := func(name, value string) string {
-		return fmt.Sprintf(`%s:"%s"`, name, value)
+	db := &FieldTag{Name: "db"}
+	db.AddOption(column.Name)
+
+	if column.Type.IsPrimaryKey {
+		db.AddOption("primary_key")
 	}
 
-	tags := []string{}
-	tags = append(tags, tag("db", column.Name))
-	tags = append(tags, tag("json", column.Name))
+	json := &FieldTag{Name: "json"}
+	json.AddOption(column.Name)
+
+	validate := &FieldTag{Name: "validate"}
 
 	if !column.Type.IsNullable {
-		tags = append(tags, tag("validate", "required"))
+		validate.AddOption("required")
 	}
 
-	return fmt.Sprintf("`%s`", strings.Join(tags, " "))
+	if len := column.Type.CharMaxLength; len > 0 {
+		validate.AddOption(fmt.Sprintf("lte=%d", len))
+	}
+
+	tags := FieldTagList{}
+	tags = append(tags, db)
+	tags = append(tags, json)
+	tags = append(tags, validate)
+	return tags.String()
 }
 
 func (g *Generator) format(buffer *bytes.Buffer) error {

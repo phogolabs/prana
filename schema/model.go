@@ -206,6 +206,43 @@ type Spec struct {
 	Dir string
 }
 
+// FieldTag represents a field tag
+type FieldTag struct {
+	// Name of the tag
+	Name string
+	// Options
+	Options []string
+}
+
+// AddOption adds option to that tag
+func (t *FieldTag) AddOption(opt string) {
+	t.Options = append(t.Options, opt)
+}
+
+// String returns the tag as string
+func (t *FieldTag) String() string {
+	options := t.Options
+	if len(options) == 0 {
+		options = append(options, "-")
+	}
+
+	return fmt.Sprintf("%s:\"%s\"", t.Name, strings.Join(options, ","))
+}
+
+// FieldTagList represents tag of list
+type FieldTagList []*FieldTag
+
+// String returns the list as string
+func (l FieldTagList) String() string {
+	tags := []string{}
+
+	for _, t := range l {
+		tags = append(tags, t.String())
+	}
+
+	return fmt.Sprintf("`%s`", strings.Join(tags, " "))
+}
+
 type sqliteInf struct {
 	CID          int
 	Type         string
