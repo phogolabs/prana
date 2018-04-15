@@ -5,7 +5,7 @@
 [![Build Status][travis-img]][travis-url]
 [![Coverage][coveralls-img]][coveralls-url]
 
-*A Golang Database Manager*
+*Golang Database Manager*
 
 [![OAK][oak-img]][oak-url]
 
@@ -302,7 +302,7 @@ We are welcome to any contributions. Just fork the
 [logo-author-url]: https://www.freepik.com/free-photos-vectors/tree
 [logo-license]: http://creativecommons.org/licenses/by/3.0/
 [oak-url]: https://github.com/phogolabs/oak
-[oak-img]: doc/img/logo.jpg
+[oak-img]: doc/img/logo.png
 [coveralls-url]: https://coveralls.io/github/phogolabs/oak
 [coveralls-img]: https://coveralls.io/repos/github/phogolabs/oak/badge.svg?branch=master
 [travis-img]: https://travis-ci.org/phogolabs/oak.svg?branch=master
