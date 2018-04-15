@@ -2,15 +2,14 @@
 package fake
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"sync"
 
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/parcel"
 )
 
-type ScriptFileSystem struct {
+type FileSystem struct {
 	WalkStub        func(dir string, fn filepath.WalkFunc) error
 	walkMutex       sync.RWMutex
 	walkArgsForCall []struct {
@@ -20,7 +19,7 @@ type ScriptFileSystem struct {
 	walkReturns struct {
 		result1 error
 	}
-	OpenFileStub        func(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error)
+	OpenFileStub        func(name string, flag int, perm os.FileMode) (parcel.File, error)
 	openFileMutex       sync.RWMutex
 	openFileArgsForCall []struct {
 		name string
@@ -28,14 +27,14 @@ type ScriptFileSystem struct {
 		perm os.FileMode
 	}
 	openFileReturns struct {
-		result1 io.ReadWriteCloser
+		result1 parcel.File
 		result2 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ScriptFileSystem) Walk(dir string, fn filepath.WalkFunc) error {
+func (fake *FileSystem) Walk(dir string, fn filepath.WalkFunc) error {
 	fake.walkMutex.Lock()
 	fake.walkArgsForCall = append(fake.walkArgsForCall, struct {
 		dir string
@@ -49,26 +48,26 @@ func (fake *ScriptFileSystem) Walk(dir string, fn filepath.WalkFunc) error {
 	return fake.walkReturns.result1
 }
 
-func (fake *ScriptFileSystem) WalkCallCount() int {
+func (fake *FileSystem) WalkCallCount() int {
 	fake.walkMutex.RLock()
 	defer fake.walkMutex.RUnlock()
 	return len(fake.walkArgsForCall)
 }
 
-func (fake *ScriptFileSystem) WalkArgsForCall(i int) (string, filepath.WalkFunc) {
+func (fake *FileSystem) WalkArgsForCall(i int) (string, filepath.WalkFunc) {
 	fake.walkMutex.RLock()
 	defer fake.walkMutex.RUnlock()
 	return fake.walkArgsForCall[i].dir, fake.walkArgsForCall[i].fn
 }
 
-func (fake *ScriptFileSystem) WalkReturns(result1 error) {
+func (fake *FileSystem) WalkReturns(result1 error) {
 	fake.WalkStub = nil
 	fake.walkReturns = struct {
 		result1 error
 	}{result1}
 }
 
-func (fake *ScriptFileSystem) OpenFile(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error) {
+func (fake *FileSystem) OpenFile(name string, flag int, perm os.FileMode) (parcel.File, error) {
 	fake.openFileMutex.Lock()
 	fake.openFileArgsForCall = append(fake.openFileArgsForCall, struct {
 		name string
@@ -83,27 +82,27 @@ func (fake *ScriptFileSystem) OpenFile(name string, flag int, perm os.FileMode) 
 	return fake.openFileReturns.result1, fake.openFileReturns.result2
 }
 
-func (fake *ScriptFileSystem) OpenFileCallCount() int {
+func (fake *FileSystem) OpenFileCallCount() int {
 	fake.openFileMutex.RLock()
 	defer fake.openFileMutex.RUnlock()
 	return len(fake.openFileArgsForCall)
 }
 
-func (fake *ScriptFileSystem) OpenFileArgsForCall(i int) (string, int, os.FileMode) {
+func (fake *FileSystem) OpenFileArgsForCall(i int) (string, int, os.FileMode) {
 	fake.openFileMutex.RLock()
 	defer fake.openFileMutex.RUnlock()
 	return fake.openFileArgsForCall[i].name, fake.openFileArgsForCall[i].flag, fake.openFileArgsForCall[i].perm
 }
 
-func (fake *ScriptFileSystem) OpenFileReturns(result1 io.ReadWriteCloser, result2 error) {
+func (fake *FileSystem) OpenFileReturns(result1 parcel.File, result2 error) {
 	fake.OpenFileStub = nil
 	fake.openFileReturns = struct {
-		result1 io.ReadWriteCloser
+		result1 parcel.File
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *ScriptFileSystem) Invocations() map[string][][]interface{} {
+func (fake *FileSystem) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.walkMutex.RLock()
@@ -113,7 +112,7 @@ func (fake *ScriptFileSystem) Invocations() map[string][][]interface{} {
 	return fake.invocations
 }
 
-func (fake *ScriptFileSystem) recordInvocation(key string, args []interface{}) {
+func (fake *FileSystem) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -125,4 +124,4 @@ func (fake *ScriptFileSystem) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ script.FileSystem = new(ScriptFileSystem)
+var _ parcel.FileSystem = new(FileSystem)

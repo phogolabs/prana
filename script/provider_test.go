@@ -51,10 +51,10 @@ var _ = Describe("Provider", func() {
 	})
 
 	Describe("ReadDir", func() {
-		var fileSystem *fake.ScriptFileSystem
+		var fileSystem *fake.FileSystem
 
 		BeforeEach(func() {
-			fileSystem = &fake.ScriptFileSystem{}
+			fileSystem = &fake.FileSystem{}
 		})
 
 		It("loads the provider successfully", func() {

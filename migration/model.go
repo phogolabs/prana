@@ -5,14 +5,14 @@ package migration
 import (
 	"fmt"
 	"io"
-	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"time"
+
+	"github.com/phogolabs/parcel"
 )
 
-//go:generate counterfeiter -fake-name MigrationFileSystem -o ../fake/MigrationFileSystem.go . FileSystem
 //go:generate counterfeiter -fake-name MigrationRunner -o ../fake/MigrationRunner.go . ItemRunner
 //go:generate counterfeiter -fake-name MigrationProvider -o ../fake/MigrationProvider.go . ItemProvider
 //go:generate counterfeiter -fake-name MigrationGenerator -o ../fake/MigrationGenerator.go . ItemGenerator
@@ -23,13 +23,7 @@ var (
 )
 
 // FileSystem provides with primitives to work with the underlying file system
-type FileSystem interface {
-	// Walk walks the file tree rooted at root, calling walkFn for each file or
-	// directory in the tree, including root.
-	Walk(dir string, fn filepath.WalkFunc) error
-	// OpenFile is the generalized open call; most users will use Open
-	OpenFile(name string, flag int, perm os.FileMode) (io.ReadWriteCloser, error)
-}
+type FileSystem = parcel.FileSystem
 
 // ItemRunner runs or reverts a given migration item.
 type ItemRunner interface {

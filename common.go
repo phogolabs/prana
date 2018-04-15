@@ -61,7 +61,7 @@ func init() {
 }
 
 // Migrate runs all pending migration
-func Migrate(gateway *Gateway, fileSystem migration.FileSystem) error {
+func Migrate(gateway *Gateway, fileSystem parcel.FileSystem) error {
 	return migration.RunAll(gateway.db, fileSystem)
 }
 
@@ -72,7 +72,7 @@ func LoadSQLCommandsFromReader(r io.Reader) error {
 
 // LoadSQLCommandsFrom loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
-func LoadSQLCommandsFrom(fileSystem script.FileSystem) error {
+func LoadSQLCommandsFrom(fileSystem parcel.FileSystem) error {
 	return provider.ReadDir(fileSystem)
 }
 
