@@ -3,8 +3,9 @@ package script
 import (
 	"fmt"
 	"os"
-	"strings"
 	"time"
+
+	"github.com/go-openapi/inflect"
 )
 
 // Generator generates a new command.
@@ -15,8 +16,8 @@ type Generator struct {
 
 // Create crates a new file and command for given file name and command name.
 func (g *Generator) Create(path, name string) (string, string, error) {
-	path = strings.Replace(path, " ", "_", -1)
-	name = strings.Replace(name, " ", "-", -1)
+	path = inflect.Underscore(inflect.Camelize(path))
+	name = inflect.Dasherize(name)
 
 	provider := &Provider{}
 

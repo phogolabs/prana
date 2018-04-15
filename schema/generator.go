@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/jinzhu/inflection"
+	"github.com/go-openapi/inflect"
 	"golang.org/x/tools/imports"
 )
 
@@ -70,7 +70,7 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 		fmt.Fprintln(buffer)
 
 		for index, column := range columns {
-			fieldName := g.fieldName(&column)
+			fieldName := inflect.Camelize(column.Name)
 			fieldType := g.fieldType(&column)
 			fieldTag := g.fieldTag(&column)
 
@@ -116,14 +116,9 @@ func (g *Generator) ignore() []string {
 }
 
 func (g *Generator) tableName(table *Table) string {
-	name := g.sanitize(table.Name)
-	name = inflection.Singular(name)
-	name = strings.Title(name)
+	name := inflect.Camelize(table.Name)
+	name = inflect.Singularize(name)
 	return name
-}
-
-func (g *Generator) fieldName(column *Column) string {
-	return g.sanitize(column.Name)
 }
 
 func (g *Generator) fieldType(column *Column) string {
@@ -144,17 +139,6 @@ func (g *Generator) fieldTag(column *Column) string {
 	}
 
 	return fmt.Sprintf("`%s`", strings.Join(tags, " "))
-}
-
-func (g *Generator) sanitize(text string) string {
-	buffer := &bytes.Buffer{}
-	parts := strings.Split(text, "_")
-
-	for _, part := range parts {
-		buffer.WriteString(strings.Title(part))
-	}
-
-	return buffer.String()
 }
 
 func (g *Generator) format(buffer *bytes.Buffer) error {
