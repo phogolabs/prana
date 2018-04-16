@@ -114,7 +114,7 @@ func (m *SQLSchema) print(ctx *cli.Context) error {
 		Tables: ctx.GlobalStringSlice("table-name"),
 	}
 
-	if err := m.executor.WriteTo(os.Stdout, spec); err != nil {
+	if err := m.executor.Write(os.Stdout, spec); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeSchema)
 	}
 

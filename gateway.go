@@ -4,7 +4,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// Gateway is connected to a database and can executes SQL queries againts it.
+// Gateway is connected to a database and can executes SQL queries against it.
 type Gateway struct {
 	db *sqlx.DB
 }

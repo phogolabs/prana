@@ -63,7 +63,7 @@ var _ = Describe("Executor", func() {
 		}
 	})
 
-	Describe("WriteTo", func() {
+	Describe("Write", func() {
 		BeforeEach(func() {
 			reader := bytes.NewBufferString("source")
 			composer.ComposeReturns(reader, nil)
@@ -71,7 +71,7 @@ var _ = Describe("Executor", func() {
 
 		It("writes the generated source successfully", func() {
 			writer := &bytes.Buffer{}
-			Expect(executor.WriteTo(writer, spec)).To(Succeed())
+			Expect(executor.Write(writer, spec)).To(Succeed())
 			Expect(writer.String()).To(Equal("source"))
 
 			Expect(provider.TablesCallCount()).To(BeZero())
@@ -94,7 +94,7 @@ var _ = Describe("Executor", func() {
 			})
 
 			It("uses the schema name as package name", func() {
-				Expect(executor.WriteTo(ioutil.Discard, spec)).To(Succeed())
+				Expect(executor.Write(ioutil.Discard, spec)).To(Succeed())
 				Expect(composer.ComposeCallCount()).To(Equal(1))
 				packageName, _ := composer.ComposeArgsForCall(0)
 
@@ -112,7 +112,7 @@ var _ = Describe("Executor", func() {
 				reader := bytes.NewBufferString("source")
 				composer.ComposeReturns(reader, nil)
 
-				Expect(executor.WriteTo(writer, spec)).To(Succeed())
+				Expect(executor.Write(writer, spec)).To(Succeed())
 				Expect(writer.String()).To(Equal("source"))
 
 				Expect(provider.TablesCallCount()).To(Equal(1))
@@ -138,7 +138,7 @@ var _ = Describe("Executor", func() {
 
 				It("returns the error", func() {
 					writer := &bytes.Buffer{}
-					Expect(executor.WriteTo(writer, spec)).To(MatchError("Oh no!"))
+					Expect(executor.Write(writer, spec)).To(MatchError("Oh no!"))
 					Expect(writer.Bytes()).To(BeEmpty())
 				})
 			})
@@ -150,7 +150,7 @@ var _ = Describe("Executor", func() {
 			})
 
 			It("returns the error", func() {
-				Expect(executor.WriteTo(ioutil.Discard, spec)).To(MatchError("Oh no!"))
+				Expect(executor.Write(ioutil.Discard, spec)).To(MatchError("Oh no!"))
 			})
 		})
 
@@ -161,7 +161,7 @@ var _ = Describe("Executor", func() {
 			})
 
 			It("returns the error", func() {
-				Expect(executor.WriteTo(ioutil.Discard, spec)).To(MatchError("Oh no!"))
+				Expect(executor.Write(ioutil.Discard, spec)).To(MatchError("Oh no!"))
 			})
 		})
 	})

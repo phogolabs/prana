@@ -15,8 +15,8 @@ type Executor struct {
 	Provider Provider
 }
 
-// WriteTo writes the generated schema models to a writer
-func (e *Executor) WriteTo(w io.Writer, spec *Spec) error {
+// Write writes the generated schema models to a writer
+func (e *Executor) Write(w io.Writer, spec *Spec) error {
 	schema, err := e.schemaOf(spec)
 	if err != nil {
 		return err

@@ -79,7 +79,7 @@ func (m *Provider) Migrations() ([]Item, error) {
 	return migrations, err
 }
 
-// Insert inserts exectued migration item in the migrations table.
+// Insert inserts executed migration item in the migrations table.
 func (m *Provider) Insert(item *Item) error {
 	rows, err := m.DB.Query("SELECT id FROM migrations WHERE id = ?", item.ID)
 
