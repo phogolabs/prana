@@ -32,20 +32,20 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 		Before:       m.before,
 		After:        m.after,
 		Subcommands: []cli.Command{
-			cli.Command{
+			{
 				Name:        "setup",
 				Usage:       "Setup the migration for the current project",
 				Description: "Configure the current project by creating database directory hierarchy and initial migration",
 				Action:      m.setup,
 			},
-			cli.Command{
+			{
 				Name:        "create",
 				Usage:       "Generate a new migration with the given name, and the current timestamp as the version",
 				Description: "Create a new migration file for the given name, and the current timestamp as the version in database/migration directory",
 				ArgsUsage:   "[name]",
 				Action:      m.create,
 			},
-			cli.Command{
+			{
 				Name:   "run",
 				Usage:  "Run the pending migrations",
 				Action: m.run,
@@ -57,7 +57,7 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 					},
 				},
 			},
-			cli.Command{
+			{
 				Name:   "revert",
 				Usage:  "Revert the latest applied migrations",
 				Action: m.revert,
@@ -69,12 +69,12 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 					},
 				},
 			},
-			cli.Command{
+			{
 				Name:   "reset",
 				Usage:  "Revert and re-run all migrations",
 				Action: m.reset,
 			},
-			cli.Command{
+			{
 				Name:   "status",
 				Usage:  "Show all migrations, marking those that have been applied",
 				Action: m.status,

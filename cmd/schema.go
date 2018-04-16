@@ -50,13 +50,13 @@ func (m *SQLSchema) CreateCommand() cli.Command {
 			},
 		},
 		Subcommands: []cli.Command{
-			cli.Command{
+			{
 				Name:        "print",
 				Usage:       "Print the object model for given database schema or tables",
 				Description: "Print the object model for given database schema or tables",
 				Action:      m.print,
 			},
-			cli.Command{
+			{
 				Name:        "sync",
 				Usage:       "Generate a package of models for given database schema",
 				Description: "Generate a package of models for given database schema",

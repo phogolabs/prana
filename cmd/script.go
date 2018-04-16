@@ -29,7 +29,7 @@ func (m *SQLScript) CreateCommand() cli.Command {
 		BashComplete: cli.DefaultAppComplete,
 		Before:       m.before,
 		Subcommands: []cli.Command{
-			cli.Command{
+			{
 				Name:        "create",
 				Usage:       "Create a new SQL command for given container filename",
 				Description: "Create a new SQL command for given container filename",
@@ -43,7 +43,7 @@ func (m *SQLScript) CreateCommand() cli.Command {
 					},
 				},
 			},
-			cli.Command{
+			{
 				Name:        "run",
 				Usage:       "Run a SQL command for given arguments",
 				Description: "Run a SQL command for given arguments",
