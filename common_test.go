@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/phogolabs/oak"
+	"github.com/phogolabs/oak/fake"
 	"github.com/phogolabs/parcel"
 )
 
@@ -23,6 +24,7 @@ var _ = Describe("Command", func() {
 		fmt.Fprintln(buffer)
 		fmt.Fprintln(buffer, "SELECT * FROM users")
 		Expect(oak.LoadSQLCommandsFromReader(buffer)).To(Succeed())
+
 	})
 
 	It("returns a command", func() {
@@ -32,6 +34,32 @@ var _ = Describe("Command", func() {
 		query, params := stmt.Prepare()
 		Expect(query).To(Equal("SELECT * FROM users"))
 		Expect(params).To(BeEmpty())
+	})
+
+	Context("when loading a whole directory", func() {
+		BeforeEach(func() {
+			buffer := bytes.NewBufferString(fmt.Sprintf("-- name: %v", "cmd"))
+			fmt.Fprintln(buffer)
+			fmt.Fprintln(buffer, "SELECT * FROM categories")
+
+			fileSystem := &fake.FileSystem{}
+			fileSystem.OpenFileReturns(parcel.NewBufferWith(buffer.Bytes()), nil)
+
+			fileSystem.WalkStub = func(dir string, fn filepath.WalkFunc) error {
+				return fn("command", parcel.NewNodeFile("command.sql", buffer.Bytes()), nil)
+			}
+
+			Expect(oak.LoadSQLCommandsFrom(fileSystem)).To(Succeed())
+		})
+
+		It("returns a command", func() {
+			stmt := oak.Command("cmd")
+			Expect(stmt).NotTo(BeNil())
+
+			query, params := stmt.Prepare()
+			Expect(query).To(Equal("SELECT * FROM categories"))
+			Expect(params).To(BeEmpty())
+		})
 	})
 
 	Context("when the statement does not exits", func() {

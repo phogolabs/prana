@@ -221,6 +221,19 @@ var _ = Describe("Gateway", func() {
 				Expect(err).To(Succeed())
 			})
 
+			Context("when the database is not available", func() {
+				It("cannot start a transaction", func() {
+					txDb, err := oak.Open("sqlite3", "/tmp/oak.db")
+					Expect(err).To(BeNil())
+					Expect(txDb.DriverName()).To(Equal("sqlite3"))
+					Expect(txDb.Close()).To(Succeed())
+
+					tx, err := txDb.Begin()
+					Expect(err).To(MatchError("sql: database is closed"))
+					Expect(tx).To(BeNil())
+				})
+			})
+
 			Describe("Select", func() {
 				It("executes a query successfully", func() {
 					query := lk.Select("first_name", "last_name", "email").From("users")
