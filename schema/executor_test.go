@@ -27,10 +27,10 @@ var _ = Describe("Executor", func() {
 			Name:      "public",
 			IsDefault: true,
 			Tables: []schema.Table{
-				schema.Table{
+				{
 					Name: "table1",
 					Columns: []schema.Column{
-						schema.Column{
+						{
 							Name:     "ID",
 							ScanType: "string",
 						},

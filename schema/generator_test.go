@@ -22,10 +22,10 @@ var _ = Describe("Generator", func() {
 		schemaDef = &schema.Schema{
 			Name: "schema",
 			Tables: []schema.Table{
-				schema.Table{
+				{
 					Name: "table1",
 					Columns: []schema.Column{
-						schema.Column{
+						{
 							Name:     "id",
 							ScanType: "string",
 							Type: schema.ColumnType{

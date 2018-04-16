@@ -106,7 +106,7 @@ var _ = Describe("Executor", func() {
 
 	Describe("Migrations", func() {
 		It("returns the migrations successfully", func() {
-			provider.MigrationsReturns([]migration.Item{migration.Item{ID: "id-123"}}, nil)
+			provider.MigrationsReturns([]migration.Item{{ID: "id-123"}}, nil)
 			migrations, err := executor.Migrations()
 			Expect(err).To(BeNil())
 			Expect(migrations).To(HaveLen(1))
@@ -139,16 +139,16 @@ var _ = Describe("Executor", func() {
 		Context("when there are applied migrations", func() {
 			It("does not run any of the applied migrations", func() {
 				migrations := []migration.Item{
-					migration.Item{
+					{
 						ID:          "20060102150405",
 						Description: "First",
 						CreatedAt:   time.Now(),
 					},
-					migration.Item{
+					{
 						ID:          "20070102150405",
 						Description: "Second",
 					},
-					migration.Item{
+					{
 						ID:          "20080102150405",
 						Description: "Third",
 					},
@@ -176,16 +176,16 @@ var _ = Describe("Executor", func() {
 
 			BeforeEach(func() {
 				migrations = []migration.Item{
-					migration.Item{
+					{
 						ID:          "20060102150405",
 						Description: "First",
 						CreatedAt:   time.Now(),
 					},
-					migration.Item{
+					{
 						ID:          "20070102150405",
 						Description: "Second",
 					},
-					migration.Item{
+					{
 						ID:          "20080102150405",
 						Description: "Third",
 					},
@@ -259,17 +259,17 @@ var _ = Describe("Executor", func() {
 		Context("when there are pending migrations", func() {
 			It("does not revert any of the pending migrations", func() {
 				migrations := []migration.Item{
-					migration.Item{
+					{
 						ID:          "20060102150405",
 						Description: "First",
 						CreatedAt:   time.Now(),
 					},
-					migration.Item{
+					{
 						ID:          "20070102150405",
 						Description: "Second",
 						CreatedAt:   time.Now(),
 					},
-					migration.Item{
+					{
 						ID:          "20080102150405",
 						Description: "Third",
 					},
@@ -298,17 +298,17 @@ var _ = Describe("Executor", func() {
 
 			BeforeEach(func() {
 				migrations = []migration.Item{
-					migration.Item{
+					{
 						ID:          "20060102150405",
 						Description: "First",
 						CreatedAt:   time.Now(),
 					},
-					migration.Item{
+					{
 						ID:          "20070102150405",
 						Description: "Second",
 						CreatedAt:   time.Now(),
 					},
-					migration.Item{
+					{
 						ID:          "20080102150405",
 						Description: "Third",
 					},
@@ -356,16 +356,16 @@ var _ = Describe("Executor", func() {
 			Context("when the delete fails", func() {
 				It("returns the error", func() {
 					migrations := []migration.Item{
-						migration.Item{
+						{
 							ID:          "20060102150405",
 							Description: "First",
 							CreatedAt:   time.Now(),
 						},
-						migration.Item{
+						{
 							ID:          "20070102150405",
 							Description: "Second",
 						},
-						migration.Item{
+						{
 							ID:          "20080102150405",
 							Description: "Third",
 						},
