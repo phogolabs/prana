@@ -1,5 +1,5 @@
 hash: 8951f3f5660b48600aa77acb01c228f1827c78114b2503dde33bc13de42fadf4
-updated: 2018-04-15T15:38:01.1811+02:00
+updated: 2018-04-16T21:33:21.785937+02:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -40,7 +40,7 @@ imports:
 - name: github.com/Pallinder/go-randomdata
   version: dab270d296c6c8fb98de3b4334bbd7d7b0ceca53
 - name: github.com/phogolabs/parcel
-  version: dd26f724e0696f0f2799619052813d5fcc478512
+  version: d97e5c45877404ec8c728d67dd7904d6afdc3bca
 - name: github.com/pkg/errors
   version: 816c9085562cd7ee03e7f8188a1cfd942858cded
 - name: github.com/ulule/loukoum
@@ -56,11 +56,11 @@ imports:
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: golang.org/x/sys
-  version: 2281fa97ef7b0c26324634d5a22f04babdac8713
+  version: 3b87a42e500a6dc65dae1a55d0b641295971163e
   subpackages:
   - unix
 - name: golang.org/x/tools
-  version: 327197e6b056fd5c2c733feceab7a7a195556dbc
+  version: dc06d3e643411517e465276d75b66dbed2898850
   subpackages:
   - go/ast/astutil
   - imports
