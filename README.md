@@ -3,7 +3,8 @@
 [![Documentation][godoc-img]][godoc-url]
 ![License][license-img]
 [![Build Status][travis-img]][travis-url]
-[![Coverage][coveralls-img]][coveralls-url]
+[![Coverage][codecov-img]][codecov-url]
+[![Go Report Card][report-img]][report-url]
 
 *Golang Database Manager*
 
@@ -299,12 +300,14 @@ We are welcome to any contributions. Just fork the
 
 *logo made by [Free Pik][logo-author-url]*
 
+[report-img]: https://goreportcard.com/badge/github.com/phogolabs/oak
+[report-url]: https://goreportcard.com/report/github.com/phogolabs/oak
 [logo-author-url]: https://www.freepik.com/free-photos-vectors/tree
 [logo-license]: http://creativecommons.org/licenses/by/3.0/
 [oak-url]: https://github.com/phogolabs/oak
 [oak-img]: doc/img/logo.png
-[coveralls-url]: https://coveralls.io/github/phogolabs/oak
-[coveralls-img]: https://coveralls.io/repos/github/phogolabs/oak/badge.svg?branch=master
+[codecov-url]: https://codecov.io/gh/phogolabs/oak
+[codecov-img]: https://codecov.io/gh/phogolabs/oak/branch/master/graph/badge.svg
 [travis-img]: https://travis-ci.org/phogolabs/oak.svg?branch=master
 [travis-url]: https://travis-ci.org/phogolabs/oak
 [oak-url]: https://github.com/phogolabs/oak
