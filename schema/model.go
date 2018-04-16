@@ -1,4 +1,4 @@
-// Package shema provides primitives for generating structs from database schema
+// Package schema provides primitives for generating structs from database schema
 package schema
 
 import (

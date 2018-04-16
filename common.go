@@ -67,7 +67,8 @@ func Migrate(gateway *Gateway, fileSystem parcel.FileSystem) error {
 
 // LoadSQLCommandsFromReader loads all commands from a given reader.
 func LoadSQLCommandsFromReader(r io.Reader) error {
-	return provider.ReadFrom(r)
+	_, err := provider.ReadFrom(r)
+	return err
 }
 
 // LoadSQLCommandsFrom loads all script commands from a given directory. Note that all

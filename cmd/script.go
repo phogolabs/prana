@@ -118,7 +118,7 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 		DB:         db,
 	}
 
-	rows := &oak.Rows{}
+	var rows *oak.Rows
 	rows, err = runner.Run(name, params...)
 
 	if err != nil {

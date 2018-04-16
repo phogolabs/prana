@@ -21,11 +21,11 @@ type Executor struct {
 	Generator ItemGenerator
 }
 
-// Setups setups the current project for database migrations by creating
+// Setup setups the current project for database migrations by creating
 // migration directory and related database.
 func (m *Executor) Setup() error {
 	migration := &Item{
-		Id:          min.Format(format),
+		ID:          min.Format(format),
 		Description: "setup",
 		CreatedAt:   time.Now(),
 	}
@@ -65,7 +65,7 @@ func (m *Executor) Create(name string) (*Item, error) {
 	timestamp := time.Now()
 
 	migration := &Item{
-		Id:          timestamp.Format(format),
+		ID:          timestamp.Format(format),
 		Description: name,
 		CreatedAt:   timestamp,
 	}
@@ -92,7 +92,7 @@ func (m *Executor) Run(step int) (int, error) {
 			return run, nil
 		}
 
-		timestamp, err := time.Parse(format, migration.Id)
+		timestamp, err := time.Parse(format, migration.ID)
 		if err != nil {
 			return run, err
 		}
@@ -147,7 +147,7 @@ func (m *Executor) Revert(step int) (int, error) {
 			continue
 		}
 
-		timestamp, err := time.Parse(format, migration.Id)
+		timestamp, err := time.Parse(format, migration.ID)
 		if err != nil || timestamp == min {
 			return reverted, err
 		}

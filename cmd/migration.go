@@ -15,7 +15,7 @@ import (
 	"github.com/urfave/cli"
 )
 
-// SQLCommand provides a subcommands to work with SQL migrations.
+// SQLMigration provides a subcommands to work with SQL migrations.
 type SQLMigration struct {
 	executor *migration.Executor
 	db       *sqlx.DB
@@ -217,7 +217,7 @@ func (m *SQLMigration) log(migrations []migration.Item) {
 		}
 
 		fields := log.Fields{
-			"Id":          m.Id,
+			"Id":          m.ID,
 			"Description": m.Description,
 			"Status":      status,
 			"CreatedAt":   timestamp,
@@ -240,7 +240,7 @@ func (m *SQLMigration) table(migrations []migration.Item) {
 			timestamp = m.CreatedAt.Format(time.UnixDate)
 		}
 
-		row := []string{m.Id, m.Description, status, timestamp}
+		row := []string{m.ID, m.Description, status, timestamp}
 		table.Append(row)
 	}
 

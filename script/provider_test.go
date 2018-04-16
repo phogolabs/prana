@@ -28,7 +28,9 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("loads the provider successfully", func() {
-			Expect(provider.ReadFrom(buffer)).To(Succeed())
+			n, err := provider.ReadFrom(buffer)
+			Expect(n).To(Equal(int64(1)))
+			Expect(err).To(Succeed())
 
 			cmd, err := provider.Command("up")
 			Expect(err).To(BeNil())
@@ -39,13 +41,17 @@ var _ = Describe("Provider", func() {
 
 		Context("when the statement are duplicated", func() {
 			It("returns an error", func() {
-				Expect(provider.ReadFrom(buffer)).To(Succeed())
+				n, err := provider.ReadFrom(buffer)
+				Expect(n).To(Equal(int64(1)))
+				Expect(err).To(Succeed())
 
 				buffer = bytes.NewBufferString("-- name: up")
 				fmt.Fprintln(buffer)
 				fmt.Fprintln(buffer, "SELECT * FROM categories;")
 
-				Expect(provider.ReadFrom(buffer)).To(MatchError("Command 'up' already exists"))
+				n, err = provider.ReadFrom(buffer)
+				Expect(n).To(BeZero())
+				Expect(err).To(MatchError("Command 'up' already exists"))
 			})
 		})
 	})
@@ -79,7 +85,9 @@ var _ = Describe("Provider", func() {
 			fmt.Fprintln(buffer)
 			fmt.Fprintln(buffer, "SELECT * FROM users")
 
-			Expect(provider.ReadFrom(buffer)).To(Succeed())
+			n, err := provider.ReadFrom(buffer)
+			Expect(n).To(Equal(int64(1)))
+			Expect(err).To(Succeed())
 		})
 
 		It("returns a command", func() {
@@ -98,7 +106,9 @@ var _ = Describe("Provider", func() {
 				fmt.Fprintln(buffer)
 				fmt.Fprintln(buffer, "SELECT * FROM users WHERE id = ?")
 
-				Expect(provider.ReadFrom(buffer)).To(Succeed())
+				n, err := provider.ReadFrom(buffer)
+				Expect(n).To(Equal(int64(1)))
+				Expect(err).To(Succeed())
 			})
 
 			It("returns a command with params", func() {

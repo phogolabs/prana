@@ -62,7 +62,7 @@ type Content struct {
 // Item represents a single migration.
 type Item struct {
 	// Id is the primary key for this migration
-	Id string `db:"id"`
+	ID string `db:"id"`
 	// Description is the short description of this migration.
 	Description string `db:"description"`
 	// CreatedAt returns the time of migration execution.
@@ -71,7 +71,7 @@ type Item struct {
 
 // Filename returns the item filename
 func (m Item) Filename() string {
-	return fmt.Sprintf("%s_%s.sql", m.Id, m.Description)
+	return fmt.Sprintf("%s_%s.sql", m.ID, m.Description)
 }
 
 // Parse parses a given file path to a migration item.
@@ -89,7 +89,7 @@ func Parse(path string) (*Item, error) {
 	}
 
 	return &Item{
-		Id:          parts[0],
+		ID:          parts[0],
 		Description: parts[1],
 	}, nil
 }

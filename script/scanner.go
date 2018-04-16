@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var rgxp *regexp.Regexp = regexp.MustCompile("^\\s*--\\s*name:\\s*(\\S+)")
+var rgxp = regexp.MustCompile("^\\s*--\\s*name:\\s*(\\S+)")
 
 // Scanner loads a SQL statements for given SQL Script
 type Scanner struct{}

@@ -63,7 +63,7 @@ var _ = Describe("Provider", func() {
 	Describe("Insert", func() {
 		It("inserts a migration item successfully", func() {
 			item := migration.Item{
-				Id:          "20070102150405",
+				ID:          "20070102150405",
 				Description: "trigger",
 			}
 
@@ -75,10 +75,10 @@ var _ = Describe("Provider", func() {
 			Expect(provider.DB.Select(&items, query)).To(Succeed())
 			Expect(items).To(HaveLen(2))
 
-			Expect(items[0].Id).To(Equal("20060102150405"))
+			Expect(items[0].ID).To(Equal("20060102150405"))
 			Expect(items[0].Description).To(Equal("schema"))
 
-			Expect(items[1].Id).To(Equal("20070102150405"))
+			Expect(items[1].ID).To(Equal("20070102150405"))
 			Expect(items[1].Description).To(Equal("trigger"))
 		})
 
@@ -98,7 +98,7 @@ var _ = Describe("Provider", func() {
 	Describe("Delete", func() {
 		It("deletes a migration item successfully", func() {
 			item := migration.Item{
-				Id:          "20060102150405",
+				ID:          "20060102150405",
 				Description: "schema",
 			}
 
@@ -118,7 +118,7 @@ var _ = Describe("Provider", func() {
 
 			It("returns an error", func() {
 				item := migration.Item{
-					Id:          "20060102150405",
+					ID:          "20060102150405",
 					Description: "setup",
 				}
 				Expect(provider.Delete(&item)).To(MatchError("sql: database is closed"))
@@ -135,10 +135,10 @@ var _ = Describe("Provider", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(items).To(HaveLen(2))
 
-			Expect(items[0].Id).To(Equal("20060102150405"))
+			Expect(items[0].ID).To(Equal("20060102150405"))
 			Expect(items[0].Description).To(Equal("schema"))
 
-			Expect(items[1].Id).To(Equal("20070102150405"))
+			Expect(items[1].ID).To(Equal("20070102150405"))
 			Expect(items[1].Description).To(Equal("setup"))
 			Expect(items[1].CreatedAt.IsZero()).To(BeTrue())
 		})

@@ -14,7 +14,7 @@ type Provider struct {
 	repository map[string]string
 }
 
-// LoadDir loads all script commands from a given directory. Note that all
+// ReadDir loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
 func (p *Provider) ReadDir(fs FileSystem) error {
 	return fs.Walk("/", func(path string, info os.FileInfo, err error) error {
@@ -42,7 +42,7 @@ func (p *Provider) ReadDir(fs FileSystem) error {
 			}
 		}()
 
-		if err = p.ReadFrom(file); err != nil {
+		if _, err = p.ReadFrom(file); err != nil {
 			return err
 		}
 
@@ -51,7 +51,7 @@ func (p *Provider) ReadDir(fs FileSystem) error {
 }
 
 // ReadFrom reads the script from a reader
-func (p *Provider) ReadFrom(r io.Reader) error {
+func (p *Provider) ReadFrom(r io.Reader) (int64, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
@@ -64,13 +64,13 @@ func (p *Provider) ReadFrom(r io.Reader) error {
 
 	for name, stmt := range stmts {
 		if _, ok := p.repository[name]; ok {
-			return fmt.Errorf("Command '%s' already exists", name)
+			return 0, fmt.Errorf("Command '%s' already exists", name)
 		}
 
 		p.repository[name] = stmt
 	}
 
-	return nil
+	return int64(len(stmts)), nil
 }
 
 // Command returns a command for given name and parameters. The operation can

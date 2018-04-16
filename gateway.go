@@ -29,7 +29,7 @@ func (g *Gateway) DriverName() string {
 	return g.db.DriverName()
 }
 
-// Beginx begins a transaction and returns an *Tx
+// Begin begins a transaction and returns an *Tx
 func (g *Gateway) Begin() (*Tx, error) {
 	tx, err := g.db.Beginx()
 	if err != nil {
@@ -44,7 +44,7 @@ func (g *Gateway) Select(dest Entity, query Query) error {
 	return selectMany(g.db, dest, query)
 }
 
-// Select executes a given query and maps a single result to the provided entity.
+// SelectOne executes a given query and maps a single result to the provided entity.
 func (g *Gateway) SelectOne(dest Entity, query Query) error {
 	return selectOne(g.db, dest, query)
 }
@@ -54,7 +54,7 @@ func (g *Gateway) Query(query Query) (*Rows, error) {
 	return queryRows(g.db, query)
 }
 
-// Query executes a given query and returns an instance of row.
+// QueryRow executes a given query and returns an instance of row.
 func (g *Gateway) QueryRow(query Query) (*Row, error) {
 	return queryRow(g.db, query)
 }
@@ -85,7 +85,7 @@ func (tx *Tx) Select(dest Entity, query Query) error {
 	return selectMany(tx.tx, dest, query)
 }
 
-// Select executes a given query and maps a single result to the provided entity.
+// SelectOne executes a given query and maps a single result to the provided entity.
 func (tx *Tx) SelectOne(dest Entity, query Query) error {
 	return selectOne(tx.tx, dest, query)
 }
@@ -95,7 +95,7 @@ func (tx *Tx) Query(query Query) (*Rows, error) {
 	return queryRows(tx.tx, query)
 }
 
-// Query executes a given query and returns an instance of row.
+// QueryRow executes a given query and returns an instance of row.
 func (tx *Tx) QueryRow(query Query) (*Row, error) {
 	return queryRow(tx.tx, query)
 }

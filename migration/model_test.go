@@ -10,7 +10,7 @@ var _ = Describe("Model", func() {
 	Describe("Item", func() {
 		It("returns the filename correctly", func() {
 			item := &migration.Item{
-				Id:          "id",
+				ID:          "id",
 				Description: "schema",
 			}
 
@@ -22,7 +22,7 @@ var _ = Describe("Model", func() {
 				filename := "20060102150405_schema.sql"
 				item, err := migration.Parse(filename)
 				Expect(err).NotTo(HaveOccurred())
-				Expect(item.Id).To(Equal("20060102150405"))
+				Expect(item.ID).To(Equal("20060102150405"))
 				Expect(item.Description).To(Equal("schema"))
 			})
 
@@ -31,7 +31,7 @@ var _ = Describe("Model", func() {
 					filename := "20060102150405_my_schema_for_this_db.sql"
 					item, err := migration.Parse(filename)
 					Expect(err).NotTo(HaveOccurred())
-					Expect(item.Id).To(Equal("20060102150405"))
+					Expect(item.ID).To(Equal("20060102150405"))
 					Expect(item.Description).To(Equal("my_schema_for_this_db"))
 				})
 			})

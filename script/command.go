@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Cme represents a single command from SQL script.
+// Cmd represents a single command from SQL script.
 type Cmd struct {
 	query  string
 	params []Param

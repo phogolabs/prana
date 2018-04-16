@@ -1,4 +1,4 @@
-// Package provides a set of commands used in CLI.
+// Package cmd provides a set of commands used in CLI.
 package cmd
 
 import (

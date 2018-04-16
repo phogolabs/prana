@@ -37,7 +37,7 @@ var _ = Describe("Runner", func() {
 		}
 
 		item = &migration.Item{
-			Id:          "20160102150",
+			ID:          "20160102150",
 			Description: "schema",
 		}
 	})

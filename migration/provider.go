@@ -63,8 +63,8 @@ func (m *Provider) Migrations() ([]Item, error) {
 	for index, migration := range applied {
 		m := migrations[index]
 
-		if m.Id != migration.Id {
-			err = fmt.Errorf("Mismatched migration id. Expected: '%s' but has '%s'", migration.Id, m.Id)
+		if m.ID != migration.ID {
+			err = fmt.Errorf("Mismatched migration id. Expected: '%s' but has '%s'", migration.ID, m.ID)
 			return []Item{}, err
 		}
 
@@ -81,7 +81,7 @@ func (m *Provider) Migrations() ([]Item, error) {
 
 // Insert inserts exectued migration item in the migrations table.
 func (m *Provider) Insert(item *Item) error {
-	rows, err := m.DB.Query("SELECT id FROM migrations WHERE id = ?", item.Id)
+	rows, err := m.DB.Query("SELECT id FROM migrations WHERE id = ?", item.ID)
 
 	if err != nil {
 		return err
@@ -99,7 +99,7 @@ func (m *Provider) Insert(item *Item) error {
 	query.WriteString("INSERT INTO migrations(id, description, created_at) ")
 	query.WriteString("VALUES (?, ?, ?)")
 
-	if _, err := m.DB.Exec(query.String(), item.Id, item.Description, item.CreatedAt); err != nil {
+	if _, err := m.DB.Exec(query.String(), item.ID, item.Description, item.CreatedAt); err != nil {
 		return err
 	}
 
@@ -112,7 +112,7 @@ func (m *Provider) Delete(item *Item) error {
 	query.WriteString("DELETE FROM migrations ")
 	query.WriteString("WHERE id = ?")
 
-	if _, err := m.DB.Exec(query.String(), item.Id); err != nil {
+	if _, err := m.DB.Exec(query.String(), item.ID); err != nil {
 		return err
 	}
 

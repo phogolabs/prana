@@ -42,7 +42,7 @@ var _ = Describe("Executor", func() {
 			Expect(generator.WriteCallCount()).To(Equal(1))
 
 			item, content := generator.WriteArgsForCall(0)
-			Expect(item.Id).To(Equal(min.Format(format)))
+			Expect(item.ID).To(Equal(min.Format(format)))
 			Expect(item.Description).To(Equal("setup"))
 
 			data, err := ioutil.ReadAll(content.UpCommand)
@@ -63,7 +63,7 @@ var _ = Describe("Executor", func() {
 			Expect(runner.RunCallCount()).To(Equal(1))
 			item = runner.RunArgsForCall(0)
 
-			Expect(item.Id).To(Equal(min.Format(format)))
+			Expect(item.ID).To(Equal(min.Format(format)))
 			Expect(item.Description).To(Equal("setup"))
 		})
 
@@ -91,7 +91,7 @@ var _ = Describe("Executor", func() {
 			Expect(generator.CreateCallCount()).To(Equal(1))
 
 			item := generator.CreateArgsForCall(0)
-			Expect(item.Id).To(Equal(item.CreatedAt.Format(format)))
+			Expect(item.ID).To(Equal(item.CreatedAt.Format(format)))
 			Expect(item.Description).To(Equal("schema"))
 			Expect(item).To(Equal(migration))
 		})
@@ -106,11 +106,11 @@ var _ = Describe("Executor", func() {
 
 	Describe("Migrations", func() {
 		It("returns the migrations successfully", func() {
-			provider.MigrationsReturns([]migration.Item{migration.Item{Id: "id-123"}}, nil)
+			provider.MigrationsReturns([]migration.Item{migration.Item{ID: "id-123"}}, nil)
 			migrations, err := executor.Migrations()
 			Expect(err).To(BeNil())
 			Expect(migrations).To(HaveLen(1))
-			Expect(migrations[0].Id).To(Equal("id-123"))
+			Expect(migrations[0].ID).To(Equal("id-123"))
 			Expect(provider.MigrationsCallCount()).To(Equal(1))
 		})
 
@@ -140,16 +140,16 @@ var _ = Describe("Executor", func() {
 			It("does not run any of the applied migrations", func() {
 				migrations := []migration.Item{
 					migration.Item{
-						Id:          "20060102150405",
+						ID:          "20060102150405",
 						Description: "First",
 						CreatedAt:   time.Now(),
 					},
 					migration.Item{
-						Id:          "20070102150405",
+						ID:          "20070102150405",
 						Description: "Second",
 					},
 					migration.Item{
-						Id:          "20080102150405",
+						ID:          "20080102150405",
 						Description: "Third",
 					},
 				}
@@ -177,16 +177,16 @@ var _ = Describe("Executor", func() {
 			BeforeEach(func() {
 				migrations = []migration.Item{
 					migration.Item{
-						Id:          "20060102150405",
+						ID:          "20060102150405",
 						Description: "First",
 						CreatedAt:   time.Now(),
 					},
 					migration.Item{
-						Id:          "20070102150405",
+						ID:          "20070102150405",
 						Description: "Second",
 					},
 					migration.Item{
-						Id:          "20080102150405",
+						ID:          "20080102150405",
 						Description: "Third",
 					},
 				}
@@ -260,17 +260,17 @@ var _ = Describe("Executor", func() {
 			It("does not revert any of the pending migrations", func() {
 				migrations := []migration.Item{
 					migration.Item{
-						Id:          "20060102150405",
+						ID:          "20060102150405",
 						Description: "First",
 						CreatedAt:   time.Now(),
 					},
 					migration.Item{
-						Id:          "20070102150405",
+						ID:          "20070102150405",
 						Description: "Second",
 						CreatedAt:   time.Now(),
 					},
 					migration.Item{
-						Id:          "20080102150405",
+						ID:          "20080102150405",
 						Description: "Third",
 					},
 				}
@@ -299,17 +299,17 @@ var _ = Describe("Executor", func() {
 			BeforeEach(func() {
 				migrations = []migration.Item{
 					migration.Item{
-						Id:          "20060102150405",
+						ID:          "20060102150405",
 						Description: "First",
 						CreatedAt:   time.Now(),
 					},
 					migration.Item{
-						Id:          "20070102150405",
+						ID:          "20070102150405",
 						Description: "Second",
 						CreatedAt:   time.Now(),
 					},
 					migration.Item{
-						Id:          "20080102150405",
+						ID:          "20080102150405",
 						Description: "Third",
 					},
 				}
@@ -357,16 +357,16 @@ var _ = Describe("Executor", func() {
 				It("returns the error", func() {
 					migrations := []migration.Item{
 						migration.Item{
-							Id:          "20060102150405",
+							ID:          "20060102150405",
 							Description: "First",
 							CreatedAt:   time.Now(),
 						},
 						migration.Item{
-							Id:          "20070102150405",
+							ID:          "20070102150405",
 							Description: "Second",
 						},
 						migration.Item{
-							Id:          "20080102150405",
+							ID:          "20080102150405",
 							Description: "Third",
 						},
 					}
