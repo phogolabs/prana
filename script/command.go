@@ -33,18 +33,12 @@ func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
 		part := fmt.Sprintf("%s:%s", query[:i], name)
 		params[name] = cmd.params[j]
 
-		if _, err := buffer.WriteString(part); err != nil {
-			return "", nil
-		}
-
+		buffer.WriteString(part)
 		query = query[i+1:]
 		j = j + 1
 	}
 
-	if _, err := buffer.WriteString(query); err != nil {
-		return "", nil
-	}
-
+	buffer.WriteString(query)
 	query = buffer.String()
 	return query, params
 }

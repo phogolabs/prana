@@ -3,12 +3,14 @@ package script_test
 import (
 	"bytes"
 	"fmt"
+	"path/filepath"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/phogolabs/oak/fake"
 	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/parcel"
 )
 
 var _ = Describe("Provider", func() {
@@ -57,10 +59,17 @@ var _ = Describe("Provider", func() {
 	})
 
 	Describe("ReadDir", func() {
-		var fileSystem *fake.FileSystem
+		var (
+			fileSystem *fake.FileSystem
+			buffer     *bytes.Buffer
+		)
 
 		BeforeEach(func() {
 			fileSystem = &fake.FileSystem{}
+
+			buffer = bytes.NewBufferString("-- name: up")
+			fmt.Fprintln(buffer)
+			fmt.Fprintln(buffer, "SELECT * FROM categories;")
 		})
 
 		It("loads the provider successfully", func() {
@@ -71,10 +80,45 @@ var _ = Describe("Provider", func() {
 			Expect(dir).To(Equal("/"))
 		})
 
+		It("skips non sql files", func() {
+			fileSystem.WalkStub = func(dir string, fn filepath.WalkFunc) error {
+				return fn(dir, parcel.NewNodeFile("file", buffer.Bytes()), nil)
+			}
+
+			Expect(provider.ReadDir(fileSystem)).To(Succeed())
+
+			cmd, err := provider.Command("up")
+			Expect(cmd).To(BeNil())
+			Expect(err).To(MatchError("Command 'up' not found"))
+		})
+
 		Context("when the file system fails ", func() {
+			BeforeEach(func() {
+				fileSystem.WalkStub = func(dir string, fn filepath.WalkFunc) error {
+					return fn(dir, parcel.NewNodeFile("file.sql", buffer.Bytes()), nil)
+				}
+			})
+
 			It("returns an error", func() {
 				fileSystem.WalkReturns(fmt.Errorf("Oh no!"))
 				Expect(provider.ReadDir(fileSystem)).To(MatchError("Oh no!"))
+			})
+
+			Context("when opening a file fails", func() {
+				It("returns an error", func() {
+					fileSystem.OpenFileReturns(nil, fmt.Errorf("Oh no!"))
+					Expect(provider.ReadDir(fileSystem)).To(MatchError("Oh no!"))
+				})
+			})
+
+			Context("when reading from a file fails", func() {
+				It("returns an error", func() {
+					fileSystem.OpenFileReturns(parcel.NewBufferWith(buffer.Bytes()), nil)
+					Expect(provider.ReadDir(fileSystem)).To(Succeed())
+
+					fileSystem.OpenFileReturns(parcel.NewBufferWith(buffer.Bytes()), nil)
+					Expect(provider.ReadDir(fileSystem)).To(MatchError("Command 'up' already exists"))
+				})
 			})
 		})
 	})

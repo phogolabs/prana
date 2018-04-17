@@ -39,12 +39,7 @@ func (g *Generator) Create(path, name string) (string, string, error) {
 		return "", "", err
 	}
 
-	defer func() {
-		if ioErr := file.Close(); err != nil {
-			path = ""
-			err = ioErr
-		}
-	}()
+	defer file.Close()
 
 	fmt.Fprintln(file, "-- Auto-generated at", time.Now().Format(time.UnixDate))
 	fmt.Fprintf(file, "-- name: %s", name)

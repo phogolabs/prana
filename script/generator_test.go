@@ -10,6 +10,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/oak/fake"
 	"github.com/phogolabs/oak/script"
 	"github.com/phogolabs/parcel"
 )
@@ -76,6 +77,9 @@ var _ = Describe("Generator", func() {
 				Expect(err).To(BeNil())
 				Expect(name).To(Equal("update"))
 
+				path = filepath.Join(dir, path)
+				Expect(path).To(BeARegularFile())
+
 				name, path, err = generator.Create("commands", "delete")
 				Expect(err).To(BeNil())
 				Expect(name).To(Equal("delete"))
@@ -89,6 +93,19 @@ var _ = Describe("Generator", func() {
 				script := string(data)
 				Expect(script).To(ContainSubstring("-- name: update"))
 				Expect(script).To(ContainSubstring("-- name: delete"))
+			})
+		})
+
+		Context("when opening a file fails", func() {
+			BeforeEach(func() {
+				fileSystem := &fake.FileSystem{}
+				fileSystem.OpenFileReturns(nil, fmt.Errorf("Oh no!"))
+				generator.FileSystem = fileSystem
+			})
+
+			It("returns an error", func() {
+				_, _, err := generator.Create("commands", "update")
+				Expect(err).To(MatchError("Oh no!"))
 			})
 		})
 

@@ -18,7 +18,7 @@ var _ = Describe("Executor", func() {
 		spec      *schema.Spec
 		provider  *fake.SchemaProvider
 		composer  *fake.SchemaComposer
-		reader    *fake.Reader
+		reader    *fake.Buffer
 		schemaDef *schema.Schema
 	)
 
@@ -48,7 +48,7 @@ var _ = Describe("Executor", func() {
 			Dir:    filepath.Join(dir, "entity"),
 		}
 
-		reader = &fake.Reader{}
+		reader = &fake.Buffer{}
 
 		provider = &fake.SchemaProvider{}
 		provider.TablesReturns([]string{"table1"}, nil)

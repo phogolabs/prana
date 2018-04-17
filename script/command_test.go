@@ -13,4 +13,13 @@ var _ = Describe("Command", func() {
 		Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg0"))
 		Expect(params).To(HaveKeyWithValue("arg0", 1))
 	})
+
+	Context("when parameters are more than the required number", func() {
+		It("returns the query", func() {
+			stmt := script.SQL("SELECT * FROM users WHERE id = ? and name = ?", 2)
+			query, params := stmt.Prepare()
+			Expect(query).To(BeEmpty())
+			Expect(params).To(BeNil())
+		})
+	})
 })

@@ -10,6 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/oak/fake"
 	"github.com/phogolabs/oak/script"
 	"github.com/phogolabs/parcel"
 )
@@ -60,6 +61,19 @@ var _ = Describe("Runner", func() {
 		Expect(columns).To(ContainElement("tbl_name"))
 		Expect(columns).To(ContainElement("rootpage"))
 		Expect(columns).To(ContainElement("sql"))
+	})
+
+	Context("when the file system fails", func() {
+		BeforeEach(func() {
+			fileSystem := &fake.FileSystem{}
+			fileSystem.WalkReturns(fmt.Errorf("Oh no!"))
+			runner.FileSystem = fileSystem
+		})
+
+		It("returns the error", func() {
+			_, err := runner.Run("system-tables")
+			Expect(err).To(MatchError("Oh no!"))
+		})
 	})
 
 	Context("when the command requires parameters", func() {
