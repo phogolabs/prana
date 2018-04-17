@@ -249,9 +249,58 @@ var _ = Describe("Executor", func() {
 			})
 		})
 
+		Context("when getting the schame fails", func() {
+			BeforeEach(func() {
+				provider.SchemaReturns(nil, fmt.Errorf("Oh no!"))
+			})
+
+			It("returns the error", func() {
+				path, err := executor.Create(spec)
+				Expect(err).To(MatchError("Oh no!"))
+				Expect(path).To(BeEmpty())
+			})
+		})
+
+		Context("when the reader has empty content", func() {
+			BeforeEach(func() {
+				composer.ComposeReturns(&bytes.Buffer{}, nil)
+			})
+
+			It("creates a package with generated source successfully", func() {
+				path, err := executor.Create(spec)
+				Expect(err).To(Succeed())
+				Expect(path).To(BeEmpty())
+			})
+		})
+
 		Context("when the composer fails", func() {
 			BeforeEach(func() {
 				composer.ComposeReturns(nil, fmt.Errorf("Oh no!"))
+			})
+
+			It("returns the error", func() {
+				path, err := executor.Create(spec)
+				Expect(err).To(MatchError("Oh no!"))
+				Expect(path).To(BeEmpty())
+			})
+		})
+
+		Context("when creating the dir fails", func() {
+			BeforeEach(func() {
+				spec.Dir = "/mydir"
+			})
+
+			It("returns the error", func() {
+				path, err := executor.Create(spec)
+				Expect(err).To(MatchError("mkdir /mydir: permission denied"))
+				Expect(path).To(BeEmpty())
+			})
+		})
+
+		Context("when the copy fails", func() {
+			BeforeEach(func() {
+				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
+				composer.ComposeReturns(reader, nil)
 			})
 
 			It("returns the error", func() {

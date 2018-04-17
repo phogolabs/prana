@@ -35,6 +35,16 @@ var _ = Describe("Generator", func() {
 								CharMaxLength: 200,
 							},
 						},
+						{
+							Name:     "name",
+							ScanType: "string",
+							Type: schema.ColumnType{
+								Name:          "varchar",
+								IsPrimaryKey:  false,
+								IsNullable:    false,
+								CharMaxLength: 200,
+							},
+						},
 					},
 				},
 			},
@@ -53,6 +63,7 @@ var _ = Describe("Generator", func() {
 		fmt.Fprintln(source)
 		fmt.Fprintln(source, "type Table1 struct {")
 		fmt.Fprintln(source, "        Id string `db:\"id,primary_key\" json:\"id\" validate:\"lte=200\"`")
+		fmt.Fprintln(source, "        Name string `db:\"name\" json:\"name\" validate:\"required,lte=200\"`")
 		fmt.Fprintln(source, "}")
 
 		data, err := imports.Process("model", source.Bytes(), nil)
@@ -66,7 +77,6 @@ var _ = Describe("Generator", func() {
 
 		generated, err := ioutil.ReadAll(reader)
 		Expect(err).To(BeNil())
-
 		Expect(generated).To(Equal(data))
 	})
 
@@ -103,6 +113,21 @@ var _ = Describe("Generator", func() {
 		})
 	})
 
+	Context("when the tables are ignored", func() {
+		BeforeEach(func() {
+			generator.Config.IgnoreTables = []string{"table1", "atab"}
+		})
+
+		It("generates the schema successfully", func() {
+			reader, err := generator.Compose("model", schemaDef)
+			Expect(err).To(BeNil())
+
+			data, err := ioutil.ReadAll(reader)
+			Expect(err).To(BeNil())
+			Expect(data).To(BeEmpty())
+		})
+	})
+
 	Context("when no tables are provided", func() {
 		BeforeEach(func() {
 			schemaDef.Tables = []schema.Table{}
@@ -115,6 +140,14 @@ var _ = Describe("Generator", func() {
 			data, err := ioutil.ReadAll(reader)
 			Expect(err).To(BeNil())
 			Expect(data).To(BeEmpty())
+		})
+	})
+
+	Context("when the package name is not provided", func() {
+		It("returns an error", func() {
+			reader, err := generator.Compose("", schemaDef)
+			Expect(reader).To(BeNil())
+			Expect(err).To(MatchError("model:2:1: expected 'IDENT', found 'type'"))
 		})
 	})
 })

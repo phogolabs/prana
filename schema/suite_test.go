@@ -67,7 +67,7 @@ func CreateTable(reader *bytes.Buffer) string {
 		fmt.Fprintln(query)
 	}
 
-	io.Copy(query, reader)
+	_, _ = io.Copy(query, reader)
 	fmt.Fprintln(query, ")")
 
 	return query.String()

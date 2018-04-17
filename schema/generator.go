@@ -31,16 +31,42 @@ type Generator struct {
 // Compose generates the golang structs from database schema
 func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 	buffer := &bytes.Buffer{}
+	tables := g.tables(schema)
 
-	if len(schema.Tables) == 0 {
+	if len(tables) == 0 {
 		return buffer, nil
 	}
 
-	ignore := g.ignore()
-	processed := 0
+	g.writePackage(pkg, schema.Name, buffer)
 
+	for _, table := range tables {
+		g.writeTable(&table, buffer)
+	}
+
+	if err := g.format(buffer); err != nil {
+		return nil, err
+	}
+
+	return buffer, nil
+}
+
+func (g *Generator) tables(schema *Schema) []Table {
+	tables := []Table{}
+	ignore := g.ignore()
+
+	for _, table := range schema.Tables {
+		if index := sort.SearchStrings(ignore, table.Name); index >= 0 && index < len(ignore) {
+			continue
+		}
+
+		tables = append(tables, table)
+	}
+	return tables
+}
+
+func (g *Generator) writePackage(pkg, name string, buffer io.Writer) {
 	if g.Config.InlcudeDoc {
-		fmt.Fprintf(buffer, "// Package %s contains an object model of database schema '%s'", pkg, schema.Name)
+		fmt.Fprintf(buffer, "// Package %s contains an object model of database schema '%s'", pkg, name)
 		fmt.Fprintln(buffer)
 		fmt.Fprintln(buffer, "// Auto-generated at", time.Now().Format(time.UnixDate))
 	}
@@ -48,60 +74,47 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 	fmt.Fprintf(buffer, "package ")
 	fmt.Fprintf(buffer, pkg)
 	fmt.Fprintln(buffer)
+}
 
-	for _, table := range schema.Tables {
-		if index := sort.SearchStrings(ignore, table.Name); index >= 0 && index < len(ignore) {
-			continue
-		}
+func (g *Generator) writeTable(table *Table, buffer io.Writer) {
+	columns := table.Columns
+	length := len(columns)
+	typeName := g.tableName(table)
 
-		processed = processed + 1
-		columns := table.Columns
-		length := len(columns)
-		typeName := g.tableName(&table)
+	if g.Config.InlcudeDoc {
+		fmt.Fprintln(buffer)
+		fmt.Fprintf(buffer, "// %s represents a data base table '%s'", typeName, table.Name)
+		fmt.Fprintln(buffer)
+	}
+
+	fmt.Fprintf(buffer, "type %v struct {", typeName)
+	fmt.Fprintln(buffer)
+
+	for index, column := range columns {
+		fieldName := inflect.Camelize(column.Name)
+		fieldType := g.fieldType(&column)
+		fieldTag := g.fieldTag(&column)
 
 		if g.Config.InlcudeDoc {
-			fmt.Fprintln(buffer)
-			fmt.Fprintf(buffer, "// %s represents a data base table '%s'", typeName, table.Name)
-			fmt.Fprintln(buffer)
-		}
-
-		fmt.Fprintf(buffer, "type %v struct {", typeName)
-		fmt.Fprintln(buffer)
-
-		for index, column := range columns {
-			fieldName := inflect.Camelize(column.Name)
-			fieldType := g.fieldType(&column)
-			fieldTag := g.fieldTag(&column)
-
-			if g.Config.InlcudeDoc {
-				if index > 0 {
-					fmt.Fprintln(buffer)
-				}
-				fmt.Fprintf(buffer, "// %s represents a database column '%s' of type '%v'", fieldName, column.Name, column.Type)
+			if index > 0 {
 				fmt.Fprintln(buffer)
 			}
-
-			fmt.Fprint(buffer, fieldName)
-			fmt.Fprint(buffer, " ")
-			fmt.Fprint(buffer, fieldType)
-			fmt.Fprint(buffer, " ")
-			fmt.Fprint(buffer, fieldTag)
-
+			fmt.Fprintf(buffer, "// %s represents a database column '%s' of type '%v'", fieldName, column.Name, column.Type)
 			fmt.Fprintln(buffer)
+		}
 
-			if index == length-1 {
-				fmt.Fprintln(buffer, "}")
-			}
+		fmt.Fprint(buffer, fieldName)
+		fmt.Fprint(buffer, " ")
+		fmt.Fprint(buffer, fieldType)
+		fmt.Fprint(buffer, " ")
+		fmt.Fprint(buffer, fieldTag)
+
+		fmt.Fprintln(buffer)
+
+		if index == length-1 {
+			fmt.Fprintln(buffer, "}")
 		}
 	}
-
-	if processed == 0 {
-		buffer.Reset()
-	} else if err := g.format(buffer); err != nil {
-		return nil, err
-	}
-
-	return buffer, nil
 }
 
 func (g *Generator) ignore() []string {

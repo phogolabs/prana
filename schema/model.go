@@ -8,83 +8,83 @@ import (
 )
 
 var (
-	IntDef = &TypeDef{
+	intDef = &TypeDef{
 		Type:         "int",
 		NullableType: "null.Int",
 	}
-	UIntDef = &TypeDef{
+	uintDef = &TypeDef{
 		Type:         "Uint",
 		NullableType: "null.Uint",
 	}
-	Int16Def = &TypeDef{
+	int16Def = &TypeDef{
 		Type:         "int16",
 		NullableType: "null.Int16",
 	}
-	Int64Def = &TypeDef{
+	int64Def = &TypeDef{
 		Type:         "int64",
 		NullableType: "null.Int64",
 	}
-	Int8Def = &TypeDef{
+	int8Def = &TypeDef{
 		Type:         "int8",
 		NullableType: "null.Int8",
 	}
-	UInt8Def = &TypeDef{
+	uint8Def = &TypeDef{
 		Type:         "uint8",
 		NullableType: "null.Uint8",
 	}
-	UInt16Def = &TypeDef{
+	uint16Def = &TypeDef{
 		Type:         "uint16",
 		NullableType: "null.Uint16",
 	}
-	UInt32Def = &TypeDef{
+	uint32Def = &TypeDef{
 		Type:         "uint32",
 		NullableType: "null.Uint32",
 	}
-	Int32Def = &TypeDef{
+	int32Def = &TypeDef{
 		Type:         "int32",
 		NullableType: "null.Int32",
 	}
-	UInt64Def = &TypeDef{
+	uint64Def = &TypeDef{
 		Type:         "uint64",
 		NullableType: "null.Uint64",
 	}
-	Float32Def = &TypeDef{
+	float32Def = &TypeDef{
 		Type:         "float32",
 		NullableType: "null.Float32",
 	}
-	Float64Def = &TypeDef{
+	float64Def = &TypeDef{
 		Type:         "float64",
 		NullableType: "null.Float64",
 	}
-	StringDef = &TypeDef{
+	stringDef = &TypeDef{
 		Type:         "string",
 		NullableType: "null.String",
 	}
-	ByteDef = &TypeDef{
+	byteDef = &TypeDef{
 		Type:         "byte",
 		NullableType: "null.Byte",
 	}
-	ByteSliceDef = &TypeDef{
+	byteSliceDef = &TypeDef{
 		Type:         "[]byte",
 		NullableType: "null.Bytes",
 	}
-	BoolDef = &TypeDef{
+	boolDef = &TypeDef{
 		Type:         "bool",
 		NullableType: "null.Bool",
 	}
-	TimeDef = &TypeDef{
+	timeDef = &TypeDef{
 		Type:         "time.Time",
 		NullableType: "null.Time",
 	}
-	UUIDDef = &TypeDef{
+	uuidDef = &TypeDef{
 		Type:         "uuid.UUID",
 		NullableType: "uuid.NullUUID",
 	}
-	JSONDef = &TypeDef{
+	jsonDef = &TypeDef{
 		Type:         "[]byte",
 		NullableType: "null.JSON",
 	}
-	HStoreDef = &TypeDef{
+	hstoreDef = &TypeDef{
 		Type:         "hstore.Hstore",
 		NullableType: "hstore.Hstore",
 	}

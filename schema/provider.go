@@ -37,7 +37,12 @@ func (m *PostgreSQLProvider) Tables(schema string) ([]string, error) {
 	if err != nil {
 		return tables, err
 	}
-	defer rows.Close()
+
+	defer func() {
+		if ioErr := rows.Close(); err == nil {
+			err = ioErr
+		}
+	}()
 
 	for rows.Next() {
 		table := ""
@@ -144,9 +149,9 @@ func (m *PostgreSQLProvider) userDefType(columnType *ColumnType) string {
 
 	switch name {
 	case "hstore":
-		return HStoreDef.As(nullable)
+		return hstoreDef.As(nullable)
 	default:
-		return StringDef.As(nullable)
+		return stringDef.As(nullable)
 	}
 }
 
@@ -164,7 +169,11 @@ func (m *SQLiteProvider) Tables(schema string) ([]string, error) {
 	if err != nil {
 		return tables, err
 	}
-	defer rows.Close()
+	defer func() {
+		if ioErr := rows.Close(); err == nil {
+			err = ioErr
+		}
+	}()
 
 	for rows.Next() {
 		table := ""
@@ -299,7 +308,11 @@ func (m *MySQLProvider) Tables(schema string) ([]string, error) {
 	if err != nil {
 		return tables, err
 	}
-	defer rows.Close()
+	defer func() {
+		if ioErr := rows.Close(); err == nil {
+			err = ioErr
+		}
+	}()
 
 	for rows.Next() {
 		table := ""
@@ -437,6 +450,7 @@ func sanitize(name string) string {
 	return strings.Replace(strings.ToLower(name), `"`, "", -1)
 }
 
+// nolint: gocyclo
 func translate(columnType *ColumnType) string {
 	nullable := columnType.IsNullable
 	name := strings.Replace(strings.ToLower(columnType.Name), `"`, "", -1)
@@ -446,18 +460,18 @@ func translate(columnType *ColumnType) string {
 		case "tinyint":
 			switch columnType.Underlying {
 			case "tinyint(1)":
-				return BoolDef.As(nullable)
+				return boolDef.As(nullable)
 			default:
-				return UInt8Def.As(nullable)
+				return uint8Def.As(nullable)
 			}
 		case "smallint":
-			return UInt16Def.As(nullable)
+			return uint16Def.As(nullable)
 		case "mediumint":
-			return UInt32Def.As(nullable)
+			return uint32Def.As(nullable)
 		case "int", "integer":
-			return UIntDef.As(nullable)
+			return uintDef.As(nullable)
 		case "bigint":
-			return UInt64Def.As(nullable)
+			return uint64Def.As(nullable)
 		}
 	}
 
@@ -465,39 +479,39 @@ func translate(columnType *ColumnType) string {
 	case "tinyint":
 		switch columnType.Underlying {
 		case "tinyint(1)":
-			return BoolDef.As(nullable)
+			return boolDef.As(nullable)
 		default:
-			return Int8Def.As(nullable)
+			return int8Def.As(nullable)
 		}
 	case "mediumint":
-		return Int32Def.As(nullable)
+		return int32Def.As(nullable)
 	case "binary", "varbinary", "tinyblob", "blob", "mediumblob", "longblob":
-		return ByteDef.As(nullable)
+		return byteDef.As(nullable)
 	case "bigint", "bigserial":
-		return Int64Def.As(nullable)
+		return int64Def.As(nullable)
 	case "int", "integer", "serial":
-		return IntDef.As(nullable)
+		return intDef.As(nullable)
 	case "smallint", "smallserial":
-		return Int16Def.As(nullable)
+		return int16Def.As(nullable)
 	case "decimal", "numeric", "double precision":
-		return Float64Def.As(nullable)
+		return float64Def.As(nullable)
 	case "real":
-		return Float32Def.As(nullable)
+		return float32Def.As(nullable)
 	case "bit", "interval", "uuint", "bit varying", "character", "money", "character varying", "cidr", "inet", "macaddr", "text", "xml":
-		return StringDef.As(nullable)
+		return stringDef.As(nullable)
 	case "char":
-		return ByteDef.As(nullable)
+		return byteDef.As(nullable)
 	case "json", "jsonb":
-		return JSONDef.As(nullable)
+		return jsonDef.As(nullable)
 	case "bytea":
-		return ByteSliceDef.As(nullable)
+		return byteSliceDef.As(nullable)
 	case "boolean":
-		return BoolDef.As(nullable)
+		return boolDef.As(nullable)
 	case "date", "time", "datetime", "timestamp", "timestamp without time zone", "timestamp with time zone", "time without time zone", "time with time zone":
-		return TimeDef.As(nullable)
+		return timeDef.As(nullable)
 	case "uuid":
-		return UUIDDef.As(nullable)
+		return uuidDef.As(nullable)
 	default:
-		return StringDef.As(nullable)
+		return stringDef.As(nullable)
 	}
 }

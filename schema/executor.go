@@ -64,7 +64,11 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", err
 	}
 
-	defer file.Close()
+	defer func() {
+		if ioErr := file.Close(); err == nil {
+			err = ioErr
+		}
+	}()
 
 	if _, err = file.Write(body); err != nil {
 		return "", err
