@@ -100,7 +100,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when the up step cannot be created", func() {
 			It("returns an error", func() {
-				reader := &fake.Reader{}
+				reader := &fake.Buffer{}
 				content := &migration.Content{
 					UpCommand:   reader,
 					DownCommand: bytes.NewBufferString("rollback"),
@@ -112,7 +112,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when the up step cannot be created", func() {
 			It("returns an error", func() {
-				reader := &fake.Reader{}
+				reader := &fake.Buffer{}
 				content := &migration.Content{
 					UpCommand:   bytes.NewBufferString("upgrade"),
 					DownCommand: reader,
