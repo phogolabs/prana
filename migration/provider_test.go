@@ -60,6 +60,44 @@ var _ = Describe("Provider", func() {
 		provider.DB.Close()
 	})
 
+	Describe("Exists", func() {
+		Context("when the migration exists", func() {
+			It("returns true", func() {
+				item := migration.Item{
+					ID:          "20060102150405",
+					Description: "schema",
+				}
+				Expect(provider.Exists(&item)).To(BeTrue())
+			})
+		})
+
+		Context("when the migration NOT exists", func() {
+			It("returns true", func() {
+				item := migration.Item{
+					ID:          "20070102150405",
+					Description: "schema",
+				}
+
+				Expect(provider.Exists(&item)).To(BeFalse())
+			})
+		})
+
+		Context("when the data base is not available", func() {
+			JustBeforeEach(func() {
+				Expect(provider.DB.Close()).To(Succeed())
+			})
+
+			It("returns an error", func() {
+				item := migration.Item{
+					ID:          "20070102150405",
+					Description: "schema",
+				}
+
+				Expect(provider.Exists(&item)).To(BeFalse())
+			})
+		})
+	})
+
 	Describe("Insert", func() {
 		It("inserts a migration item successfully", func() {
 			item := migration.Item{
@@ -88,9 +126,12 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				items, err := provider.Migrations()
-				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError("sql: database is closed"))
+				item := migration.Item{
+					ID:          "20070102150405",
+					Description: "trigger",
+				}
+
+				Expect(provider.Insert(&item)).To(MatchError("sql: database is closed"))
 			})
 		})
 	})

@@ -30,6 +30,10 @@ func (m *Executor) Setup() error {
 		CreatedAt:   time.Now(),
 	}
 
+	if ok := m.Provider.Exists(migration); ok {
+		return nil
+	}
+
 	up := &bytes.Buffer{}
 	fmt.Fprintln(up, "CREATE TABLE IF NOT EXISTS migrations (")
 	fmt.Fprintln(up, " id          TEXT      NOT NULL PRIMARY KEY,")
@@ -45,9 +49,7 @@ func (m *Executor) Setup() error {
 	}
 
 	if err := m.Generator.Write(migration, content); err != nil {
-		if !IsMigrationExistErr(err) {
-			return err
-		}
+		return err
 	}
 
 	if err := m.Runner.Run(migration); err != nil {

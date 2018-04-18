@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"path/filepath"
-	"regexp"
 	"strings"
 	"time"
 
@@ -41,6 +40,8 @@ type ItemProvider interface {
 	Insert(item *Item) error
 	// Delete deletes applied migration item from migrations table.
 	Delete(item *Item) error
+	// Exists returns true if the migration exists
+	Exists(item *Item) bool
 }
 
 // ItemGenerator generates a migration item file.
@@ -92,10 +93,4 @@ func Parse(path string) (*Item, error) {
 		ID:          parts[0],
 		Description: parts[1],
 	}, nil
-}
-
-// IsMigrationExistErr returns true, if the error is migration already exists
-func IsMigrationExistErr(err error) bool {
-	pattern := regexp.MustCompile(`Migration '[\W\w]+' already exists`)
-	return pattern.MatchString(err.Error())
 }

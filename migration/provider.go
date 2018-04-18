@@ -81,18 +81,6 @@ func (m *Provider) Migrations() ([]Item, error) {
 
 // Insert inserts executed migration item in the migrations table.
 func (m *Provider) Insert(item *Item) error {
-	rows, err := m.DB.Query("SELECT id FROM migrations WHERE id = ?", item.ID)
-
-	if err != nil {
-		return err
-	}
-
-	defer rows.Close()
-
-	if rows.Next() {
-		return nil
-	}
-
 	item.CreatedAt = time.Now()
 
 	query := &bytes.Buffer{}
@@ -117,4 +105,15 @@ func (m *Provider) Delete(item *Item) error {
 	}
 
 	return nil
+}
+
+// Exists returns true if the migration exists
+func (m *Provider) Exists(item *Item) bool {
+	count := 0
+
+	if err := m.DB.Get(&count, "SELECT count(id) FROM migrations WHERE id = ?", item.ID); err != nil {
+		return false
+	}
+
+	return count == 1
 }

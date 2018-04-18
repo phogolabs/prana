@@ -18,14 +18,17 @@ var _ = Describe("Executor", func() {
 		provider  *fake.MigrationProvider
 		generator *fake.MigrationGenerator
 		runner    *fake.MigrationRunner
+		logger    *fake.Logger
 	)
 
 	BeforeEach(func() {
 		provider = &fake.MigrationProvider{}
 		generator = &fake.MigrationGenerator{}
 		runner = &fake.MigrationRunner{}
+		logger = &fake.Logger{}
 
 		executor = &migration.Executor{
+			Logger:    logger,
 			Provider:  provider,
 			Generator: generator,
 			Runner:    runner,
@@ -67,6 +70,14 @@ var _ = Describe("Executor", func() {
 			Expect(item.Description).To(Equal("setup"))
 		})
 
+		Context("when the migration exists", func() {
+			It("does not setup the project", func() {
+				provider.ExistsReturns(true)
+				Expect(executor.Setup()).To(Succeed())
+				Expect(runner.RunCallCount()).To(Equal(0))
+			})
+		})
+
 		Context("when the generator fails", func() {
 			It("returns the error", func() {
 				generator.WriteReturns(fmt.Errorf("oh no!"))
@@ -98,8 +109,10 @@ var _ = Describe("Executor", func() {
 
 		Context("when the generator fails", func() {
 			It("returns the error", func() {
-				generator.WriteReturns(fmt.Errorf("oh no!"))
-				Expect(executor.Setup()).To(MatchError("oh no!"))
+				generator.CreateReturns(fmt.Errorf("oh no!"))
+				item, err := executor.Create("test")
+				Expect(err).To(MatchError("oh no!"))
+				Expect(item).To(BeNil())
 			})
 		})
 	})
@@ -169,6 +182,57 @@ var _ = Describe("Executor", func() {
 				item = provider.InsertArgsForCall(0)
 				Expect(*item).To(Equal(migrations[1]))
 			})
+
+			It("runs all migrations", func() {
+				migrations := []migration.Item{
+					{
+						ID:          "20060102150405",
+						Description: "First",
+					},
+					{
+						ID:          "20070102150405",
+						Description: "Second",
+					},
+					{
+						ID:          "20080102150405",
+						Description: "Third",
+					},
+				}
+
+				provider.MigrationsReturns(migrations, nil)
+				cnt, err := executor.RunAll()
+				Expect(err).To(Succeed())
+				Expect(cnt).To(Equal(3))
+
+				Expect(provider.MigrationsCallCount()).To(Equal(1))
+				Expect(runner.RunCallCount()).To(Equal(3))
+				Expect(provider.InsertCallCount()).To(Equal(3))
+
+				for i := 0; i < 3; i++ {
+					item := runner.RunArgsForCall(i)
+					Expect(*item).To(Equal(migrations[i]))
+
+					item = provider.InsertArgsForCall(i)
+					Expect(*item).To(Equal(migrations[i]))
+				}
+			})
+
+			Context("when the item name is wrong", func() {
+				It("returns an error", func() {
+					migrations := []migration.Item{
+						{
+							ID:          "timestamp",
+							Description: "First",
+							CreatedAt:   time.Now(),
+						},
+					}
+
+					provider.MigrationsReturns(migrations, nil)
+					cnt, err := executor.Run(1)
+					Expect(err).To(MatchError(`parsing time "timestamp" as "20060102150405": cannot parse "timestamp" as "2006"`))
+					Expect(cnt).To(BeZero())
+				})
+			})
 		})
 
 		Context("when the step is negative number", func() {
@@ -201,6 +265,7 @@ var _ = Describe("Executor", func() {
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(Equal(2))
+				Expect(logger.InfofCallCount()).To(Equal(4))
 
 				for i := 0; i < runner.RunCallCount(); i++ {
 					item := runner.RunArgsForCall(i)
@@ -254,6 +319,45 @@ var _ = Describe("Executor", func() {
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RevertCallCount()).To(BeZero())
 			})
+		})
+
+		It("revert all migrations", func() {
+			migrations := []migration.Item{
+				{
+					ID:          "20060102150405",
+					Description: "First",
+					CreatedAt:   time.Now(),
+				},
+				{
+					ID:          "20070102150405",
+					Description: "Second",
+					CreatedAt:   time.Now(),
+				},
+				{
+					ID:          "20080102150405",
+					Description: "Third",
+					CreatedAt:   time.Now(),
+				},
+			}
+
+			provider.MigrationsReturns(migrations, nil)
+			cnt, err := executor.RevertAll()
+			Expect(err).To(Succeed())
+			Expect(cnt).To(Equal(3))
+
+			Expect(provider.MigrationsCallCount()).To(Equal(1))
+			Expect(runner.RevertCallCount()).To(Equal(3))
+			Expect(provider.DeleteCallCount()).To(Equal(3))
+
+			for i, j := 0, 2; i < 3; i++ {
+				item := runner.RevertArgsForCall(i)
+				Expect(*item).To(Equal(migrations[j]))
+
+				item = provider.DeleteArgsForCall(i)
+				Expect(*item).To(Equal(migrations[j]))
+
+				j = j - 1
+			}
 		})
 
 		Context("when there are pending migrations", func() {
@@ -341,6 +445,23 @@ var _ = Describe("Executor", func() {
 
 					Expect(runner.RevertCallCount()).To(Equal(1))
 				})
+			})
+		})
+
+		Context("when the item name is wrong", func() {
+			It("returns an error", func() {
+				migrations := []migration.Item{
+					{
+						ID:          "timestamp",
+						Description: "First",
+						CreatedAt:   time.Now(),
+					},
+				}
+
+				provider.MigrationsReturns(migrations, nil)
+				cnt, err := executor.Revert(1)
+				Expect(err).To(MatchError(`parsing time "timestamp" as "20060102150405": cannot parse "timestamp" as "2006"`))
+				Expect(cnt).To(BeZero())
 			})
 		})
 

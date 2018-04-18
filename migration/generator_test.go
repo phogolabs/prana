@@ -87,6 +87,25 @@ var _ = Describe("Generator", func() {
 			Expect(script).To(ContainSubstring("rollback"))
 		})
 
+		Context("when writing to the fails fails", func() {
+			It("returns an error", func() {
+				content := &migration.Content{
+					UpCommand:   bytes.NewBufferString("commit"),
+					DownCommand: bytes.NewBufferString("rollback"),
+				}
+
+				writer := &fake.Buffer{}
+				writer.WriteReturns(1, nil)
+
+				fileSystem := &fake.FileSystem{}
+				fileSystem.OpenFileReturns(writer, nil)
+
+				generator.FileSystem = fileSystem
+
+				Expect(generator.Write(item, content)).To(MatchError("short write"))
+			})
+		})
+
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
 				content := &migration.Content{

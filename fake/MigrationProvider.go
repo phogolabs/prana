@@ -31,6 +31,14 @@ type MigrationProvider struct {
 	deleteReturns struct {
 		result1 error
 	}
+	ExistsStub        func(item *migration.Item) bool
+	existsMutex       sync.RWMutex
+	existsArgsForCall []struct {
+		item *migration.Item
+	}
+	existsReturns struct {
+		result1 bool
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -124,6 +132,38 @@ func (fake *MigrationProvider) DeleteReturns(result1 error) {
 	}{result1}
 }
 
+func (fake *MigrationProvider) Exists(item *migration.Item) bool {
+	fake.existsMutex.Lock()
+	fake.existsArgsForCall = append(fake.existsArgsForCall, struct {
+		item *migration.Item
+	}{item})
+	fake.recordInvocation("Exists", []interface{}{item})
+	fake.existsMutex.Unlock()
+	if fake.ExistsStub != nil {
+		return fake.ExistsStub(item)
+	}
+	return fake.existsReturns.result1
+}
+
+func (fake *MigrationProvider) ExistsCallCount() int {
+	fake.existsMutex.RLock()
+	defer fake.existsMutex.RUnlock()
+	return len(fake.existsArgsForCall)
+}
+
+func (fake *MigrationProvider) ExistsArgsForCall(i int) *migration.Item {
+	fake.existsMutex.RLock()
+	defer fake.existsMutex.RUnlock()
+	return fake.existsArgsForCall[i].item
+}
+
+func (fake *MigrationProvider) ExistsReturns(result1 bool) {
+	fake.ExistsStub = nil
+	fake.existsReturns = struct {
+		result1 bool
+	}{result1}
+}
+
 func (fake *MigrationProvider) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -133,6 +173,8 @@ func (fake *MigrationProvider) Invocations() map[string][][]interface{} {
 	defer fake.insertMutex.RUnlock()
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
+	fake.existsMutex.RLock()
+	defer fake.existsMutex.RUnlock()
 	return fake.invocations
 }
 
