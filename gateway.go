@@ -9,6 +9,16 @@ type Gateway struct {
 	db *sqlx.DB
 }
 
+// OpenURL creates a new gateway connecto to the provided URL.
+func OpenURL(url string) (*Gateway, error) {
+	driver, source, err := ParseURL(url)
+	if err != nil {
+		return nil, err
+	}
+
+	return Open(driver, source)
+}
+
 // Open creates a new gateway connected to the provided source.
 func Open(driver, source string) (*Gateway, error) {
 	db, err := sqlx.Open(driver, source)

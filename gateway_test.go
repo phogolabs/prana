@@ -19,9 +19,26 @@ var _ = Describe("Gateway", func() {
 	Describe("Open", func() {
 		Context("when cannot open the database", func() {
 			It("returns an error", func() {
-				db, err := oak.Open("sqlite4", "/tmp/oak.db")
-				Expect(db).To(BeNil())
+				g, err := oak.Open("sqlite4", "/tmp/oak.db")
+				Expect(g).To(BeNil())
 				Expect(err).To(MatchError(`sql: unknown driver "sqlite4" (forgotten import?)`))
+			})
+		})
+	})
+
+	Describe("OpenURL", func() {
+		It("opens the URL successfully", func() {
+			g, err := oak.OpenURL("sqlite3://tmp/oak.db")
+			Expect(g).NotTo(BeNil())
+			Expect(err).To(BeNil())
+			Expect(g.Close()).To(Succeed())
+		})
+
+		Context("when cannot open the database", func() {
+			It("returns an error", func() {
+				g, err := oak.OpenURL("://www")
+				Expect(g).To(BeNil())
+				Expect(err).To(MatchError("parse ://www: missing protocol scheme"))
 			})
 		})
 	})
