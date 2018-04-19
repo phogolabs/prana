@@ -271,17 +271,25 @@ Running command 'show-sqlite-master' from '$PWD/database/script'
 
 You can run the command by using the `Gateway API` as well:
 
+Let's first load the file:
+
 ```golang
-err := oak.LoadDir("./database/script")
-
-if err != nil {
-	return err
+if err = oak.LoadSQLCommandsFromReader(file); err != nil {
+	log.WithError(err).Fatal("Failed to load script")
 }
+```
 
-cmd := oak.Command("show-sqlite-master")
+Then you can execute the desired script by just passing its name:
 
-_, err = gateway.Exec(cmd)
-return err
+```golang
+_, err = gateway.Exec(oak.Command("show-sqlite-master"))
+```
+
+If you want to run Raw SQL Scripts from your code, you should follow this
+example:
+
+```golang
+rows, err := gateway.Query(oak.SQL("SELECT * FROM users"))
 ```
 
 ### Command Line Interface Advance Usage
