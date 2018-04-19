@@ -16,12 +16,15 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/oak/migration"
 	"github.com/phogolabs/oak/script"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 )
+
+// FileSystem provides with primitives to work with the underlying file system
+type FileSystem = parcello.FileSystem
 
 // Dir implements FileSystem using the native file system restricted to a
 // specific directory tree.
-type Dir = parcel.Dir
+type Dir = parcello.Dir
 
 // Query represents an SQL Query that can be executed by Gateway.
 type Query interface {
@@ -61,12 +64,12 @@ func init() {
 }
 
 // Setup setups the oak environment for us
-func Setup(gateway *Gateway, manager *parcel.Manager) error {
-	if err := LoadSQLCommandsFrom(parcel.Root("script")); err != nil {
+func Setup(gateway *Gateway, manager *parcello.Manager) error {
+	if err := LoadSQLCommandsFrom(parcello.Root("script")); err != nil {
 		return err
 	}
 
-	if err := Migrate(gateway, parcel.Root("migration")); err != nil {
+	if err := Migrate(gateway, parcello.Root("migration")); err != nil {
 		return err
 	}
 
@@ -74,7 +77,7 @@ func Setup(gateway *Gateway, manager *parcel.Manager) error {
 }
 
 // Migrate runs all pending migration
-func Migrate(gateway *Gateway, fileSystem parcel.FileSystem) error {
+func Migrate(gateway *Gateway, fileSystem FileSystem) error {
 	return migration.RunAll(gateway.db, fileSystem)
 }
 
@@ -86,7 +89,7 @@ func LoadSQLCommandsFromReader(r io.Reader) error {
 
 // LoadSQLCommandsFrom loads all script commands from a given directory. Note that all
 // scripts should have .sql extension.
-func LoadSQLCommandsFrom(fileSystem parcel.FileSystem) error {
+func LoadSQLCommandsFrom(fileSystem FileSystem) error {
 	return provider.ReadDir(fileSystem)
 }
 

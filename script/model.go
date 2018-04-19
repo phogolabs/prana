@@ -4,7 +4,7 @@ package script
 
 import (
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 )
 
 var (
@@ -19,4 +19,4 @@ type Rows = sqlx.Rows
 type Param = interface{}
 
 // FileSystem provides with primitives to work with the underlying file system
-type FileSystem = parcel.FileSystem
+type FileSystem = parcello.FileSystem

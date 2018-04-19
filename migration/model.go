@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 )
 
 //go:generate counterfeiter -fake-name MigrationRunner -o ../fake/MigrationRunner.go . ItemRunner
@@ -22,7 +22,7 @@ var (
 )
 
 // FileSystem provides with primitives to work with the underlying file system
-type FileSystem = parcel.FileSystem
+type FileSystem = parcello.FileSystem
 
 // ItemRunner runs or reverts a given migration item.
 type ItemRunner interface {

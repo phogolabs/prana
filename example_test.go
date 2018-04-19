@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/phogolabs/oak"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 	lk "github.com/ulule/loukoum"
 )
 
@@ -150,7 +150,7 @@ func ExampleGateway_Exec() {
 }
 
 func ExampleCommand() {
-	err := oak.LoadSQLCommandsFrom(parcel.Dir("./database/command"))
+	err := oak.LoadSQLCommandsFrom(parcello.Dir("./database/command"))
 
 	if err != nil {
 		fmt.Println(err)

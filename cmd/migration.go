@@ -11,7 +11,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
 	"github.com/phogolabs/oak/migration"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 	"github.com/urfave/cli"
 )
 
@@ -94,7 +94,7 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 		return err
 	}
 
-	fs := parcel.Dir(filepath.Join(cwd, "database/migration"))
+	fs := parcello.Dir(filepath.Join(cwd, "database/migration"))
 
 	m.cwd = string(fs)
 	m.db = db

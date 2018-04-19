@@ -7,12 +7,12 @@ import (
 	randomdata "github.com/Pallinder/go-randomdata"
 	_ "github.com/mattn/go-sqlite3"
 	_ "github.com/phogolabs/oak/example"
+	"github.com/phogolabs/parcello"
 	validator "gopkg.in/go-playground/validator.v9"
 
 	"github.com/apex/log"
 	"github.com/phogolabs/oak"
 	"github.com/phogolabs/oak/example/database/model"
-	"github.com/phogolabs/parcel"
 	lk "github.com/ulule/loukoum"
 )
 
@@ -23,7 +23,7 @@ func main() {
 	}
 	defer gateway.Close()
 
-	if err = oak.Setup(parcel.Root("database")); err != nil {
+	if err = oak.Setup(gateway, parcello.Root("database")); err != nil {
 		log.WithError(err).Fatal("Failed to setup OAK")
 	}
 

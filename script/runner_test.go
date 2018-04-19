@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
 	"github.com/phogolabs/oak/script"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Runner", func() {
@@ -32,7 +32,7 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &script.Runner{
-			FileSystem: parcel.Dir(dir),
+			FileSystem: parcello.Dir(dir),
 			DB:         gateway,
 		}
 	})

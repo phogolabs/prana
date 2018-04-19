@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"sync"
 	"time"
 
 	. "github.com/onsi/ginkgo"
@@ -12,7 +13,7 @@ import (
 
 	"github.com/phogolabs/oak"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Command", func() {
@@ -42,11 +43,19 @@ var _ = Describe("Command", func() {
 			fmt.Fprintln(buffer)
 			fmt.Fprintln(buffer, "SELECT * FROM categories")
 
+			content := buffer.Bytes()
+
+			node := &parcello.Node{
+				Name:    "script.sql",
+				Content: &content,
+				Mutex:   &sync.RWMutex{},
+			}
+
 			fileSystem := &fake.FileSystem{}
-			fileSystem.OpenFileReturns(parcel.NewBufferWith(buffer.Bytes()), nil)
+			fileSystem.OpenFileReturns(parcello.NewResourceFile(node), nil)
 
 			fileSystem.WalkStub = func(dir string, fn filepath.WalkFunc) error {
-				return fn("command", parcel.NewNodeFile("command.sql", buffer.Bytes()), nil)
+				return fn("command", &parcello.ResourceFileInfo{Node: node}, nil)
 			}
 
 			Expect(oak.LoadSQLCommandsFrom(fileSystem)).To(Succeed())
@@ -109,6 +118,6 @@ var _ = Describe("Migrate", func() {
 		url := filepath.Join(dir, "oak.db")
 		db, err := oak.Open("sqlite3", url)
 		Expect(err).To(BeNil())
-		Expect(oak.Migrate(db, parcel.Dir(dir))).To(Succeed())
+		Expect(oak.Migrate(db, parcello.Dir(dir))).To(Succeed())
 	})
 })

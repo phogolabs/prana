@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/migration"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Provider", func() {
@@ -32,7 +32,7 @@ var _ = Describe("Provider", func() {
 		Expect(err).To(BeNil())
 
 		provider = &migration.Provider{
-			FileSystem: parcel.Dir(dir),
+			FileSystem: parcello.Dir(dir),
 			DB:         db,
 		}
 	})

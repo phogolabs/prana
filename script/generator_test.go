@@ -12,7 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
 	"github.com/phogolabs/oak/script"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Generator", func() {
@@ -27,7 +27,7 @@ var _ = Describe("Generator", func() {
 		Expect(err).To(BeNil())
 
 		generator = &script.Generator{
-			FileSystem: parcel.Dir(dir),
+			FileSystem: parcello.Dir(dir),
 		}
 	})
 
@@ -125,7 +125,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				generator.FileSystem = parcel.Dir("/hello")
+				generator.FileSystem = parcello.Dir("/hello")
 				_, _, err := generator.Create("commands", "update")
 				Expect(err).To(MatchError("Directory does not exist"))
 			})

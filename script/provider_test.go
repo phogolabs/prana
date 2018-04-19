@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"fmt"
 	"path/filepath"
+	"sync"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/phogolabs/oak/fake"
 	"github.com/phogolabs/oak/script"
-	"github.com/phogolabs/parcel"
+	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Provider", func() {
@@ -81,8 +82,16 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("skips non sql files", func() {
+			data := []byte{}
+			node := &parcello.Node{
+				Name:    "file.sql",
+				Content: &data,
+				Mutex:   &sync.RWMutex{},
+			}
+
+			fileSystem.OpenFileReturns(parcello.NewResourceFile(node), nil)
 			fileSystem.WalkStub = func(dir string, fn filepath.WalkFunc) error {
-				return fn(dir, parcel.NewNodeFile("file", buffer.Bytes()), nil)
+				return fn(dir, &parcello.ResourceFileInfo{Node: node}, nil)
 			}
 
 			Expect(provider.ReadDir(fileSystem)).To(Succeed())
@@ -95,7 +104,7 @@ var _ = Describe("Provider", func() {
 		Context("when the file system fails ", func() {
 			BeforeEach(func() {
 				fileSystem.WalkStub = func(dir string, fn filepath.WalkFunc) error {
-					return fn(dir, parcel.NewNodeFile("file.sql", buffer.Bytes()), nil)
+					return fn(dir, &parcello.ResourceFileInfo{Node: &parcello.Node{Name: "file.sql"}}, nil)
 				}
 			})
 
@@ -113,10 +122,17 @@ var _ = Describe("Provider", func() {
 
 			Context("when reading from a file fails", func() {
 				It("returns an error", func() {
-					fileSystem.OpenFileReturns(parcel.NewBufferWith(buffer.Bytes()), nil)
+					data := buffer.Bytes()
+					node := &parcello.Node{
+						Name:    "file.sql",
+						Content: &data,
+						Mutex:   &sync.RWMutex{},
+					}
+
+					fileSystem.OpenFileReturns(parcello.NewResourceFile(node), nil)
 					Expect(provider.ReadDir(fileSystem)).To(Succeed())
 
-					fileSystem.OpenFileReturns(parcel.NewBufferWith(buffer.Bytes()), nil)
+					fileSystem.OpenFileReturns(parcello.NewResourceFile(node), nil)
 					Expect(provider.ReadDir(fileSystem)).To(MatchError("Command 'up' already exists"))
 				})
 			})
