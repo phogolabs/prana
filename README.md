@@ -95,21 +95,31 @@ contains Golang structs, which represents each table from the desired schema.
 For that purpose you should call the following subcommand:
 
 ```bash
-$ oak schema sync
+$ oak model sync
 ```
 
-By default the command will place the generated code in single `model.go` file in
-`$PWD/database/model` package for the default database schema.
+By default the command will place the generated code in single `schema.go` file
+in `$PWD/database/model` package for the default database schema. Any other
+schemas will be placed in the same package but in separate files. You can
+control the behavior by passing `--keep-schema` flag which will cause each
+schema to be generated in own package under the `/$PWD/database/model` package.
 
 You can print the source code without generating a package by executing the
 following command:
 
 ```bash
-$ oak schema print
+$ oak model print
 ```
 
 Note that you can specify the desired schema or tables by providing the correct
 arguments.
+
+If you pass `--extra-tag` argument, you can specify which tag to be included in
+your final result. Supported extra tags are:
+
+- [json](https://golang.org/pkg/encoding/json/) that can be recognized by Golang
+- [xml](https://golang.org/pkg/encoding/xml/) tag used by Golang to marshal fields in XML
+- [validate](https://github.com/go-playground/validator/blob/v9/_examples/simple/main.go#L11) to validate field by [validator](https://github.com/go-playground/validator) package
 
 The model representation of the users table is:
 
@@ -139,6 +149,14 @@ installed:
 
 - [go.uuid](https://github.com/satori/go.uuid) package
 - [null](https://github.com/guregu/null) package
+
+The generated `db` tag is recognized by
+[parcel.Gateway](https://godoc.org/github.com/phogolabs/oak#Gateway) as well as
+[sqlx](https://github.com/jmoiron/sqlx).
+
+If you wan to generate model to work with [gorm](http://gorm.io), you should
+pass `--orm-tag gorm`. Note that constraints like unique or indexes are not
+included for now.
 
 ### SQL Queries with Loukoum
 
