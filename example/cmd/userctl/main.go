@@ -23,12 +23,8 @@ func main() {
 	}
 	defer gateway.Close()
 
-	if err = oak.LoadSQLCommandsFrom(parcel.Root("database/script")); err != nil {
-		log.WithError(err).Fatal("Failed to load script")
-	}
-
-	if err = oak.Migrate(gateway, parcel.Root("database/migration")); err != nil {
-		log.WithError(err).Fatal("Failed to load script")
+	if err = oak.Setup(parcel.Root("database")); err != nil {
+		log.WithError(err).Fatal("Failed to setup OAK")
 	}
 
 	if err = create(gateway); err != nil {

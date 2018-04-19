@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/oak"
 	"github.com/phogolabs/oak/migration"
 	"github.com/phogolabs/oak/script"
 	"github.com/phogolabs/parcel"
@@ -58,6 +59,19 @@ var provider *script.Provider
 
 func init() {
 	provider = &script.Provider{}
+}
+
+// Setup setups the oak environment for us
+func Setup(gateway *Gateway, manager *parcel.Manager) error {
+	if err := oak.LoadSQLCommandsFrom(parcel.Root("script")); err != nil {
+		return err
+	}
+
+	if err := oak.Migrate(gateway, parcel.Root("migration")); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Migrate runs all pending migration
