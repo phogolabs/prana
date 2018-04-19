@@ -289,7 +289,7 @@ If you want to run Raw SQL Scripts from your code, you should follow this
 example:
 
 ```golang
-rows, err := gateway.Query(oak.SQL("SELECT * FROM users"))
+rows, err := gateway.Query(oak.SQL("SELECT * FROM users WHERE id = ?", 5432))
 ```
 
 ### Command Line Interface Advance Usage
