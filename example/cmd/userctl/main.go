@@ -17,25 +17,34 @@ import (
 )
 
 func main() {
-	driver, source, err := oak.ParseURL("sqlite3://oak.db")
-	if err != nil {
-		log.WithError(err).Fatal("Failed to parse database connection string")
-	}
-
-	gateway, err := oak.Open(driver, source)
+	gateway, err := oak.OpenURL("sqlite3://oak.db")
 	if err != nil {
 		log.WithError(err).Fatal("Failed to open database connection")
 	}
 	defer gateway.Close()
 
-	if err := oak.LoadSQLCommandsFrom(parcel.Root("database/script")); err != nil {
+	if err = oak.LoadSQLCommandsFrom(parcel.Root("database/script")); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 
-	if err := oak.Migrate(gateway, parcel.Root("database/migration")); err != nil {
+	if err = oak.Migrate(gateway, parcel.Root("database/migration")); err != nil {
 		log.WithError(err).Fatal("Failed to load script")
 	}
 
+	if err = create(gateway); err != nil {
+		log.WithError(err).Fatal("Failed to generate users")
+	}
+
+	users := []model.User{}
+
+	if err = gateway.Select(&users, oak.Command("show-users")); err != nil {
+		log.WithError(err).Fatal("Failed to select all users")
+	}
+
+	show(users)
+}
+
+func create(gateway *oak.Gateway) error {
 	for i := 0; i < 10; i++ {
 		var lastName interface{}
 
@@ -50,17 +59,15 @@ func main() {
 				lk.Pair("last_name", lastName),
 			)
 
-		if _, err = gateway.Exec(query); err != nil {
-			log.WithError(err).Fatal("Failed to insert new user")
+		if _, err := gateway.Exec(query); err != nil {
+			return err
 		}
 	}
 
-	users := []model.User{}
+	return nil
+}
 
-	if err = gateway.Select(&users, oak.Command("show-users")); err != nil {
-		log.WithError(err).Fatal("Failed to select all users")
-	}
-
+func show(users []model.User) {
 	validate := validator.New()
 
 	for _, user := range users {
@@ -69,7 +76,7 @@ func main() {
 			continue
 		}
 
-		fmt.Printf("User ID: %v\n", user.Id)
+		fmt.Printf("User ID: %v\n", user.ID)
 		fmt.Printf("First Name: %v\n", user.FirstName)
 
 		if user.LastName.Valid {
