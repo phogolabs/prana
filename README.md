@@ -321,8 +321,30 @@ You can check our [Getting Started Example](/example).
 For more information, how you can change the default behavior you can read the
 help documentation by executing:
 
-```bash
+```console
 $ oak -h
+
+NAME:
+   oak - Golang Database Object Manager
+
+USAGE:
+   oak [global options]
+
+VERSION:
+   1.0
+
+COMMANDS:
+     migration  A group of commands for generating, running, and reverting migrations
+     model      A group of commands for generating object model from database schema
+     script     A group of commands for generating, running, and removing SQL commands
+     help, h    Shows a list of commands or help for one command
+
+GLOBAL OPTIONS:
+   --database-url value  Database URL (default: "sqlite3://oak.db") [$OAK_DB_URL]
+   --log-format value    format of the logs [$OAK_LOG_FORMAT]
+   --log-level value     level of logging (default: "info") [$OAK_LOG_LEVEL]
+   --help, -h            show help
+   --version, -v         print the version
 ```
 
 ## Contributing
