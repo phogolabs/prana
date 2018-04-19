@@ -307,7 +307,7 @@ If you want to change the default connection, you can pass it via command line
 argument:
 
 ```bash
-$ oak --database-url mysql://root@./oak_demo [command]
+$ oak --database-url [driver-name]://[connection-string] [command]
 ```
 
 oak uses a URL schema to determines the right database driver. If you want to
