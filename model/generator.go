@@ -16,6 +16,8 @@ var _ Composer = &Generator{}
 
 // GeneratorConfig controls how the code generation happens
 type GeneratorConfig struct {
+	// KeepSchema controlls whether the database schema to be kept as package
+	KeepSchema bool
 	// InlcudeDoc determines whether to include documentation
 	InlcudeDoc bool
 	// IgnoreTables ecludes the those tables from generation
@@ -42,7 +44,7 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 	g.writePackage(pkg, schema.Name, buffer)
 
 	for _, table := range tables {
-		g.writeTable(&table, buffer)
+		g.writeTable(pkg, &table, buffer)
 	}
 
 	if err := g.format(buffer); err != nil {
@@ -78,10 +80,10 @@ func (g *Generator) writePackage(pkg, name string, buffer io.Writer) {
 	fmt.Fprintln(buffer)
 }
 
-func (g *Generator) writeTable(table *Table, buffer io.Writer) {
+func (g *Generator) writeTable(pkg string, table *Table, buffer io.Writer) {
 	columns := table.Columns
 	length := len(columns)
-	typeName := g.tableName(table)
+	typeName := g.tableName(pkg, table)
 
 	if g.Config.InlcudeDoc {
 		fmt.Fprintln(buffer)
@@ -130,43 +132,21 @@ func (g *Generator) ignore() []string {
 	return ignore
 }
 
-func (g *Generator) tableName(table *Table) string {
+func (g *Generator) tableName(pkg string, table *Table) string {
 	name := inflect.Camelize(table.Name)
 	name = inflect.Singularize(name)
+
+	if !g.Config.KeepSchema {
+		pkg = inflect.Camelize(pkg)
+		name = fmt.Sprintf("%s%s", pkg, name)
+	}
+
 	return name
 }
 
 func (g *Generator) fieldType(column *Column) string {
 	return column.ScanType
 }
-
-// func (g *Generator) fieldTag(column *Column) string {
-// 	db := &FieldTag{Name: "db"}
-// 	db.AddOption(column.Name)
-
-// 	if column.Type.IsPrimaryKey {
-// 		db.AddOption("primary_key")
-// 	}
-
-// 	json := &FieldTag{Name: "json"}
-// 	json.AddOption(column.Name)
-
-// 	validate := &FieldTag{Name: "validate"}
-
-// 	if !column.Type.IsNullable {
-// 		validate.AddOption("required")
-// 	}
-
-// 	if len := column.Type.CharMaxLength; len > 0 {
-// 		validate.AddOption(fmt.Sprintf("lte=%d", len))
-// 	}
-
-// 	tags := FieldTagList{}
-// 	tags = append(tags, db)
-// 	tags = append(tags, json)
-// 	tags = append(tags, validate)
-// 	return tags.String()
-// }
 
 func (g *Generator) format(buffer *bytes.Buffer) error {
 	data, err := imports.Process("model", buffer.Bytes(), nil)

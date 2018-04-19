@@ -1,14 +1,23 @@
 package model
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 )
 
+// ExecutorConfig defines the Executor's configuration
+type ExecutorConfig struct {
+	// KeepSchema controlls whether the database schema to be kept as package
+	KeepSchema bool
+}
+
 // Executor executes the schema generation
 type Executor struct {
+	// Config of the executor
+	Config *ExecutorConfig
 	// Composer is the model generator
 	Composer Composer
 	// Provider provides information the database schema
@@ -101,19 +110,25 @@ func (e *Executor) fileOf(schema *Schema, spec *Spec) (string, error) {
 		return "", err
 	}
 
+	filename := "schema.go"
+
 	if !schema.IsDefault {
-		dir = filepath.Join(dir, schema.Name)
+		if e.Config.KeepSchema {
+			dir = filepath.Join(dir, schema.Name)
+		} else {
+			filename = fmt.Sprintf("%s.go", schema.Name)
+		}
 	}
 
 	if err := os.MkdirAll(dir, 0700); err != nil {
 		return "", err
 	}
 
-	return filepath.Join(dir, "schema.go"), nil
+	return filepath.Join(dir, filename), nil
 }
 
 func (e *Executor) packageOf(schema *Schema, spec *Spec) string {
-	if schema.IsDefault {
+	if schema.IsDefault || !e.Config.KeepSchema {
 		return filepath.Base(spec.Dir)
 	}
 

@@ -57,36 +57,49 @@ var _ = Describe("Generator", func() {
 		generator = &model.Generator{
 			TagBuilder: builder,
 			Config: &model.GeneratorConfig{
+				KeepSchema: true,
 				InlcudeDoc: false,
 			},
 		}
 	})
 
-	It("generates the schema successfully", func() {
-		source := &bytes.Buffer{}
-		fmt.Fprintln(source, "package model")
-		fmt.Fprintln(source)
-		fmt.Fprintln(source, "type Table1 struct {")
-		fmt.Fprintln(source, "        Id string `db`")
-		fmt.Fprintln(source, "        Name string `db`")
-		fmt.Fprintln(source, "}")
+	ItGeneratesTheModelSuccessfully := func(table string) {
+		It("generates the schema successfully", func() {
+			source := &bytes.Buffer{}
+			fmt.Fprintln(source, "package model")
+			fmt.Fprintln(source)
+			fmt.Fprintf(source, "type %s struct {", table)
+			fmt.Fprintln(source, "        Id string `db`")
+			fmt.Fprintln(source, "        Name string `db`")
+			fmt.Fprintln(source, "}")
 
-		data, err := imports.Process("model", source.Bytes(), nil)
-		Expect(err).To(BeNil())
+			data, err := imports.Process("model", source.Bytes(), nil)
+			Expect(err).To(BeNil())
 
-		data, err = format.Source(data)
-		Expect(err).To(BeNil())
+			data, err = format.Source(data)
+			Expect(err).To(BeNil())
 
-		reader, err := generator.Compose("model", schemaDef)
-		Expect(err).To(BeNil())
+			reader, err := generator.Compose("model", schemaDef)
+			Expect(err).To(BeNil())
 
-		Expect(builder.BuildCallCount()).To(Equal(2))
-		Expect(builder.BuildArgsForCall(0)).To(Equal(&schemaDef.Tables[0].Columns[0]))
-		Expect(builder.BuildArgsForCall(1)).To(Equal(&schemaDef.Tables[0].Columns[1]))
+			Expect(builder.BuildCallCount()).To(Equal(2))
+			Expect(builder.BuildArgsForCall(0)).To(Equal(&schemaDef.Tables[0].Columns[0]))
+			Expect(builder.BuildArgsForCall(1)).To(Equal(&schemaDef.Tables[0].Columns[1]))
 
-		generated, err := ioutil.ReadAll(reader)
-		Expect(err).To(BeNil())
-		Expect(generated).To(Equal(data))
+			generated, err := ioutil.ReadAll(reader)
+			Expect(err).To(BeNil())
+			Expect(string(generated)).To(Equal(string(data)))
+		})
+	}
+
+	ItGeneratesTheModelSuccessfully("Table1")
+
+	Context("when KeepSchema is disabled", func() {
+		BeforeEach(func() {
+			generator.Config.KeepSchema = false
+		})
+
+		ItGeneratesTheModelSuccessfully("ModelTable1")
 	})
 
 	Context("when the table is ignored", func() {

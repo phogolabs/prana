@@ -58,6 +58,9 @@ var _ = Describe("Executor", func() {
 		composer.ComposeReturns(reader, nil)
 
 		executor = &model.Executor{
+			Config: &model.ExecutorConfig{
+				KeepSchema: true,
+			},
 			Provider: provider,
 			Composer: composer,
 		}
@@ -171,26 +174,54 @@ var _ = Describe("Executor", func() {
 			composer.ComposeReturns(bytes.NewBufferString("source"), nil)
 		})
 
-		It("creates a package with generated source successfully", func() {
-			path, err := executor.Create(spec)
-			Expect(err).To(Succeed())
+		ItCreatesTheSchemaInRootPkg := func(filename, pkg string) {
+			It("creates a package with generated source successfully", func() {
+				path, err := executor.Create(spec)
+				Expect(err).To(Succeed())
 
-			Expect(spec.Dir).To(BeADirectory())
-			Expect(filepath.Join(spec.Dir, "schema.go")).To(BeARegularFile())
-			Expect(path).To(Equal(filepath.Join(spec.Dir, "schema.go")))
+				Expect(spec.Dir).To(BeADirectory())
+				Expect(filepath.Join(spec.Dir, filename)).To(BeARegularFile())
+				Expect(path).To(Equal(filepath.Join(spec.Dir, filename)))
 
-			Expect(provider.TablesCallCount()).To(BeZero())
-			Expect(provider.SchemaCallCount()).To(Equal(1))
+				Expect(provider.TablesCallCount()).To(BeZero())
+				Expect(provider.SchemaCallCount()).To(Equal(1))
 
-			schemaName, tables := provider.SchemaArgsForCall(0)
-			Expect(schemaName).To(Equal("public"))
-			Expect(tables).To(ContainElement("table1"))
+				schemaName, tables := provider.SchemaArgsForCall(0)
+				Expect(schemaName).To(Equal("public"))
+				Expect(tables).To(ContainElement("table1"))
 
-			Expect(composer.ComposeCallCount()).To(Equal(1))
-			packageName, schemaDefintion := composer.ComposeArgsForCall(0)
+				Expect(composer.ComposeCallCount()).To(Equal(1))
+				packageName, schemaDefintion := composer.ComposeArgsForCall(0)
 
-			Expect(packageName).To(Equal("entity"))
-			Expect(schemaDefintion).To(Equal(schemaDef))
+				Expect(packageName).To(Equal(pkg))
+				Expect(schemaDefintion).To(Equal(schemaDef))
+			})
+		}
+
+		ItCreatesTheSchemaInRootPkg("schema.go", "entity")
+
+		Context("when the schema is not default", func() {
+			BeforeEach(func() {
+				schemaDef.IsDefault = false
+			})
+
+			ItCreatesTheSchemaInRootPkg("public/schema.go", "public")
+		})
+
+		Context("when the KeepSchema is false", func() {
+			BeforeEach(func() {
+				executor.Config.KeepSchema = false
+			})
+
+			ItCreatesTheSchemaInRootPkg("schema.go", "entity")
+
+			Context("when the schema is not default", func() {
+				BeforeEach(func() {
+					schemaDef.IsDefault = false
+				})
+
+				ItCreatesTheSchemaInRootPkg("public.go", "entity")
+			})
 		})
 
 		Context("when the tables are not provided", func() {

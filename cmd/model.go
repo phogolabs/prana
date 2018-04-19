@@ -50,6 +50,10 @@ func (m *SQLModel) CreateCommand() cli.Command {
 				Usage: "orm package for which the model tag will be generated",
 				Value: "sqlx",
 			},
+			cli.BoolFlag{
+				Name:  "keep-schema, k",
+				Usage: "keep the schema as package (except default schema)",
+			},
 			cli.BoolTFlag{
 				Name:  "include-docs, d",
 				Usage: "include API documentation in generated source code",
@@ -109,10 +113,14 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 
 	m.db = db
 	m.executor = &model.Executor{
+		Config: &model.ExecutorConfig{
+			KeepSchema: ctx.Bool("keep-schema"),
+		},
 		Provider: provider,
 		Composer: &model.Generator{
 			TagBuilder: builder,
 			Config: &model.GeneratorConfig{
+				KeepSchema:   ctx.Bool("keep-schema"),
 				InlcudeDoc:   ctx.BoolT("include-docs"),
 				IgnoreTables: ctx.StringSlice("ignore-table-name"),
 			},
