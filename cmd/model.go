@@ -146,6 +146,8 @@ func (m *SQLModel) builder(ctx *cli.Context) (model.TagBuilder, error) {
 			builder = append(builder, model.JSONTagBuilder{})
 		case "xml":
 			builder = append(builder, model.XMLTagBuilder{})
+		case "validate":
+			builder = append(builder, model.ValidateTagBuilder{})
 		default:
 			err := fmt.Errorf("Cannot find tag builder for '%s'", tag)
 			return nil, cli.NewExitError(err.Error(), ErrCodeArg)

@@ -29,6 +29,29 @@ var _ = Describe("CompositeTagBuilder", func() {
 		Expect(builder2.BuildCallCount()).To(Equal(1))
 		Expect(builder2.BuildArgsForCall(0)).To(Equal(column))
 	})
+
+	Context("when some of the builders return an space string", func() {
+		It("skips the result", func() {
+			builder := model.CompositeTagBuilder{}
+
+			builder1 := &fake.ModelTagBuilder{}
+			builder1.BuildReturns(" ")
+			builder = append(builder, builder1)
+
+			builder2 := &fake.ModelTagBuilder{}
+			builder2.BuildReturns(" tag2")
+			builder = append(builder, builder2)
+
+			column := &model.Column{}
+			Expect(builder.Build(column)).To(Equal("`tag2`"))
+
+			Expect(builder1.BuildCallCount()).To(Equal(1))
+			Expect(builder1.BuildArgsForCall(0)).To(Equal(column))
+
+			Expect(builder2.BuildCallCount()).To(Equal(1))
+			Expect(builder2.BuildArgsForCall(0)).To(Equal(column))
+		})
+	})
 })
 
 var _ = Describe("SQLXTagBuilder", func() {
@@ -195,5 +218,53 @@ var _ = Describe("XMLTagBuilder", func() {
 
 	It("creates a xml tag", func() {
 		Expect(builder.Build(column)).To(Equal("xml:\"id\""))
+	})
+})
+
+var _ = Describe("ValidateTagBuilder", func() {
+	var (
+		column  *model.Column
+		builder *model.ValidateTagBuilder
+	)
+
+	BeforeEach(func() {
+		builder = &model.ValidateTagBuilder{}
+		column = &model.Column{
+			Name: "id",
+		}
+	})
+
+	It("creates a validation tag", func() {
+		Expect(builder.Build(column)).To(Equal("validate:\"required\""))
+	})
+
+	Context("when the value has length", func() {
+		BeforeEach(func() {
+			column.Type.CharMaxLength = 200
+		})
+
+		It("creates a validation tag", func() {
+			Expect(builder.Build(column)).To(Equal("validate:\"required,max=200\""))
+		})
+	})
+
+	Context("when the value is not nullable", func() {
+		BeforeEach(func() {
+			column.Type.IsNullable = true
+		})
+
+		Context("when the value has length", func() {
+			BeforeEach(func() {
+				column.Type.CharMaxLength = 200
+			})
+
+			It("creates a validation tag", func() {
+				Expect(builder.Build(column)).To(Equal("validate:\"max=200\""))
+			})
+		})
+
+		It("returns an empty tag", func() {
+			Expect(builder.Build(column)).To(Equal("validate:\"-\""))
+		})
 	})
 })
