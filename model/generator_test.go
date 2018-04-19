@@ -70,7 +70,7 @@ var _ = Describe("Generator", func() {
 			fmt.Fprintln(source, "package model")
 			fmt.Fprintln(source)
 			fmt.Fprintf(source, "type %s struct {", table)
-			fmt.Fprintln(source, "        Id string `db`")
+			fmt.Fprintln(source, "        ID string `db`")
 			fmt.Fprintln(source, "        Name string `db`")
 			fmt.Fprintln(source, "}")
 
@@ -140,7 +140,7 @@ var _ = Describe("Generator", func() {
 
 			source := string(data)
 			Expect(source).To(ContainSubstring("// Table1 represents a data base table 'table1'"))
-			Expect(source).To(ContainSubstring("// Id represents a database column 'id' of type 'VARCHAR(200) PRIMARY KEY NULL'"))
+			Expect(source).To(ContainSubstring("// ID represents a database column 'id' of type 'VARCHAR(200) PRIMARY KEY NULL'"))
 		})
 	})
 

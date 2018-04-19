@@ -6,6 +6,7 @@ import (
 	"go/format"
 	"io"
 	"sort"
+	"strings"
 	"time"
 
 	"github.com/go-openapi/inflect"
@@ -96,7 +97,7 @@ func (g *Generator) writeTable(pkg string, isDefaultSchema bool, table *Table, b
 
 	for index, column := range columns {
 		current := column
-		fieldName := inflect.Camelize(current.Name)
+		fieldName := g.fieldName(&current)
 		fieldType := g.fieldType(&current)
 		fieldTag := g.TagBuilder.Build(&current)
 
@@ -141,6 +142,12 @@ func (g *Generator) tableName(pkg string, isDefaultSchema bool, table *Table) st
 		name = fmt.Sprintf("%s%s", pkg, name)
 	}
 
+	return name
+}
+
+func (g *Generator) fieldName(column *Column) string {
+	name := inflect.Camelize(column.Name)
+	name = strings.Replace(name, "Id", "ID", -1)
 	return name
 }
 
