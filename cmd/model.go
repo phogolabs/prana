@@ -46,8 +46,8 @@ func (m *SQLModel) CreateCommand() cli.Command {
 				Value: "./database/model",
 			},
 			cli.StringFlag{
-				Name:  "orm-type, m",
-				Usage: "orm package for which the model tag will be generated",
+				Name:  "orm-tag-format, m",
+				Usage: "tag format that is wellknow for some ORM packages",
 				Value: "sqlx",
 			},
 			cli.BoolFlag{
@@ -127,14 +127,15 @@ func (m *SQLModel) provider(db *sqlx.DB) (model.Provider, error) {
 
 func (m *SQLModel) builder(ctx *cli.Context) (model.TagBuilder, error) {
 	builder := model.CompositeTagBuilder{}
+	format := ctx.String("orm-tag-format")
 
-	switch strings.ToLower(ctx.String("orm-type")) {
+	switch strings.ToLower(format) {
 	case "sqlx":
 		builder = append(builder, model.SQLXTagBuilder{})
 	case "gorm":
 		builder = append(builder, model.GORMTagBuilder{})
 	default:
-		err := fmt.Errorf("Cannot find tag builder for '%s'", ctx.String("orm-type"))
+		err := fmt.Errorf("Cannot find tag builder for '%s'", format)
 		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 
