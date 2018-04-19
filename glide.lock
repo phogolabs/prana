@@ -1,5 +1,5 @@
 hash: 8951f3f5660b48600aa77acb01c228f1827c78114b2503dde33bc13de42fadf4
-updated: 2018-04-16T21:33:21.785937+02:00
+updated: 2018-04-20T00:02:22.655335+02:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -36,11 +36,11 @@ imports:
 - name: github.com/mattn/go-sqlite3
   version: 6c771bb9887719704b210e87e934f08be014bdb1
 - name: github.com/olekukonko/tablewriter
-  version: b8a9be070da40449e501c3c4730a889e42d87a9e
+  version: d5dd8a50526aadb3d5f2c9b5233277bc2db90e88
 - name: github.com/Pallinder/go-randomdata
   version: dab270d296c6c8fb98de3b4334bbd7d7b0ceca53
 - name: github.com/phogolabs/parcel
-  version: d97e5c45877404ec8c728d67dd7904d6afdc3bca
+  version: e02de3d65fd7d28e818e5571942917632ae1951d
 - name: github.com/pkg/errors
   version: 816c9085562cd7ee03e7f8188a1cfd942858cded
 - name: github.com/ulule/loukoum
