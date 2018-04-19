@@ -3,6 +3,7 @@ package main
 
 import (
 	"os"
+	"sort"
 
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
@@ -57,6 +58,14 @@ func main() {
 		Flags:                flags,
 		Before:               cmd.BeforeEach,
 		Commands:             commands,
+	}
+
+	sort.Sort(cli.FlagsByName(app.Flags))
+	sort.Sort(cli.CommandsByName(app.Commands))
+
+	for _, command := range commands {
+		sort.Sort(cli.FlagsByName(command.Flags))
+		sort.Sort(cli.CommandsByName(command.Subcommands))
 	}
 
 	app.Run(os.Args)
