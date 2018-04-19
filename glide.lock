@@ -1,33 +1,143 @@
 hash: 8951f3f5660b48600aa77acb01c228f1827c78114b2503dde33bc13de42fadf4
-updated: 2018-04-20T00:08:48.965124+02:00
+updated: 2018-04-20T00:50:09.128595+02:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
   subpackages:
   - handlers/json
+- name: github.com/blang/vfs
+  version: c14afcac17253ce7418da751ec6b1988790cdc8f
+  subpackages:
+  - memfs
 - name: github.com/fatih/color
   version: 507f6050b8568533fb3f5504de8e5205fa62a114
 - name: github.com/gchaincl/dotsql
   version: 5487b6a5fc12870425fc14d9e05a3fabddd91d7e
+- name: github.com/go-openapi/inflect
+  version: b1f6470ffb9c552dc105dd869f16e36ba86ba7d0
+- name: github.com/go-playground/locales
+  version: f63010822830b6fe52288ee52d5a1151088ce039
+  subpackages:
+  - currency
+- name: github.com/go-playground/universal-translator
+  version: 71201497bace774495daed26a3874fd339e0b538
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
 - name: github.com/jmoiron/sqlx
   version: 2aeb6a910c2b94f2d5eb53d9895d80e27264ec41
+  subpackages:
+  - reflectx
 - name: github.com/lib/pq
   version: d34b9ff171c21ad295489235aec8b6626023cd04
+  subpackages:
+  - oid
+- name: github.com/mattn/go-colorable
+  version: efa589957cd060542a26d2dd7832fd6a6c6c3ade
+- name: github.com/mattn/go-isatty
+  version: 6ca4dbf54d38eea1a992b3c722a76a5d1c4cb25c
+- name: github.com/mattn/go-runewidth
+  version: ce7b0b5c7b45a81508558cd1dba6bb1e4ddb51bb
 - name: github.com/mattn/go-sqlite3
   version: 6c771bb9887719704b210e87e934f08be014bdb1
 - name: github.com/olekukonko/tablewriter
   version: d5dd8a50526aadb3d5f2c9b5233277bc2db90e88
+- name: github.com/Pallinder/go-randomdata
+  version: dab270d296c6c8fb98de3b4334bbd7d7b0ceca53
+- name: github.com/phogolabs/parcello
+  version: e02de3d65fd7d28e818e5571942917632ae1951d
+  subpackages:
+  - fake
+- name: github.com/pkg/errors
+  version: 816c9085562cd7ee03e7f8188a1cfd942858cded
 - name: github.com/ulule/loukoum
   version: 09752c4c10f314002ad590a1f9b12d2815376b51
+  subpackages:
+  - builder
+  - format
+  - lexer
+  - parser
+  - stmt
+  - token
+  - types
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
+- name: golang.org/x/sys
+  version: 3b87a42e500a6dc65dae1a55d0b641295971163e
+  subpackages:
+  - unix
+- name: golang.org/x/tools
+  version: dc06d3e643411517e465276d75b66dbed2898850
+  subpackages:
+  - go/ast/astutil
+  - imports
+- name: gopkg.in/go-playground/validator.v9
+  version: 14984d91328f9612b58443cbdf4a077d4fd71091
+- name: gopkg.in/volatiletech/null.v6
+  version: 0bef4e07ae1b27a2a4efa23bbb3006c8c3d2e01d
+  subpackages:
+  - convert
 testImports:
 - name: github.com/onsi/ginkgo
-  version: ""
-- name: github.com/onsi/gomega
-  version: ""
+  version: 9eda700730cba42af70d53180f9dcce9266bc2bc
   subpackages:
+  - config
+  - internal/codelocation
+  - internal/containernode
+  - internal/failer
+  - internal/leafnodes
+  - internal/remote
+  - internal/spec
+  - internal/spec_iterator
+  - internal/specrunner
+  - internal/suite
+  - internal/testingtproxy
+  - internal/writer
+  - reporters
+  - reporters/stenographer
+  - reporters/stenographer/support/go-colorable
+  - reporters/stenographer/support/go-isatty
+  - types
+- name: github.com/onsi/gomega
+  version: 003f63b7f4cff3fc95357005358af2de0f5fe152
+  subpackages:
+  - format
   - gbytes
   - gexec
+  - internal/assertion
+  - internal/asyncassertion
+  - internal/oraclematcher
+  - internal/testingtsupport
+  - matchers
+  - matchers/support/goraph/bipartitegraph
+  - matchers/support/goraph/edge
+  - matchers/support/goraph/node
+  - matchers/support/goraph/util
+  - types
+- name: golang.org/x/net
+  version: 61147c48b25b599e5b561d2e9c4f3e1ef489ca41
+  subpackages:
+  - html
+  - html/atom
+  - html/charset
+- name: golang.org/x/text
+  version: 7922cc490dd5a7dbaa7fd5d6196b49db59ac042f
+  subpackages:
+  - encoding
+  - encoding/charmap
+  - encoding/htmlindex
+  - encoding/internal
+  - encoding/internal/identifier
+  - encoding/japanese
+  - encoding/korean
+  - encoding/simplifiedchinese
+  - encoding/traditionalchinese
+  - encoding/unicode
+  - internal/language
+  - internal/language/compact
+  - internal/tag
+  - internal/utf8internal
+  - language
+  - runes
+  - transform
+- name: gopkg.in/yaml.v2
+  version: 5420a8b6744d3b0345ab293f6fcba19c978f1183
