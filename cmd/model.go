@@ -45,14 +45,18 @@ func (m *SQLModel) CreateCommand() cli.Command {
 				Usage: "path to the package, where the source code will be generated",
 				Value: "./database/model",
 			},
-			cli.StringFlag{
-				Name:  "orm-tag-format, m",
-				Usage: "tag format that is wellknow for some ORM packages",
-				Value: "sqlx",
-			},
 			cli.BoolFlag{
 				Name:  "keep-schema, k",
 				Usage: "keep the schema as package (except default schema)",
+			},
+			cli.StringFlag{
+				Name:  "orm-tag, m",
+				Usage: "tag tag that is wellknow for some ORM packages. supported: (sqlx, gorm)",
+				Value: "sqlx",
+			},
+			cli.StringSliceFlag{
+				Name:  "extra-tag, e",
+				Usage: "extra tags that should be included in model fields. supported: (json, xml, validate)",
 			},
 			cli.BoolTFlag{
 				Name:  "include-docs, d",
@@ -127,20 +131,26 @@ func (m *SQLModel) provider(db *sqlx.DB) (model.Provider, error) {
 
 func (m *SQLModel) builder(ctx *cli.Context) (model.TagBuilder, error) {
 	builder := model.CompositeTagBuilder{}
-	format := ctx.String("orm-tag-format")
 
-	switch strings.ToLower(format) {
-	case "sqlx":
-		builder = append(builder, model.SQLXTagBuilder{})
-	case "gorm":
-		builder = append(builder, model.GORMTagBuilder{})
-	default:
-		err := fmt.Errorf("Cannot find tag builder for '%s'", format)
-		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
+	tags := []string{}
+	tags = append(tags, ctx.String("orm-tag"))
+	tags = append(tags, ctx.StringSlice("extra-tag")...)
+
+	for _, tag := range tags {
+		switch strings.ToLower(tag) {
+		case "sqlx":
+			builder = append(builder, model.SQLXTagBuilder{})
+		case "gorm":
+			builder = append(builder, model.GORMTagBuilder{})
+		case "json":
+			builder = append(builder, model.JSONTagBuilder{})
+		case "xml":
+			builder = append(builder, model.XMLTagBuilder{})
+		default:
+			err := fmt.Errorf("Cannot find tag builder for '%s'", tag)
+			return nil, cli.NewExitError(err.Error(), ErrCodeArg)
+		}
 	}
-
-	builder = append(builder, model.JSONTagBuilder{})
-	builder = append(builder, model.XMLTagBuilder{})
 
 	return builder, nil
 }
