@@ -130,6 +130,7 @@ func (m *SQLModel) provider(db *sqlx.DB) (model.Provider, error) {
 }
 
 func (m *SQLModel) builder(ctx *cli.Context) (model.TagBuilder, error) {
+	registered := make(map[string]struct{})
 	builder := model.CompositeTagBuilder{}
 
 	tags := []string{}
@@ -137,6 +138,12 @@ func (m *SQLModel) builder(ctx *cli.Context) (model.TagBuilder, error) {
 	tags = append(tags, ctx.StringSlice("extra-tag")...)
 
 	for _, tag := range tags {
+		if _, ok := registered[tag]; ok {
+			continue
+		}
+
+		registered[tag] = struct{}{}
+
 		switch strings.ToLower(tag) {
 		case "sqlx":
 			builder = append(builder, model.SQLXTagBuilder{})
