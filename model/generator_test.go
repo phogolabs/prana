@@ -1,4 +1,4 @@
-package schema_test
+package model_test
 
 import (
 	"bytes"
@@ -9,28 +9,28 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/schema"
+	"github.com/phogolabs/oak/model"
 	"golang.org/x/tools/imports"
 )
 
 var _ = Describe("Generator", func() {
 	var (
-		generator *schema.Generator
-		builder   *fake.SchemaTagBuilder
-		schemaDef *schema.Schema
+		generator *model.Generator
+		builder   *fake.ModelTagBuilder
+		schemaDef *model.Schema
 	)
 
 	BeforeEach(func() {
-		schemaDef = &schema.Schema{
+		schemaDef = &model.Schema{
 			Name: "schema",
-			Tables: []schema.Table{
+			Tables: []model.Table{
 				{
 					Name: "table1",
-					Columns: []schema.Column{
+					Columns: []model.Column{
 						{
 							Name:     "id",
 							ScanType: "string",
-							Type: schema.ColumnType{
+							Type: model.ColumnType{
 								Name:          "varchar",
 								IsPrimaryKey:  true,
 								IsNullable:    true,
@@ -40,7 +40,7 @@ var _ = Describe("Generator", func() {
 						{
 							Name:     "name",
 							ScanType: "string",
-							Type: schema.ColumnType{
+							Type: model.ColumnType{
 								Name:          "varchar",
 								IsPrimaryKey:  false,
 								IsNullable:    false,
@@ -52,11 +52,11 @@ var _ = Describe("Generator", func() {
 			},
 		}
 
-		builder = &fake.SchemaTagBuilder{}
+		builder = &fake.ModelTagBuilder{}
 		builder.BuildReturns("`db`")
-		generator = &schema.Generator{
+		generator = &model.Generator{
 			TagBuilder: builder,
-			Config: &schema.GeneratorConfig{
+			Config: &model.GeneratorConfig{
 				InlcudeDoc: false,
 			},
 		}
@@ -139,7 +139,7 @@ var _ = Describe("Generator", func() {
 
 	Context("when no tables are provided", func() {
 		BeforeEach(func() {
-			schemaDef.Tables = []schema.Table{}
+			schemaDef.Tables = []model.Table{}
 		})
 
 		It("generates the schema successfully", func() {

@@ -1,4 +1,4 @@
-package schema_test
+package model_test
 
 import (
 	"bytes"
@@ -9,27 +9,27 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/schema"
+	"github.com/phogolabs/oak/model"
 )
 
 var _ = Describe("Executor", func() {
 	var (
-		executor  *schema.Executor
-		spec      *schema.Spec
-		provider  *fake.SchemaProvider
-		composer  *fake.SchemaComposer
+		executor  *model.Executor
+		spec      *model.Spec
+		provider  *fake.ModelProvider
+		composer  *fake.ModelComposer
 		reader    *fake.Buffer
-		schemaDef *schema.Schema
+		schemaDef *model.Schema
 	)
 
 	BeforeEach(func() {
-		schemaDef = &schema.Schema{
+		schemaDef = &model.Schema{
 			Name:      "public",
 			IsDefault: true,
-			Tables: []schema.Table{
+			Tables: []model.Table{
 				{
 					Name: "table1",
-					Columns: []schema.Column{
+					Columns: []model.Column{
 						{
 							Name:     "ID",
 							ScanType: "string",
@@ -42,7 +42,7 @@ var _ = Describe("Executor", func() {
 		dir, err := ioutil.TempDir("", "oak")
 		Expect(err).To(BeNil())
 
-		spec = &schema.Spec{
+		spec = &model.Spec{
 			Schema: "public",
 			Tables: []string{"table1"},
 			Dir:    filepath.Join(dir, "entity"),
@@ -50,14 +50,14 @@ var _ = Describe("Executor", func() {
 
 		reader = &fake.Buffer{}
 
-		provider = &fake.SchemaProvider{}
+		provider = &fake.ModelProvider{}
 		provider.TablesReturns([]string{"table1"}, nil)
 		provider.SchemaReturns(schemaDef, nil)
 
-		composer = &fake.SchemaComposer{}
+		composer = &fake.ModelComposer{}
 		composer.ComposeReturns(reader, nil)
 
-		executor = &schema.Executor{
+		executor = &model.Executor{
 			Provider: provider,
 			Composer: composer,
 		}

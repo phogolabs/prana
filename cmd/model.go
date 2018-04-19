@@ -7,20 +7,20 @@ import (
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/oak/schema"
+	"github.com/phogolabs/oak/model"
 	"github.com/urfave/cli"
 )
 
-// SQLSchema provides a subcommands to work generate structs from existing schema
-type SQLSchema struct {
+// SQLModel provides a subcommands to work generate structs from existing schema
+type SQLModel struct {
 	db       *sqlx.DB
-	executor *schema.Executor
+	executor *model.Executor
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
-func (m *SQLSchema) CreateCommand() cli.Command {
+func (m *SQLModel) CreateCommand() cli.Command {
 	return cli.Command{
-		Name:         "schema",
+		Name:         "model",
 		Usage:        "A group of commands for generating object model from database schema",
 		Description:  "A group of commands for generating object model from database schema",
 		BashComplete: cli.DefaultAppComplete,
@@ -72,47 +72,47 @@ func (m *SQLSchema) CreateCommand() cli.Command {
 	}
 }
 
-func (m *SQLSchema) before(ctx *cli.Context) error {
+func (m *SQLModel) before(ctx *cli.Context) error {
 	db, err := open(ctx)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 
-	var provider schema.Provider
+	var provider model.Provider
 
 	switch db.DriverName() {
 	case "sqlite3":
-		provider = &schema.SQLiteProvider{DB: db}
+		provider = &model.SQLiteProvider{DB: db}
 	case "postgres":
-		provider = &schema.PostgreSQLProvider{DB: db}
+		provider = &model.PostgreSQLProvider{DB: db}
 	case "mysql":
-		provider = &schema.MySQLProvider{DB: db}
+		provider = &model.MySQLProvider{DB: db}
 	default:
 		err = fmt.Errorf("Cannot find provider for database driver '%s'", db.DriverName())
 		return cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 
-	builder := schema.CompositeTagBuilder{}
+	builder := model.CompositeTagBuilder{}
 
 	switch strings.ToLower(ctx.String("orm-type")) {
 	case "sqlx":
-		builder = append(builder, schema.SQLXTagBuilder{})
+		builder = append(builder, model.SQLXTagBuilder{})
 	case "gorm":
-		builder = append(builder, schema.GORMTagBuilder{})
+		builder = append(builder, model.GORMTagBuilder{})
 	default:
 		err = fmt.Errorf("Cannot find tag builder for '%s'", ctx.String("orm-type"))
 		return cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 
-	builder = append(builder, schema.JSONTagBuilder{})
-	builder = append(builder, schema.XMLTagBuilder{})
+	builder = append(builder, model.JSONTagBuilder{})
+	builder = append(builder, model.XMLTagBuilder{})
 
 	m.db = db
-	m.executor = &schema.Executor{
+	m.executor = &model.Executor{
 		Provider: provider,
-		Composer: &schema.Generator{
+		Composer: &model.Generator{
 			TagBuilder: builder,
-			Config: &schema.GeneratorConfig{
+			Config: &model.GeneratorConfig{
 				InlcudeDoc:   ctx.BoolT("include-docs"),
 				IgnoreTables: ctx.StringSlice("ignore-table-name"),
 			},
@@ -122,15 +122,15 @@ func (m *SQLSchema) before(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLSchema) after(ctx *cli.Context) error {
+func (m *SQLModel) after(ctx *cli.Context) error {
 	if err := m.db.Close(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeSchema)
 	}
 	return nil
 }
 
-func (m *SQLSchema) print(ctx *cli.Context) error {
-	spec := &schema.Spec{
+func (m *SQLModel) print(ctx *cli.Context) error {
+	spec := &model.Spec{
 		Dir:    ctx.GlobalString("package-dir"),
 		Schema: ctx.GlobalString("schema-name"),
 		Tables: ctx.GlobalStringSlice("table-name"),
@@ -143,8 +143,8 @@ func (m *SQLSchema) print(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLSchema) sync(ctx *cli.Context) error {
-	spec := &schema.Spec{
+func (m *SQLModel) sync(ctx *cli.Context) error {
+	spec := &model.Spec{
 		Dir:    ctx.GlobalString("package-dir"),
 		Schema: ctx.GlobalString("schema-name"),
 		Tables: ctx.GlobalStringSlice("table-name"),
@@ -156,7 +156,7 @@ func (m *SQLSchema) sync(ctx *cli.Context) error {
 	}
 
 	if path != "" {
-		log.Infof("Generated a schema model at: '%s'", path)
+		log.Infof("Generated a database model at: '%s'", path)
 	}
 
 	return nil

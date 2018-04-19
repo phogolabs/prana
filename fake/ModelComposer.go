@@ -5,15 +5,15 @@ import (
 	"io"
 	"sync"
 
-	"github.com/phogolabs/oak/schema"
+	"github.com/phogolabs/oak/model"
 )
 
-type SchemaComposer struct {
-	ComposeStub        func(pkg string, sch *schema.Schema) (io.Reader, error)
+type ModelComposer struct {
+	ComposeStub        func(pkg string, sch *model.Schema) (io.Reader, error)
 	composeMutex       sync.RWMutex
 	composeArgsForCall []struct {
 		pkg string
-		sch *schema.Schema
+		sch *model.Schema
 	}
 	composeReturns struct {
 		result1 io.Reader
@@ -23,11 +23,11 @@ type SchemaComposer struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *SchemaComposer) Compose(pkg string, sch *schema.Schema) (io.Reader, error) {
+func (fake *ModelComposer) Compose(pkg string, sch *model.Schema) (io.Reader, error) {
 	fake.composeMutex.Lock()
 	fake.composeArgsForCall = append(fake.composeArgsForCall, struct {
 		pkg string
-		sch *schema.Schema
+		sch *model.Schema
 	}{pkg, sch})
 	fake.recordInvocation("Compose", []interface{}{pkg, sch})
 	fake.composeMutex.Unlock()
@@ -37,19 +37,19 @@ func (fake *SchemaComposer) Compose(pkg string, sch *schema.Schema) (io.Reader, 
 	return fake.composeReturns.result1, fake.composeReturns.result2
 }
 
-func (fake *SchemaComposer) ComposeCallCount() int {
+func (fake *ModelComposer) ComposeCallCount() int {
 	fake.composeMutex.RLock()
 	defer fake.composeMutex.RUnlock()
 	return len(fake.composeArgsForCall)
 }
 
-func (fake *SchemaComposer) ComposeArgsForCall(i int) (string, *schema.Schema) {
+func (fake *ModelComposer) ComposeArgsForCall(i int) (string, *model.Schema) {
 	fake.composeMutex.RLock()
 	defer fake.composeMutex.RUnlock()
 	return fake.composeArgsForCall[i].pkg, fake.composeArgsForCall[i].sch
 }
 
-func (fake *SchemaComposer) ComposeReturns(result1 io.Reader, result2 error) {
+func (fake *ModelComposer) ComposeReturns(result1 io.Reader, result2 error) {
 	fake.ComposeStub = nil
 	fake.composeReturns = struct {
 		result1 io.Reader
@@ -57,7 +57,7 @@ func (fake *SchemaComposer) ComposeReturns(result1 io.Reader, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *SchemaComposer) Invocations() map[string][][]interface{} {
+func (fake *ModelComposer) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.composeMutex.RLock()
@@ -65,7 +65,7 @@ func (fake *SchemaComposer) Invocations() map[string][][]interface{} {
 	return fake.invocations
 }
 
-func (fake *SchemaComposer) recordInvocation(key string, args []interface{}) {
+func (fake *ModelComposer) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -77,4 +77,4 @@ func (fake *SchemaComposer) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ schema.Composer = new(SchemaComposer)
+var _ model.Composer = new(ModelComposer)

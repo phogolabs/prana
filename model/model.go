@@ -1,5 +1,5 @@
-// Package schema provides primitives for generating structs from database schema
-package schema
+// Package model provides primitives for generating structs from database schema
+package model
 
 import (
 	"fmt"
@@ -90,9 +90,9 @@ var (
 	}
 )
 
-//go:generate counterfeiter -fake-name SchemaProvider -o ../fake/SchemaProvider.go . Provider
-//go:generate counterfeiter -fake-name SchemaComposer -o ../fake/SchemaComposer.go . Composer
-//go:generate counterfeiter -fake-name SchemaTagBuilder -o ../fake/SchemaTagBuilder.go . TagBuilder
+//go:generate counterfeiter -fake-name ModelProvider -o ../fake/ModelProvider.go . Provider
+//go:generate counterfeiter -fake-name ModelComposer -o ../fake/ModelComposer.go . Composer
+//go:generate counterfeiter -fake-name ModelTagBuilder -o ../fake/ModelTagBuilder.go . TagBuilder
 
 // Provider provides a metadata for database schema
 type Provider interface {
@@ -218,43 +218,6 @@ type Spec struct {
 type TagBuilder interface {
 	// Build returns a struct tag from column type
 	Build(column *Column) string
-}
-
-// FieldTag represents a field tag
-type FieldTag struct {
-	// Name of the tag
-	Name string
-	// Options
-	Options []string
-}
-
-// AddOption adds option to that tag
-func (t *FieldTag) AddOption(opt string) {
-	t.Options = append(t.Options, opt)
-}
-
-// String returns the tag as string
-func (t *FieldTag) String() string {
-	options := t.Options
-	if len(options) == 0 {
-		options = append(options, "-")
-	}
-
-	return fmt.Sprintf("%s:\"%s\"", t.Name, strings.Join(options, ","))
-}
-
-// FieldTagList represents tag of list
-type FieldTagList []*FieldTag
-
-// String returns the list as string
-func (l FieldTagList) String() string {
-	tags := []string{}
-
-	for _, t := range l {
-		tags = append(tags, t.String())
-	}
-
-	return fmt.Sprintf("`%s`", strings.Join(tags, " "))
 }
 
 type sqliteInf struct {

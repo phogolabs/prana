@@ -1,45 +1,21 @@
-package schema_test
+package model_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/schema"
+	"github.com/phogolabs/oak/model"
 )
 
 var _ = Describe("Model", func() {
-	Describe("FieldTag", func() {
-		It("formats the tag successfully", func() {
-			tag := &schema.FieldTag{Name: "validate"}
-			tag.AddOption("required")
-			Expect(tag.String()).To(Equal("validate:\"required\""))
-		})
-
-		Context("when the tag does not have options", func() {
-			It("formats the tag successfully", func() {
-				tag := &schema.FieldTag{Name: "validate"}
-				Expect(tag.String()).To(Equal("validate:\"-\""))
-			})
-		})
-	})
-
-	Describe("FieldTagList", func() {
-		It("formats all tags successfully", func() {
-			tags := schema.FieldTagList{}
-			tags = append(tags, &schema.FieldTag{Name: "tag1"})
-			tags = append(tags, &schema.FieldTag{Name: "tag2"})
-			Expect(tags.String()).To(Equal("`tag1:\"-\" tag2:\"-\"`"))
-		})
-	})
-
 	Describe("TypeDef", func() {
 		It("returns the type name", func() {
-			def := &schema.TypeDef{Type: "int"}
+			def := &model.TypeDef{Type: "int"}
 			Expect(def.As(false)).To(Equal("int"))
 		})
 
 		Context("when the type is nullable", func() {
 			It("returns the nullable type name", func() {
-				def := &schema.TypeDef{
+				def := &model.TypeDef{
 					Type:         "int",
 					NullableType: "null.int",
 				}
@@ -49,10 +25,10 @@ var _ = Describe("Model", func() {
 	})
 
 	Describe("ColumnType", func() {
-		var columnType schema.ColumnType
+		var columnType model.ColumnType
 
 		BeforeEach(func() {
-			columnType = schema.ColumnType{
+			columnType = model.ColumnType{
 				Name:          "varchar",
 				IsPrimaryKey:  true,
 				IsNullable:    true,

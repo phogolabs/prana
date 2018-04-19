@@ -4,14 +4,14 @@ package fake
 import (
 	"sync"
 
-	"github.com/phogolabs/oak/schema"
+	"github.com/phogolabs/oak/model"
 )
 
-type SchemaTagBuilder struct {
-	BuildStub        func(column *schema.Column) string
+type ModelTagBuilder struct {
+	BuildStub        func(column *model.Column) string
 	buildMutex       sync.RWMutex
 	buildArgsForCall []struct {
-		column *schema.Column
+		column *model.Column
 	}
 	buildReturns struct {
 		result1 string
@@ -20,10 +20,10 @@ type SchemaTagBuilder struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *SchemaTagBuilder) Build(column *schema.Column) string {
+func (fake *ModelTagBuilder) Build(column *model.Column) string {
 	fake.buildMutex.Lock()
 	fake.buildArgsForCall = append(fake.buildArgsForCall, struct {
-		column *schema.Column
+		column *model.Column
 	}{column})
 	fake.recordInvocation("Build", []interface{}{column})
 	fake.buildMutex.Unlock()
@@ -33,26 +33,26 @@ func (fake *SchemaTagBuilder) Build(column *schema.Column) string {
 	return fake.buildReturns.result1
 }
 
-func (fake *SchemaTagBuilder) BuildCallCount() int {
+func (fake *ModelTagBuilder) BuildCallCount() int {
 	fake.buildMutex.RLock()
 	defer fake.buildMutex.RUnlock()
 	return len(fake.buildArgsForCall)
 }
 
-func (fake *SchemaTagBuilder) BuildArgsForCall(i int) *schema.Column {
+func (fake *ModelTagBuilder) BuildArgsForCall(i int) *model.Column {
 	fake.buildMutex.RLock()
 	defer fake.buildMutex.RUnlock()
 	return fake.buildArgsForCall[i].column
 }
 
-func (fake *SchemaTagBuilder) BuildReturns(result1 string) {
+func (fake *ModelTagBuilder) BuildReturns(result1 string) {
 	fake.BuildStub = nil
 	fake.buildReturns = struct {
 		result1 string
 	}{result1}
 }
 
-func (fake *SchemaTagBuilder) Invocations() map[string][][]interface{} {
+func (fake *ModelTagBuilder) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.buildMutex.RLock()
@@ -60,7 +60,7 @@ func (fake *SchemaTagBuilder) Invocations() map[string][][]interface{} {
 	return fake.invocations
 }
 
-func (fake *SchemaTagBuilder) recordInvocation(key string, args []interface{}) {
+func (fake *ModelTagBuilder) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -72,4 +72,4 @@ func (fake *SchemaTagBuilder) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ schema.TagBuilder = new(SchemaTagBuilder)
+var _ model.TagBuilder = new(ModelTagBuilder)

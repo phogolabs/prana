@@ -1,26 +1,26 @@
-package schema_test
+package model_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/schema"
+	"github.com/phogolabs/oak/model"
 )
 
 var _ = Describe("CompositeTagBuilder", func() {
 	It("delegate the build operation to underlying builders", func() {
-		builder := schema.CompositeTagBuilder{}
+		builder := model.CompositeTagBuilder{}
 
-		builder1 := &fake.SchemaTagBuilder{}
+		builder1 := &fake.ModelTagBuilder{}
 		builder1.BuildReturns("tag1")
 		builder = append(builder, builder1)
 
-		builder2 := &fake.SchemaTagBuilder{}
+		builder2 := &fake.ModelTagBuilder{}
 		builder2.BuildReturns("tag2")
 		builder = append(builder, builder2)
 
-		column := &schema.Column{}
+		column := &model.Column{}
 		Expect(builder.Build(column)).To(Equal("`tag1 tag2`"))
 
 		Expect(builder1.BuildCallCount()).To(Equal(1))
@@ -33,15 +33,15 @@ var _ = Describe("CompositeTagBuilder", func() {
 
 var _ = Describe("SQLXTagBuilder", func() {
 	var (
-		column  *schema.Column
-		builder *schema.SQLXTagBuilder
+		column  *model.Column
+		builder *model.SQLXTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &schema.SQLXTagBuilder{}
-		column = &schema.Column{
+		builder = &model.SQLXTagBuilder{}
+		column = &model.Column{
 			Name: "id",
-			Type: schema.ColumnType{},
+			Type: model.ColumnType{},
 		}
 	})
 
@@ -92,15 +92,15 @@ var _ = Describe("SQLXTagBuilder", func() {
 
 var _ = Describe("GORMTagBuilder", func() {
 	var (
-		column  *schema.Column
-		builder *schema.GORMTagBuilder
+		column  *model.Column
+		builder *model.GORMTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &schema.GORMTagBuilder{}
-		column = &schema.Column{
+		builder = &model.GORMTagBuilder{}
+		column = &model.Column{
 			Name: "id",
-			Type: schema.ColumnType{
+			Type: model.ColumnType{
 				Name: "db_type",
 			},
 		}
@@ -164,13 +164,13 @@ var _ = Describe("GORMTagBuilder", func() {
 
 var _ = Describe("JSONTagBuilder", func() {
 	var (
-		column  *schema.Column
-		builder *schema.JSONTagBuilder
+		column  *model.Column
+		builder *model.JSONTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &schema.JSONTagBuilder{}
-		column = &schema.Column{
+		builder = &model.JSONTagBuilder{}
+		column = &model.Column{
 			Name: "id",
 		}
 	})
@@ -182,13 +182,13 @@ var _ = Describe("JSONTagBuilder", func() {
 
 var _ = Describe("XMLTagBuilder", func() {
 	var (
-		column  *schema.Column
-		builder *schema.XMLTagBuilder
+		column  *model.Column
+		builder *model.XMLTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &schema.XMLTagBuilder{}
-		column = &schema.Column{
+		builder = &model.XMLTagBuilder{}
+		column = &model.Column{
 			Name: "id",
 		}
 	})
