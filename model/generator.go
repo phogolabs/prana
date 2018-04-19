@@ -44,7 +44,7 @@ func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
 	g.writePackage(pkg, schema.Name, buffer)
 
 	for _, table := range tables {
-		g.writeTable(pkg, &table, buffer)
+		g.writeTable(pkg, schema.IsDefault, &table, buffer)
 	}
 
 	if err := g.format(buffer); err != nil {
@@ -80,10 +80,10 @@ func (g *Generator) writePackage(pkg, name string, buffer io.Writer) {
 	fmt.Fprintln(buffer)
 }
 
-func (g *Generator) writeTable(pkg string, table *Table, buffer io.Writer) {
+func (g *Generator) writeTable(pkg string, isDefaultSchema bool, table *Table, buffer io.Writer) {
 	columns := table.Columns
 	length := len(columns)
-	typeName := g.tableName(pkg, table)
+	typeName := g.tableName(pkg, isDefaultSchema, table)
 
 	if g.Config.InlcudeDoc {
 		fmt.Fprintln(buffer)
@@ -132,11 +132,11 @@ func (g *Generator) ignore() []string {
 	return ignore
 }
 
-func (g *Generator) tableName(pkg string, table *Table) string {
+func (g *Generator) tableName(pkg string, isDefaultSchema bool, table *Table) string {
 	name := inflect.Camelize(table.Name)
 	name = inflect.Singularize(name)
 
-	if !g.Config.KeepSchema {
+	if !g.Config.KeepSchema && !isDefaultSchema {
 		pkg = inflect.Camelize(pkg)
 		name = fmt.Sprintf("%s%s", pkg, name)
 	}

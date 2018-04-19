@@ -22,7 +22,8 @@ var _ = Describe("Generator", func() {
 
 	BeforeEach(func() {
 		schemaDef = &model.Schema{
-			Name: "schema",
+			Name:      "schema",
+			IsDefault: true,
 			Tables: []model.Table{
 				{
 					Name: "table1",
@@ -99,7 +100,15 @@ var _ = Describe("Generator", func() {
 			generator.Config.KeepSchema = false
 		})
 
-		ItGeneratesTheModelSuccessfully("ModelTable1")
+		ItGeneratesTheModelSuccessfully("Table1")
+
+		Context("when the schema is not default", func() {
+			BeforeEach(func() {
+				schemaDef.IsDefault = false
+			})
+
+			ItGeneratesTheModelSuccessfully("ModelTable1")
+		})
 	})
 
 	Context("when the table is ignored", func() {
