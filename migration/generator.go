@@ -52,7 +52,7 @@ func (g *Generator) Write(m *Item, content *Content) error {
 }
 
 func (g *Generator) write(filename string, data []byte, perm os.FileMode) error {
-	f, err := g.FileSystem.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, perm)
+	f, err := g.FileSystem.OpenFile(filename, os.O_WRONLY|os.O_CREATE|os.O_EXCL, perm)
 	if err != nil {
 		return err
 	}

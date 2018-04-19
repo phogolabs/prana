@@ -3,6 +3,7 @@ package migration
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"strings"
 	"time"
 
@@ -48,7 +49,7 @@ func (m *Executor) Setup() error {
 		DownCommand: down,
 	}
 
-	if err := m.Generator.Write(migration, content); err != nil {
+	if err := m.Generator.Write(migration, content); err != nil && !os.IsExist(err) {
 		return err
 	}
 
