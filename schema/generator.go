@@ -24,6 +24,8 @@ type GeneratorConfig struct {
 
 // Generator generates Golang structs from database schema
 type Generator struct {
+	// TagBuilder builds struct tags from column type
+	TagBuilder TagBuilder
 	// Config controls how the code generation happens
 	Config *GeneratorConfig
 }
@@ -91,9 +93,10 @@ func (g *Generator) writeTable(table *Table, buffer io.Writer) {
 	fmt.Fprintln(buffer)
 
 	for index, column := range columns {
-		fieldName := inflect.Camelize(column.Name)
-		fieldType := g.fieldType(&column)
-		fieldTag := g.fieldTag(&column)
+		current := column
+		fieldName := inflect.Camelize(current.Name)
+		fieldType := g.fieldType(&current)
+		fieldTag := g.TagBuilder.Build(&current)
 
 		if g.Config.InlcudeDoc {
 			if index > 0 {
@@ -137,33 +140,33 @@ func (g *Generator) fieldType(column *Column) string {
 	return column.ScanType
 }
 
-func (g *Generator) fieldTag(column *Column) string {
-	db := &FieldTag{Name: "db"}
-	db.AddOption(column.Name)
+// func (g *Generator) fieldTag(column *Column) string {
+// 	db := &FieldTag{Name: "db"}
+// 	db.AddOption(column.Name)
 
-	if column.Type.IsPrimaryKey {
-		db.AddOption("primary_key")
-	}
+// 	if column.Type.IsPrimaryKey {
+// 		db.AddOption("primary_key")
+// 	}
 
-	json := &FieldTag{Name: "json"}
-	json.AddOption(column.Name)
+// 	json := &FieldTag{Name: "json"}
+// 	json.AddOption(column.Name)
 
-	validate := &FieldTag{Name: "validate"}
+// 	validate := &FieldTag{Name: "validate"}
 
-	if !column.Type.IsNullable {
-		validate.AddOption("required")
-	}
+// 	if !column.Type.IsNullable {
+// 		validate.AddOption("required")
+// 	}
 
-	if len := column.Type.CharMaxLength; len > 0 {
-		validate.AddOption(fmt.Sprintf("lte=%d", len))
-	}
+// 	if len := column.Type.CharMaxLength; len > 0 {
+// 		validate.AddOption(fmt.Sprintf("lte=%d", len))
+// 	}
 
-	tags := FieldTagList{}
-	tags = append(tags, db)
-	tags = append(tags, json)
-	tags = append(tags, validate)
-	return tags.String()
-}
+// 	tags := FieldTagList{}
+// 	tags = append(tags, db)
+// 	tags = append(tags, json)
+// 	tags = append(tags, validate)
+// 	return tags.String()
+// }
 
 func (g *Generator) format(buffer *bytes.Buffer) error {
 	data, err := imports.Process("model", buffer.Bytes(), nil)

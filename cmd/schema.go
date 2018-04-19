@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
@@ -43,6 +44,11 @@ func (m *SQLSchema) CreateCommand() cli.Command {
 				Name:  "package-dir, p",
 				Usage: "path to the package, where the source code will be generated",
 				Value: "./database/model",
+			},
+			cli.StringFlag{
+				Name:  "orm-type, m",
+				Usage: "orm package for which the model tag will be generated",
+				Value: "sqlx",
 			},
 			cli.BoolTFlag{
 				Name:  "include-docs, d",
@@ -86,10 +92,26 @@ func (m *SQLSchema) before(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 
+	builder := schema.CompositeTagBuilder{}
+
+	switch strings.ToLower(ctx.String("orm-type")) {
+	case "sqlx":
+		builder = append(builder, schema.SQLXTagBuilder{})
+	case "gorm":
+		builder = append(builder, schema.GORMTagBuilder{})
+	default:
+		err = fmt.Errorf("Cannot find tag builder for '%s'", ctx.String("orm-type"))
+		return cli.NewExitError(err.Error(), ErrCodeArg)
+	}
+
+	builder = append(builder, schema.JSONTagBuilder{})
+	builder = append(builder, schema.XMLTagBuilder{})
+
 	m.db = db
 	m.executor = &schema.Executor{
 		Provider: provider,
 		Composer: &schema.Generator{
+			TagBuilder: builder,
 			Config: &schema.GeneratorConfig{
 				InlcudeDoc:   ctx.BoolT("include-docs"),
 				IgnoreTables: ctx.StringSlice("ignore-table-name"),

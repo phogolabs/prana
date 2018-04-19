@@ -92,6 +92,7 @@ var (
 
 //go:generate counterfeiter -fake-name SchemaProvider -o ../fake/SchemaProvider.go . Provider
 //go:generate counterfeiter -fake-name SchemaComposer -o ../fake/SchemaComposer.go . Composer
+//go:generate counterfeiter -fake-name SchemaTagBuilder -o ../fake/SchemaTagBuilder.go . TagBuilder
 
 // Provider provides a metadata for database schema
 type Provider interface {
@@ -155,8 +156,8 @@ type ColumnType struct {
 	PrecisionScale int
 }
 
-// String represents the ColumnType as string
-func (t ColumnType) String() string {
+// DBType returns the db type as string
+func (t ColumnType) DBType() string {
 	name := t.Name
 
 	if t.CharMaxLength > 0 {
@@ -166,6 +167,13 @@ func (t ColumnType) String() string {
 	} else if t.Precision > 0 && t.PrecisionScale > 0 {
 		name = fmt.Sprintf("%s(%d, %d)", name, t.Precision, t.PrecisionScale)
 	}
+
+	return name
+}
+
+// String represents the ColumnType as string
+func (t ColumnType) String() string {
+	name := t.DBType()
 
 	if t.IsPrimaryKey {
 		name = fmt.Sprintf("%s PRIMARY KEY", name)
@@ -204,6 +212,12 @@ type Spec struct {
 	Tables []string
 	// Dir is a path to root model package directory
 	Dir string
+}
+
+// TagBuilder builds tags from column type
+type TagBuilder interface {
+	// Build returns a struct tag from column type
+	Build(column *Column) string
 }
 
 // FieldTag represents a field tag

@@ -8,6 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/oak/fake"
 	"github.com/phogolabs/oak/schema"
 	"golang.org/x/tools/imports"
 )
@@ -15,6 +16,7 @@ import (
 var _ = Describe("Generator", func() {
 	var (
 		generator *schema.Generator
+		builder   *fake.SchemaTagBuilder
 		schemaDef *schema.Schema
 	)
 
@@ -50,7 +52,10 @@ var _ = Describe("Generator", func() {
 			},
 		}
 
+		builder = &fake.SchemaTagBuilder{}
+		builder.BuildReturns("`db`")
 		generator = &schema.Generator{
+			TagBuilder: builder,
 			Config: &schema.GeneratorConfig{
 				InlcudeDoc: false,
 			},
@@ -62,8 +67,8 @@ var _ = Describe("Generator", func() {
 		fmt.Fprintln(source, "package model")
 		fmt.Fprintln(source)
 		fmt.Fprintln(source, "type Table1 struct {")
-		fmt.Fprintln(source, "        Id string `db:\"id,primary_key\" json:\"id\" validate:\"lte=200\"`")
-		fmt.Fprintln(source, "        Name string `db:\"name\" json:\"name\" validate:\"required,lte=200\"`")
+		fmt.Fprintln(source, "        Id string `db`")
+		fmt.Fprintln(source, "        Name string `db`")
 		fmt.Fprintln(source, "}")
 
 		data, err := imports.Process("model", source.Bytes(), nil)
@@ -74,6 +79,10 @@ var _ = Describe("Generator", func() {
 
 		reader, err := generator.Compose("model", schemaDef)
 		Expect(err).To(BeNil())
+
+		Expect(builder.BuildCallCount()).To(Equal(2))
+		Expect(builder.BuildArgsForCall(0)).To(Equal(&schemaDef.Tables[0].Columns[0]))
+		Expect(builder.BuildArgsForCall(1)).To(Equal(&schemaDef.Tables[0].Columns[1]))
 
 		generated, err := ioutil.ReadAll(reader)
 		Expect(err).To(BeNil())
