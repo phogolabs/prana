@@ -79,37 +79,18 @@ func (m *SQLModel) CreateCommand() cli.Command {
 func (m *SQLModel) before(ctx *cli.Context) error {
 	db, err := open(ctx)
 	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeArg)
+		return err
 	}
 
-	var provider model.Provider
-
-	switch db.DriverName() {
-	case "sqlite3":
-		provider = &model.SQLiteProvider{DB: db}
-	case "postgres":
-		provider = &model.PostgreSQLProvider{DB: db}
-	case "mysql":
-		provider = &model.MySQLProvider{DB: db}
-	default:
-		err = fmt.Errorf("Cannot find provider for database driver '%s'", db.DriverName())
-		return cli.NewExitError(err.Error(), ErrCodeArg)
+	provider, err := m.provider(db)
+	if err != nil {
+		return err
 	}
 
-	builder := model.CompositeTagBuilder{}
-
-	switch strings.ToLower(ctx.String("orm-type")) {
-	case "sqlx":
-		builder = append(builder, model.SQLXTagBuilder{})
-	case "gorm":
-		builder = append(builder, model.GORMTagBuilder{})
-	default:
-		err = fmt.Errorf("Cannot find tag builder for '%s'", ctx.String("orm-type"))
-		return cli.NewExitError(err.Error(), ErrCodeArg)
+	builder, err := m.builder(ctx)
+	if err != nil {
+		return err
 	}
-
-	builder = append(builder, model.JSONTagBuilder{})
-	builder = append(builder, model.XMLTagBuilder{})
 
 	m.db = db
 	m.executor = &model.Executor{
@@ -128,6 +109,39 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 	}
 
 	return nil
+}
+
+func (m *SQLModel) provider(db *sqlx.DB) (model.Provider, error) {
+	switch db.DriverName() {
+	case "sqlite3":
+		return &model.SQLiteProvider{DB: db}, nil
+	case "postgres":
+		return &model.PostgreSQLProvider{DB: db}, nil
+	case "mysql":
+		return &model.MySQLProvider{DB: db}, nil
+	default:
+		err := fmt.Errorf("Cannot find provider for database driver '%s'", db.DriverName())
+		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
+	}
+}
+
+func (m *SQLModel) builder(ctx *cli.Context) (model.TagBuilder, error) {
+	builder := model.CompositeTagBuilder{}
+
+	switch strings.ToLower(ctx.String("orm-type")) {
+	case "sqlx":
+		builder = append(builder, model.SQLXTagBuilder{})
+	case "gorm":
+		builder = append(builder, model.GORMTagBuilder{})
+	default:
+		err := fmt.Errorf("Cannot find tag builder for '%s'", ctx.String("orm-type"))
+		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
+	}
+
+	builder = append(builder, model.JSONTagBuilder{})
+	builder = append(builder, model.XMLTagBuilder{})
+
+	return builder, nil
 }
 
 func (m *SQLModel) after(ctx *cli.Context) error {
