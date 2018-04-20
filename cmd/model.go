@@ -46,7 +46,7 @@ func (m *SQLModel) CreateCommand() cli.Command {
 				Value: "./database/model",
 			},
 			cli.BoolFlag{
-				Name:  "keep-schema, k",
+				Name:  "keep-schema-as-package, k",
 				Usage: "keep the schema as package (except default schema)",
 			},
 			cli.StringFlag{
@@ -99,13 +99,13 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 	m.db = db
 	m.executor = &model.Executor{
 		Config: &model.ExecutorConfig{
-			KeepSchema: ctx.Bool("keep-schema"),
+			KeepSchema: ctx.Bool("keep-schema-as-package"),
 		},
 		Provider: provider,
 		Composer: &model.Generator{
 			TagBuilder: builder,
 			Config: &model.GeneratorConfig{
-				KeepSchema:   ctx.Bool("keep-schema"),
+				KeepSchema:   ctx.Bool("keep-schema-as-package"),
 				InlcudeDoc:   ctx.BoolT("include-docs"),
 				IgnoreTables: ctx.StringSlice("ignore-table-name"),
 			},

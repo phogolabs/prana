@@ -31,7 +31,7 @@ $ go install github.com/phogolabs/oak/cmd/oak
 ### SQL Migrations
 
 Each migration is a SQL script that contains `-- name: up` and `-- name: down`
-which have statements for run and revert operations.
+comments which have statements for run and revert operations.
 
 In order to prepare the project for migration, you have to set it up:
 
@@ -101,8 +101,9 @@ $ oak model sync
 By default the command will place the generated code in single `schema.go` file
 in `$PWD/database/model` package for the default database schema. Any other
 schemas will be placed in the same package but in separate files. You can
-control the behavior by passing `--keep-schema` flag which will cause each
-schema to be generated in own package under the `/$PWD/database/model` package.
+control the behavior by passing `--keep-schema-as-package` flag which will
+cause each schema to be generated in own package under the
+`/$PWD/database/model` package.
 
 You can print the source code without generating a package by executing the
 following command:
