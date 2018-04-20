@@ -30,8 +30,8 @@ $ go install github.com/phogolabs/oak/cmd/oak
 
 ### SQL Migrations
 
-The SQL Migration are using SQL command API under the hood. Each migration is a
-SQL script that contains `up` and `down` commands.
+Each migration is a SQL script that contains `-- name: up` and `-- name: down`
+which have statements for run and revert operations.
 
 In order to prepare the project for migration, you have to set it up:
 
@@ -117,9 +117,9 @@ arguments.
 If you pass `--extra-tag` argument, you can specify which tag to be included in
 your final result. Supported extra tags are:
 
-- [json](https://golang.org/pkg/encoding/json/) that can be recognized by Golang
-- [xml](https://golang.org/pkg/encoding/xml/) tag used by Golang to marshal fields in XML
-- [validate](https://github.com/go-playground/validator/blob/v9/_examples/simple/main.go#L11) to validate field by [validator](https://github.com/go-playground/validator) package
+- [json](https://golang.org/pkg/encoding/json/)
+- [xml](https://golang.org/pkg/encoding/xml/)
+- [validate](https://github.com/go-playground/validator/blob/v9/_examples/simple/main.go#L11) to validates fields by [validator](https://github.com/go-playground/validator) package
 
 The model representation of the users table is:
 
@@ -154,7 +154,7 @@ The generated `db` tag is recognized by
 [parcel.Gateway](https://godoc.org/github.com/phogolabs/oak#Gateway) as well as
 [sqlx](https://github.com/jmoiron/sqlx).
 
-If you wan to generate model to work with [gorm](http://gorm.io), you should
+If you wan to generate models for [gorm](http://gorm.io), you should
 pass `--orm-tag gorm`. Note that constraints like unique or indexes are not
 included for now.
 
