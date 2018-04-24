@@ -13,6 +13,7 @@ import (
 
 // SQLModel provides a subcommands to work generate structs from existing schema
 type SQLModel struct {
+	skip     bool
 	db       *sqlx.DB
 	executor *sqlmodel.Executor
 }
@@ -46,7 +47,7 @@ func (m *SQLModel) CreateCommand() cli.Command {
 				Value: "./database/model",
 			},
 			cli.BoolFlag{
-				Name:  "keep-schema-as-package, k",
+				Name:  "keep-schema, k",
 				Usage: "keep the schema as package (except default schema)",
 			},
 			cli.StringFlag{
@@ -99,13 +100,13 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 	m.db = db
 	m.executor = &sqlmodel.Executor{
 		Config: &sqlmodel.ExecutorConfig{
-			KeepSchema: ctx.Bool("keep-schema-as-package"),
+			KeepSchema: ctx.Bool("keep-schema"),
 		},
 		Provider: provider,
 		Generator: &sqlmodel.Generator{
 			TagBuilder: builder,
 			Config: &sqlmodel.GeneratorConfig{
-				KeepSchema:   ctx.Bool("keep-schema-as-package"),
+				KeepSchema:   ctx.Bool("keep-schema"),
 				InlcudeDoc:   ctx.BoolT("include-docs"),
 				IgnoreTables: ctx.StringSlice("ignore-table-name"),
 			},
@@ -156,8 +157,10 @@ func (m *SQLModel) builder(ctx *cli.Context) (sqlmodel.TagBuilder, error) {
 		case "validate":
 			builder = append(builder, sqlmodel.ValidateTagBuilder{})
 		default:
-			err := fmt.Errorf("Cannot find tag builder for '%s'", tag)
-			return nil, cli.NewExitError(err.Error(), ErrCodeArg)
+			if !m.skip {
+				err := fmt.Errorf("Cannot find tag builder for '%s'", tag)
+				return nil, cli.NewExitError(err.Error(), ErrCodeArg)
+			}
 		}
 	}
 
@@ -193,6 +196,25 @@ func (m *SQLModel) sync(ctx *cli.Context) error {
 	}
 
 	path, err := m.executor.Create(spec)
+	if err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeSchema)
+	}
+
+	if path != "" {
+		log.Infof("Generated a database model at: '%s'", path)
+	}
+
+	return nil
+}
+
+func (m *SQLModel) script(ctx *cli.Context) error {
+	spec := &sqlmodel.Spec{
+		Dir:    ctx.GlobalString("directory"),
+		Schema: ctx.GlobalString("schema-name"),
+		Tables: ctx.GlobalStringSlice("table-name"),
+	}
+
+	path, err := m.executor.CreateScript(spec)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeSchema)
 	}

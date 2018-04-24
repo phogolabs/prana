@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go/format"
 	"io/ioutil"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -80,7 +81,7 @@ var _ = Describe("Generator", func() {
 			data, err = format.Source(data)
 			Expect(err).To(BeNil())
 
-			reader, err := generator.Generate("model", schemaDef)
+			reader, err := generator.GenerateModel("model", schemaDef)
 			Expect(err).To(BeNil())
 
 			Expect(builder.BuildCallCount()).To(Equal(2))
@@ -93,7 +94,32 @@ var _ = Describe("Generator", func() {
 		})
 	}
 
+	ItGeneratesTheScriptSuccessfully := func(table string) {
+		It("generates the SQL script successfully", func() {
+			w := &bytes.Buffer{}
+			t := strings.Replace(table, ".", "-", -1)
+			fmt.Fprintf(w, "-- name: insert-%s\n", t)
+			fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
+			fmt.Fprint(w, "VALUES (?, ?)\n\n")
+			fmt.Fprintf(w, "-- name: update-%s\n", t)
+			fmt.Fprintf(w, "UPDATE %s\n", table)
+			fmt.Fprint(w, "SET name = ?\n")
+			fmt.Fprint(w, "WHERE id = ?\n\n")
+			fmt.Fprintf(w, "-- name: delete-%s\n", t)
+			fmt.Fprintf(w, "DELETE FROM %s\n", table)
+			fmt.Fprint(w, "WHERE id = ?\n\n")
+
+			reader, err := generator.GenerateSQLScript(schemaDef)
+			Expect(err).To(BeNil())
+
+			generated, err := ioutil.ReadAll(reader)
+			Expect(err).To(BeNil())
+			Expect(string(generated)).To(Equal(w.String()))
+		})
+	}
+
 	ItGeneratesTheModelSuccessfully("Table1")
+	ItGeneratesTheScriptSuccessfully("schema.table1")
 
 	Context("when KeepSchema is disabled", func() {
 		BeforeEach(func() {
@@ -101,6 +127,7 @@ var _ = Describe("Generator", func() {
 		})
 
 		ItGeneratesTheModelSuccessfully("Table1")
+		ItGeneratesTheScriptSuccessfully("table1")
 
 		Context("when the schema is not default", func() {
 			BeforeEach(func() {
@@ -108,6 +135,7 @@ var _ = Describe("Generator", func() {
 			})
 
 			ItGeneratesTheModelSuccessfully("ModelTable1")
+			ItGeneratesTheScriptSuccessfully("schema.table1")
 		})
 	})
 
@@ -117,7 +145,16 @@ var _ = Describe("Generator", func() {
 		})
 
 		It("generates the schema successfully", func() {
-			reader, err := generator.Generate("model", schemaDef)
+			reader, err := generator.GenerateModel("model", schemaDef)
+			Expect(err).To(BeNil())
+
+			data, err := ioutil.ReadAll(reader)
+			Expect(err).To(BeNil())
+			Expect(data).To(BeEmpty())
+		})
+
+		It("generates the commands successfully", func() {
+			reader, err := generator.GenerateSQLScript(schemaDef)
 			Expect(err).To(BeNil())
 
 			data, err := ioutil.ReadAll(reader)
@@ -132,7 +169,7 @@ var _ = Describe("Generator", func() {
 		})
 
 		It("generates the schema successfully", func() {
-			reader, err := generator.Generate("model", schemaDef)
+			reader, err := generator.GenerateModel("model", schemaDef)
 			Expect(err).To(BeNil())
 
 			data, err := ioutil.ReadAll(reader)
@@ -144,28 +181,22 @@ var _ = Describe("Generator", func() {
 		})
 	})
 
-	Context("when the tables are ignored", func() {
-		BeforeEach(func() {
-			generator.Config.IgnoreTables = []string{"table1", "atab"}
-		})
-
-		It("generates the schema successfully", func() {
-			reader, err := generator.Generate("model", schemaDef)
-			Expect(err).To(BeNil())
-
-			data, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-			Expect(data).To(BeEmpty())
-		})
-	})
-
 	Context("when no tables are provided", func() {
 		BeforeEach(func() {
 			schemaDef.Tables = []sqlmodel.Table{}
 		})
 
 		It("generates the schema successfully", func() {
-			reader, err := generator.Generate("model", schemaDef)
+			reader, err := generator.GenerateModel("model", schemaDef)
+			Expect(err).To(BeNil())
+
+			data, err := ioutil.ReadAll(reader)
+			Expect(err).To(BeNil())
+			Expect(data).To(BeEmpty())
+		})
+
+		It("generates the script successfully", func() {
+			reader, err := generator.GenerateSQLScript(schemaDef)
 			Expect(err).To(BeNil())
 
 			data, err := ioutil.ReadAll(reader)
@@ -176,7 +207,7 @@ var _ = Describe("Generator", func() {
 
 	Context("when the package name is not provided", func() {
 		It("returns an error", func() {
-			reader, err := generator.Generate("", schemaDef)
+			reader, err := generator.GenerateModel("", schemaDef)
 			Expect(reader).To(BeNil())
 			Expect(err).To(MatchError("model:2:1: expected 'IDENT', found 'type'"))
 		})

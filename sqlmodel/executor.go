@@ -32,7 +32,7 @@ func (e *Executor) Write(w io.Writer, spec *Spec) error {
 	}
 
 	pkg := e.packageOf(schema, spec)
-	r, err := e.Generator.Generate(pkg, schema)
+	r, err := e.Generator.GenerateModel(pkg, schema)
 
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", err
 	}
 
-	reader, err := e.Generator.Generate(e.packageOf(schema, spec), schema)
+	reader, err := e.Generator.GenerateModel(e.packageOf(schema, spec), schema)
 	if err != nil {
 		return "", err
 	}
@@ -63,7 +63,51 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", nil
 	}
 
-	filepath, err := e.fileOf(schema, spec)
+	filepath, err := e.modelFileOf(schema, spec)
+	if err != nil {
+		return "", err
+	}
+
+	file, err := os.Create(filepath)
+	if err != nil {
+		return "", err
+	}
+
+	defer func() {
+		if ioErr := file.Close(); err == nil {
+			err = ioErr
+		}
+	}()
+
+	if _, err = file.Write(body); err != nil {
+		return "", err
+	}
+
+	return filepath, nil
+}
+
+// CreateScript creates a package with the generated schema sqlmodels
+func (e *Executor) CreateScript(spec *Spec) (string, error) {
+	schema, err := e.schemaOf(spec)
+	if err != nil {
+		return "", err
+	}
+
+	reader, err := e.Generator.GenerateSQLScript(schema)
+	if err != nil {
+		return "", err
+	}
+
+	body, err := ioutil.ReadAll(reader)
+	if err != nil {
+		return "", err
+	}
+
+	if len(body) == 0 {
+		return "", nil
+	}
+
+	filepath, err := e.scriptFileOf(schema, spec)
 	if err != nil {
 		return "", err
 	}
@@ -104,7 +148,26 @@ func (e *Executor) schemaOf(spec *Spec) (*Schema, error) {
 	return schema, nil
 }
 
-func (e *Executor) fileOf(schema *Schema, spec *Spec) (string, error) {
+func (e *Executor) scriptFileOf(schema *Schema, spec *Spec) (string, error) {
+	dir, err := filepath.Abs(spec.Dir)
+	if err != nil {
+		return "", err
+	}
+
+	filename := "command.sql"
+
+	if !schema.IsDefault || e.Config.KeepSchema {
+		filename = fmt.Sprintf("%s.sql", schema.Name)
+	}
+
+	if err := os.MkdirAll(dir, 0700); err != nil {
+		return "", err
+	}
+
+	return filepath.Join(dir, filename), nil
+}
+
+func (e *Executor) modelFileOf(schema *Schema, spec *Spec) (string, error) {
 	dir, err := filepath.Abs(spec.Dir)
 	if err != nil {
 		return "", err

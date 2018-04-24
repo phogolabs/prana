@@ -27,7 +27,44 @@ func (m *SQLScript) CreateCommand() cli.Command {
 		Description:  "A group of commands for generating, running, and removing SQL commands",
 		BashComplete: cli.DefaultAppComplete,
 		Before:       m.before,
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "directory, dir, d",
+				Usage: "path to the directory that contain the scripts",
+				Value: "./database/script",
+			},
+		},
 		Subcommands: []cli.Command{
+			{
+				Name:        "sync",
+				Usage:       "Generate a SQL script of CRUD operations for given database schema",
+				Description: "Generate a SQL script of CRUD operations for given database schema",
+				Action:      m.sync,
+				Flags: []cli.Flag{
+					cli.StringFlag{
+						Name:  "schema-name, s",
+						Usage: "name of the database schema",
+						Value: "",
+					},
+					cli.StringSliceFlag{
+						Name:  "table-name, t",
+						Usage: "name of the table in the database",
+					},
+					cli.StringSliceFlag{
+						Name:  "ignore-table-name, i",
+						Usage: "name of the table in the database that should be skipped",
+						Value: &cli.StringSlice{"migrations"},
+					},
+					cli.BoolFlag{
+						Name:  "keep-schema, k",
+						Usage: "keep the schema name for the default schema",
+					},
+					cli.BoolTFlag{
+						Name:  "include-docs, d",
+						Usage: "include API documentation in generated source code",
+					},
+				},
+			},
 			{
 				Name:        "create",
 				Usage:       "Create a new SQL command for given container filename",
@@ -60,12 +97,12 @@ func (m *SQLScript) CreateCommand() cli.Command {
 }
 
 func (m *SQLScript) before(ctx *cli.Context) error {
-	dir, err := os.Getwd()
+	var err error
+	m.dir, err = filepath.Abs(ctx.String("directory"))
 	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeMigration)
+		return cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 
-	m.dir = filepath.Join(dir, "database/script")
 	return nil
 }
 
@@ -99,7 +136,7 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 
 	name := args[0]
 
-	log.Infof("Running command '%s' from '%s'", name, filepath.Join(m.dir, "database/script"))
+	log.Infof("Running command '%s' from '%s'", name, m.dir)
 
 	db, err := open(ctx)
 	if err != nil {
@@ -161,6 +198,21 @@ func (m *SQLScript) print(rows *sqlx.Rows) error {
 
 	table.Render()
 	return nil
+}
+
+func (m *SQLScript) sync(ctx *cli.Context) error {
+	model := &SQLModel{skip: true}
+
+	if err := model.before(ctx); err != nil {
+		return err
+	}
+
+	if err := model.script(ctx); err != nil {
+		_ = model.after(ctx)
+		return err
+	}
+
+	return model.after(ctx)
 }
 
 func params(args []string) []interface{} {

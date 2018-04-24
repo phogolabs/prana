@@ -104,8 +104,10 @@ type SchemaProvider interface {
 
 // ModelGenerator generates the sqlmodels
 type ModelGenerator interface {
-	// Generate generates the golang structs from database schema
-	Generate(pkg string, sch *Schema) (io.Reader, error)
+	// GenerateModel generates the golang structs from database schema
+	GenerateModel(pkg string, sch *Schema) (io.Reader, error)
+	// GenerateSQLScript generates the SQL script that contains CRUD operations
+	GenerateSQLScript(sch *Schema) (io.Reader, error)
 }
 
 // Schema represents a database schema

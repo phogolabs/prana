@@ -7,8 +7,8 @@ import (
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/prana/sqlmigr"
 	"github.com/phogolabs/parcello"
+	"github.com/phogolabs/prana/sqlmigr"
 	"github.com/urfave/cli"
 )
 
@@ -16,7 +16,7 @@ import (
 type SQLMigration struct {
 	executor *sqlmigr.Executor
 	db       *sqlx.DB
-	cwd      string
+	dir      string
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
@@ -28,6 +28,13 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 		BashComplete: cli.DefaultAppComplete,
 		Before:       m.before,
 		After:        m.after,
+		Flags: []cli.Flag{
+			cli.StringFlag{
+				Name:  "directory, dir, d",
+				Usage: "path to the directory that contain the migrations",
+				Value: "./database/migration",
+			},
+		},
 		Subcommands: []cli.Command{
 			{
 				Name:        "setup",
@@ -81,32 +88,29 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 }
 
 func (m *SQLMigration) before(ctx *cli.Context) error {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeMigration)
-	}
-
 	db, err := open(ctx)
 	if err != nil {
 		return err
 	}
 
-	fs := parcello.Dir(filepath.Join(cwd, "database/migration"))
+	m.dir, err = filepath.Abs(ctx.String("directory"))
+	if err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeArg)
+	}
 
-	m.cwd = string(fs)
 	m.db = db
 	m.executor = &sqlmigr.Executor{
 		Logger: log.Log,
 		Provider: &sqlmigr.Provider{
-			FileSystem: fs,
+			FileSystem: parcello.Dir(m.dir),
 			DB:         db,
 		},
 		Runner: &sqlmigr.Runner{
-			FileSystem: fs,
+			FileSystem: parcello.Dir(m.dir),
 			DB:         db,
 		},
 		Generator: &sqlmigr.Generator{
-			FileSystem: fs,
+			FileSystem: parcello.Dir(m.dir),
 		},
 	}
 
@@ -126,7 +130,7 @@ func (m *SQLMigration) setup(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Infof("Setup project directory at: '%s'", m.cwd)
+	log.Infof("Setup project directory at: '%s'", m.dir)
 	return nil
 }
 
@@ -142,7 +146,7 @@ func (m *SQLMigration) create(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Infof("Created migration at: '%s'", filepath.Join(m.cwd, item.Filename()))
+	log.Infof("Created migration at: '%s'", filepath.Join(m.dir, item.Filename()))
 	return nil
 }
 
