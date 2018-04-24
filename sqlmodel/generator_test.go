@@ -98,8 +98,11 @@ var _ = Describe("Generator", func() {
 		It("generates the SQL script successfully", func() {
 			w := &bytes.Buffer{}
 			t := strings.Replace(table, ".", "-", -1)
-			fmt.Fprintf(w, "-- name: select-%s\n", t)
+			fmt.Fprintf(w, "-- name: select-all-%s\n", t)
 			fmt.Fprintf(w, "SELECT * FROM %s\n\n", table)
+			fmt.Fprintf(w, "-- name: select-%s\n", t)
+			fmt.Fprintf(w, "SELECT * FROM %s\n", table)
+			fmt.Fprint(w, "WHERE id = ?\n\n")
 			fmt.Fprintf(w, "-- name: insert-%s\n", t)
 			fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
 			fmt.Fprint(w, "VALUES (?, ?)\n\n")
@@ -116,6 +119,7 @@ var _ = Describe("Generator", func() {
 
 			generated, err := ioutil.ReadAll(reader)
 			Expect(err).To(BeNil())
+
 			Expect(string(generated)).To(Equal(w.String()))
 		})
 	}

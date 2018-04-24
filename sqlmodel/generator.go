@@ -58,17 +58,15 @@ func (g *Generator) GenerateModel(pkg string, schema *Schema) (io.Reader, error)
 // GenerateSQLScript generates a script for given schema
 func (g *Generator) GenerateSQLScript(schema *Schema) (io.Reader, error) {
 	buffer := &bytes.Buffer{}
+	g.writeSQLComment(buffer)
 
 	tables := g.tables(schema)
 
 	for _, table := range tables {
-		g.writeSQLComment(buffer)
+		g.writeSQLQuerySelectAll(buffer, schema, &table)
 		g.writeSQLQuerySelect(buffer, schema, &table)
-		g.writeSQLComment(buffer)
 		g.writeSQLQueryInsert(buffer, schema, &table)
-		g.writeSQLComment(buffer)
 		g.writeSQLQueryUpdate(buffer, schema, &table)
-		g.writeSQLComment(buffer)
 		g.writeSQLQueryDelete(buffer, schema, &table)
 	}
 
@@ -192,16 +190,23 @@ func (g *Generator) format(buffer *bytes.Buffer) error {
 	return err
 }
 
+func (g *Generator) writeSQLQuerySelectAll(w io.Writer, schema *Schema, table *Table) {
+	tableName := g.tableName(schema, table)
+	fmt.Fprintf(w, "-- name: select-all-%s\n", g.commandName(tableName, false))
+	fmt.Fprintf(w, "SELECT * FROM %s\n\n", tableName)
+}
+
 func (g *Generator) writeSQLQuerySelect(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
-	fmt.Fprintf(w, "-- name: select-%s\n", g.commandName(tableName))
-	fmt.Fprintf(w, "SELECT * FROM %s\n\n", tableName)
+	fmt.Fprintf(w, "-- name: select-%s\n", g.commandName(tableName, true))
+	fmt.Fprintf(w, "SELECT * FROM %s\n", tableName)
+	fmt.Fprintf(w, "WHERE %s\n\n", g.pkCondition(table))
 }
 
 func (g *Generator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	columns, values := g.insertParam(table)
-	fmt.Fprintf(w, "-- name: insert-%s\n", g.commandName(tableName))
+	fmt.Fprintf(w, "-- name: insert-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "INSERT INTO %s (%s)\n", tableName, columns)
 	fmt.Fprintf(w, "VALUES (%s)\n\n", values)
 }
@@ -209,7 +214,7 @@ func (g *Generator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Tabl
 func (g *Generator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	condition, values := g.updateParam(table)
-	fmt.Fprintf(w, "-- name: update-%s\n", g.commandName(tableName))
+	fmt.Fprintf(w, "-- name: update-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "UPDATE %s\n", tableName)
 	fmt.Fprintf(w, "SET %s\n", values)
 	fmt.Fprintf(w, "WHERE %s\n\n", condition)
@@ -217,7 +222,7 @@ func (g *Generator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table *Tabl
 
 func (g *Generator) writeSQLQueryDelete(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
-	fmt.Fprintf(w, "-- name: delete-%s\n", g.commandName(tableName))
+	fmt.Fprintf(w, "-- name: delete-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "DELETE FROM %s\n", tableName)
 	fmt.Fprintf(w, "WHERE %s\n\n", g.pkCondition(table))
 }
@@ -225,12 +230,16 @@ func (g *Generator) writeSQLQueryDelete(w io.Writer, schema *Schema, table *Tabl
 func (g *Generator) writeSQLComment(w io.Writer) {
 	if g.Config.InlcudeDoc {
 		fmt.Fprintln(w, "-- Auto-generated at", time.Now().Format(time.UnixDate))
+		fmt.Fprintln(w)
 	}
 }
 
-func (g *Generator) commandName(name string) string {
+func (g *Generator) commandName(name string, singularize bool) string {
 	name = strings.Replace(name, ".", "-", -1)
-	return inflect.Singularize(name)
+	if singularize {
+		name = inflect.Singularize(name)
+	}
+	return name
 }
 
 func (g *Generator) tableName(schema *Schema, table *Table) string {
