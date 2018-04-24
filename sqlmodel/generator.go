@@ -195,7 +195,7 @@ func (g *Generator) format(buffer *bytes.Buffer) error {
 func (g *Generator) writeSQLQuerySelect(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	fmt.Fprintf(w, "-- name: select-%s\n", g.commandName(tableName))
-	fmt.Fprintf(w, "SELECT * FROM %s\n", tableName)
+	fmt.Fprintf(w, "SELECT * FROM %s\n\n", tableName)
 }
 
 func (g *Generator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Table) {
