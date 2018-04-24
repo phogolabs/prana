@@ -1,4 +1,4 @@
-package migration_test
+package sqlmigr_test
 
 import (
 	"bytes"
@@ -9,14 +9,14 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/migration"
+	"github.com/phogolabs/oak/sqlmigr"
 	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Generator", func() {
 	var (
-		generator *migration.Generator
-		item      *migration.Item
+		generator *sqlmigr.Generator
+		item      *sqlmigr.Item
 		dir       string
 	)
 
@@ -26,20 +26,20 @@ var _ = Describe("Generator", func() {
 		dir, err = ioutil.TempDir("", "oak_generator")
 		Expect(err).To(BeNil())
 
-		dir = filepath.Join(dir, "migration")
+		dir = filepath.Join(dir, "sqlmigr")
 
-		generator = &migration.Generator{
+		generator = &sqlmigr.Generator{
 			FileSystem: parcello.Dir(dir),
 		}
 
-		item = &migration.Item{
+		item = &sqlmigr.Item{
 			ID:          "20160102150",
 			Description: "schema",
 		}
 	})
 
 	Describe("Create", func() {
-		It("creates a migration successfully", func() {
+		It("creates a sqlmigr successfully", func() {
 			err := generator.Create(item)
 			Expect(err).To(BeNil())
 
@@ -65,8 +65,8 @@ var _ = Describe("Generator", func() {
 	})
 
 	Describe("Write", func() {
-		It("writes a migration successfully", func() {
-			content := &migration.Content{
+		It("writes a sqlmigr successfully", func() {
+			content := &sqlmigr.Content{
 				UpCommand:   bytes.NewBufferString("upgrade"),
 				DownCommand: bytes.NewBufferString("rollback"),
 			}
@@ -89,7 +89,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when writing to the fails fails", func() {
 			It("returns an error", func() {
-				content := &migration.Content{
+				content := &sqlmigr.Content{
 					UpCommand:   bytes.NewBufferString("commit"),
 					DownCommand: bytes.NewBufferString("rollback"),
 				}
@@ -108,7 +108,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when the dir is not valid", func() {
 			It("returns an error", func() {
-				content := &migration.Content{
+				content := &sqlmigr.Content{
 					UpCommand:   bytes.NewBufferString("upgrade"),
 					DownCommand: bytes.NewBufferString("rollback"),
 				}
@@ -120,7 +120,7 @@ var _ = Describe("Generator", func() {
 		Context("when the up step cannot be created", func() {
 			It("returns an error", func() {
 				reader := &fake.Buffer{}
-				content := &migration.Content{
+				content := &sqlmigr.Content{
 					UpCommand:   reader,
 					DownCommand: bytes.NewBufferString("rollback"),
 				}
@@ -132,7 +132,7 @@ var _ = Describe("Generator", func() {
 		Context("when the up step cannot be created", func() {
 			It("returns an error", func() {
 				reader := &fake.Buffer{}
-				content := &migration.Content{
+				content := &sqlmigr.Content{
 					UpCommand:   bytes.NewBufferString("upgrade"),
 					DownCommand: reader,
 				}

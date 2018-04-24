@@ -10,14 +10,14 @@ import (
 	"github.com/fatih/color"
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
-	"github.com/phogolabs/oak/migration"
+	"github.com/phogolabs/oak/sqlmigr"
 	"github.com/phogolabs/parcello"
 	"github.com/urfave/cli"
 )
 
 // SQLMigration provides a subcommands to work with SQL migrations.
 type SQLMigration struct {
-	executor *migration.Executor
+	executor *sqlmigr.Executor
 	db       *sqlx.DB
 	cwd      string
 }
@@ -98,17 +98,17 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 
 	m.cwd = string(fs)
 	m.db = db
-	m.executor = &migration.Executor{
+	m.executor = &sqlmigr.Executor{
 		Logger: log.Log,
-		Provider: &migration.Provider{
+		Provider: &sqlmigr.Provider{
 			FileSystem: fs,
 			DB:         db,
 		},
-		Runner: &migration.Runner{
+		Runner: &sqlmigr.Runner{
 			FileSystem: fs,
 			DB:         db,
 		},
-		Generator: &migration.Generator{
+		Generator: &sqlmigr.Generator{
 			FileSystem: fs,
 		},
 	}
@@ -206,7 +206,7 @@ func (m *SQLMigration) status(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLMigration) log(migrations []migration.Item) {
+func (m *SQLMigration) log(migrations []sqlmigr.Item) {
 	for _, m := range migrations {
 		status := "pending"
 		timestamp := ""
@@ -227,7 +227,7 @@ func (m *SQLMigration) log(migrations []migration.Item) {
 	}
 }
 
-func (m *SQLMigration) table(migrations []migration.Item) {
+func (m *SQLMigration) table(migrations []sqlmigr.Item) {
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Id", "Description", "Status", "Created At"})
 

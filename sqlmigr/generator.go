@@ -1,4 +1,4 @@
-package migration
+package sqlmigr
 
 import (
 	"bytes"
@@ -8,18 +8,18 @@ import (
 	"time"
 )
 
-// Generator generates a new migration file for given directory.
+// Generator generates a new sqlmigr file for given directory.
 type Generator struct {
-	// FileSystem is the file system where all migrations are created.
+	// FileSystem is the file system where all sqlmigrs are created.
 	FileSystem FileSystem
 }
 
-// Create creates a new migration.
+// Create creates a new sqlmigr.
 func (g *Generator) Create(m *Item) error {
 	return g.Write(m, nil)
 }
 
-// Write creates a new migration for given content.
+// Write creates a new sqlmigr for given content.
 func (g *Generator) Write(m *Item, content *Content) error {
 	buffer := &bytes.Buffer{}
 

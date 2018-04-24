@@ -4,23 +4,23 @@ package fake
 import (
 	"sync"
 
-	"github.com/phogolabs/oak/migration"
+	"github.com/phogolabs/oak/sqlmigr"
 )
 
 type MigrationGenerator struct {
-	CreateStub        func(m *migration.Item) error
+	CreateStub        func(m *sqlmigr.Item) error
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
-		m *migration.Item
+		m *sqlmigr.Item
 	}
 	createReturns struct {
 		result1 error
 	}
-	WriteStub        func(m *migration.Item, content *migration.Content) error
+	WriteStub        func(m *sqlmigr.Item, content *sqlmigr.Content) error
 	writeMutex       sync.RWMutex
 	writeArgsForCall []struct {
-		m       *migration.Item
-		content *migration.Content
+		m       *sqlmigr.Item
+		content *sqlmigr.Content
 	}
 	writeReturns struct {
 		result1 error
@@ -29,10 +29,10 @@ type MigrationGenerator struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *MigrationGenerator) Create(m *migration.Item) error {
+func (fake *MigrationGenerator) Create(m *sqlmigr.Item) error {
 	fake.createMutex.Lock()
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		m *migration.Item
+		m *sqlmigr.Item
 	}{m})
 	fake.recordInvocation("Create", []interface{}{m})
 	fake.createMutex.Unlock()
@@ -48,7 +48,7 @@ func (fake *MigrationGenerator) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
-func (fake *MigrationGenerator) CreateArgsForCall(i int) *migration.Item {
+func (fake *MigrationGenerator) CreateArgsForCall(i int) *sqlmigr.Item {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
 	return fake.createArgsForCall[i].m
@@ -61,11 +61,11 @@ func (fake *MigrationGenerator) CreateReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *MigrationGenerator) Write(m *migration.Item, content *migration.Content) error {
+func (fake *MigrationGenerator) Write(m *sqlmigr.Item, content *sqlmigr.Content) error {
 	fake.writeMutex.Lock()
 	fake.writeArgsForCall = append(fake.writeArgsForCall, struct {
-		m       *migration.Item
-		content *migration.Content
+		m       *sqlmigr.Item
+		content *sqlmigr.Content
 	}{m, content})
 	fake.recordInvocation("Write", []interface{}{m, content})
 	fake.writeMutex.Unlock()
@@ -81,7 +81,7 @@ func (fake *MigrationGenerator) WriteCallCount() int {
 	return len(fake.writeArgsForCall)
 }
 
-func (fake *MigrationGenerator) WriteArgsForCall(i int) (*migration.Item, *migration.Content) {
+func (fake *MigrationGenerator) WriteArgsForCall(i int) (*sqlmigr.Item, *sqlmigr.Content) {
 	fake.writeMutex.RLock()
 	defer fake.writeMutex.RUnlock()
 	return fake.writeArgsForCall[i].m, fake.writeArgsForCall[i].content
@@ -116,4 +116,4 @@ func (fake *MigrationGenerator) recordInvocation(key string, args []interface{})
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ migration.ItemGenerator = new(MigrationGenerator)
+var _ sqlmigr.ItemGenerator = new(MigrationGenerator)

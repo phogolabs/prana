@@ -1,4 +1,4 @@
-package migration_test
+package sqlmigr_test
 
 import (
 	"testing"

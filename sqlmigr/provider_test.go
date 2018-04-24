@@ -1,4 +1,4 @@
-package migration_test
+package sqlmigr_test
 
 import (
 	"bytes"
@@ -11,13 +11,13 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/migration"
+	"github.com/phogolabs/oak/sqlmigr"
 	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Provider", func() {
 	var (
-		provider *migration.Provider
+		provider *sqlmigr.Provider
 		dir      string
 	)
 
@@ -31,7 +31,7 @@ var _ = Describe("Provider", func() {
 		db, err := sqlx.Open("sqlite3", conn)
 		Expect(err).To(BeNil())
 
-		provider = &migration.Provider{
+		provider = &sqlmigr.Provider{
 			FileSystem: parcello.Dir(dir),
 			DB:         db,
 		}
@@ -61,9 +61,9 @@ var _ = Describe("Provider", func() {
 	})
 
 	Describe("Exists", func() {
-		Context("when the migration exists", func() {
+		Context("when the migrations exists", func() {
 			It("returns true", func() {
-				item := migration.Item{
+				item := sqlmigr.Item{
 					ID:          "20060102150405",
 					Description: "schema",
 				}
@@ -73,7 +73,7 @@ var _ = Describe("Provider", func() {
 
 		Context("when the migration NOT exists", func() {
 			It("returns true", func() {
-				item := migration.Item{
+				item := sqlmigr.Item{
 					ID:          "20070102150405",
 					Description: "schema",
 				}
@@ -88,7 +88,7 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				item := migration.Item{
+				item := sqlmigr.Item{
 					ID:          "20070102150405",
 					Description: "schema",
 				}
@@ -99,15 +99,15 @@ var _ = Describe("Provider", func() {
 	})
 
 	Describe("Insert", func() {
-		It("inserts a migration item successfully", func() {
-			item := migration.Item{
+		It("inserts a sqlmigr item successfully", func() {
+			item := sqlmigr.Item{
 				ID:          "20070102150405",
 				Description: "trigger",
 			}
 
 			Expect(provider.Insert(&item)).To(Succeed())
 
-			items := []migration.Item{}
+			items := []sqlmigr.Item{}
 			query := "SELECT * FROM migrations ORDER BY id ASC"
 
 			Expect(provider.DB.Select(&items, query)).To(Succeed())
@@ -126,7 +126,7 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				item := migration.Item{
+				item := sqlmigr.Item{
 					ID:          "20070102150405",
 					Description: "trigger",
 				}
@@ -137,15 +137,15 @@ var _ = Describe("Provider", func() {
 	})
 
 	Describe("Delete", func() {
-		It("deletes a migration item successfully", func() {
-			item := migration.Item{
+		It("deletes a sqlmigr item successfully", func() {
+			item := sqlmigr.Item{
 				ID:          "20060102150405",
 				Description: "schema",
 			}
 
 			Expect(provider.Delete(&item)).To(Succeed())
 
-			items := []migration.Item{}
+			items := []sqlmigr.Item{}
 			query := "SELECT * FROM migrations"
 
 			Expect(provider.DB.Select(&items, query)).To(Succeed())
@@ -158,7 +158,7 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				item := migration.Item{
+				item := sqlmigr.Item{
 					ID:          "20060102150405",
 					Description: "setup",
 				}
@@ -168,7 +168,7 @@ var _ = Describe("Provider", func() {
 	})
 
 	Describe("Migrations", func() {
-		It("returns the migrations successfully", func() {
+		It("returns the sqlmigrs successfully", func() {
 			path := filepath.Join(dir, "20070102150405_setup.sql")
 			Expect(ioutil.WriteFile(path, []byte{}, 0700)).To(Succeed())
 
@@ -197,7 +197,7 @@ var _ = Describe("Provider", func() {
 			})
 		})
 
-		Context("when cannot parse a migration", func() {
+		Context("when cannot parse a sqlmigr", func() {
 			JustBeforeEach(func() {
 				old := filepath.Join(dir, "20060102150405_schema.sql")
 				new := filepath.Join(dir, "id_schema.sql")
@@ -223,7 +223,7 @@ var _ = Describe("Provider", func() {
 			})
 		})
 
-		Context("when the migration has ID mismatch", func() {
+		Context("when the sqlmigr has ID mismatch", func() {
 			JustBeforeEach(func() {
 				old := filepath.Join(dir, "20060102150405_schema.sql")
 				new := filepath.Join(dir, "20070102150405_schema.sql")
@@ -233,11 +233,11 @@ var _ = Describe("Provider", func() {
 			It("returns an error", func() {
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError("Mismatched migration id. Expected: '20060102150405' but has '20070102150405'"))
+				Expect(err).To(MatchError("Mismatched sqlmigr id. Expected: '20060102150405' but has '20070102150405'"))
 			})
 		})
 
-		Context("when the migration has Description mismatch", func() {
+		Context("when the sqlmigr has Description mismatch", func() {
 			JustBeforeEach(func() {
 				old := filepath.Join(dir, "20060102150405_schema.sql")
 				new := filepath.Join(dir, "20060102150405_tables.sql")
@@ -247,7 +247,7 @@ var _ = Describe("Provider", func() {
 			It("returns an error", func() {
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError("Mismatched migration description. Expected: 'schema' but has 'tables'"))
+				Expect(err).To(MatchError("Mismatched sqlmigr description. Expected: 'schema' but has 'tables'"))
 			})
 		})
 	})

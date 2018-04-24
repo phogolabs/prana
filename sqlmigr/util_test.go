@@ -1,4 +1,4 @@
-package migration_test
+package sqlmigr_test
 
 import (
 	"io/ioutil"
@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/oak/migration"
+	"github.com/phogolabs/oak/sqlmigr"
 	"github.com/phogolabs/parcello"
 )
 
@@ -16,7 +16,7 @@ var _ = Describe("Util", func() {
 	Describe("RunAll", func() {
 		var (
 			db *sqlx.DB
-			fs migration.FileSystem
+			fs sqlmigr.FileSystem
 		)
 
 		BeforeEach(func() {
@@ -34,8 +34,8 @@ var _ = Describe("Util", func() {
 			Expect(db.Close()).To(Succeed())
 		})
 
-		It("runs all migrations successfully", func() {
-			Expect(migration.RunAll(db, fs)).To(Succeed())
+		It("runs all sqlmigrs successfully", func() {
+			Expect(sqlmigr.RunAll(db, fs)).To(Succeed())
 		})
 
 		Context("when the file system fails", func() {
@@ -44,7 +44,7 @@ var _ = Describe("Util", func() {
 			})
 
 			It("returns an error", func() {
-				Expect(migration.RunAll(db, fs)).To(MatchError("open /00060524000000_setup.sql: permission denied"))
+				Expect(sqlmigr.RunAll(db, fs)).To(MatchError("open /00060524000000_setup.sql: permission denied"))
 			})
 		})
 	})

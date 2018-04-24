@@ -1,4 +1,4 @@
-package migration
+package sqlmigr
 
 import (
 	"bytes"
@@ -10,7 +10,7 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// Provider provides all migration for given project.
+// Provider provides all sqlmigr for given project.
 type Provider struct {
 	// FileSystem represents the project directory file system.
 	FileSystem FileSystem
@@ -18,9 +18,9 @@ type Provider struct {
 	DB *sqlx.DB
 }
 
-// Migrations returns the project migrations.
+// Migrations returns the project sqlmigrs.
 func (m *Provider) Migrations() ([]Item, error) {
-	migrations := []Item{}
+	sqlmigrs := []Item{}
 
 	err := m.FileSystem.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info == nil {
@@ -36,12 +36,12 @@ func (m *Provider) Migrations() ([]Item, error) {
 			return err
 		}
 
-		migration, err := Parse(path)
+		sqlmigr, err := Parse(path)
 		if err != nil {
 			return err
 		}
 
-		migrations = append(migrations, *migration)
+		sqlmigrs = append(sqlmigrs, *sqlmigr)
 		return nil
 	})
 
@@ -60,26 +60,26 @@ func (m *Provider) Migrations() ([]Item, error) {
 		return []Item{}, err
 	}
 
-	for index, migration := range applied {
-		m := migrations[index]
+	for index, sqlmigr := range applied {
+		m := sqlmigrs[index]
 
-		if m.ID != migration.ID {
-			err = fmt.Errorf("Mismatched migration id. Expected: '%s' but has '%s'", migration.ID, m.ID)
+		if m.ID != sqlmigr.ID {
+			err = fmt.Errorf("Mismatched sqlmigr id. Expected: '%s' but has '%s'", sqlmigr.ID, m.ID)
 			return []Item{}, err
 		}
 
-		if m.Description != migration.Description {
-			err = fmt.Errorf("Mismatched migration description. Expected: '%s' but has '%s'", migration.Description, m.Description)
+		if m.Description != sqlmigr.Description {
+			err = fmt.Errorf("Mismatched sqlmigr description. Expected: '%s' but has '%s'", sqlmigr.Description, m.Description)
 			return []Item{}, err
 		}
 
-		migrations[index] = migration
+		sqlmigrs[index] = sqlmigr
 	}
 
-	return migrations, err
+	return sqlmigrs, err
 }
 
-// Insert inserts executed migration item in the migrations table.
+// Insert inserts executed sqlmigr item in the sqlmigrs table.
 func (m *Provider) Insert(item *Item) error {
 	item.CreatedAt = time.Now()
 
@@ -94,7 +94,7 @@ func (m *Provider) Insert(item *Item) error {
 	return nil
 }
 
-// Delete deletes applied migration item from migrations table.
+// Delete deletes applied sqlmigr item from sqlmigrs table.
 func (m *Provider) Delete(item *Item) error {
 	query := &bytes.Buffer{}
 	query.WriteString("DELETE FROM migrations ")
@@ -107,7 +107,7 @@ func (m *Provider) Delete(item *Item) error {
 	return nil
 }
 
-// Exists returns true if the migration exists
+// Exists returns true if the sqlmigr exists
 func (m *Provider) Exists(item *Item) bool {
 	count := 0
 

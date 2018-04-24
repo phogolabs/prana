@@ -1,8 +1,8 @@
-package migration
+package sqlmigr
 
 import "github.com/jmoiron/sqlx"
 
-// RunAll runs all migrations
+// RunAll runs all sqlmigrs
 func RunAll(db *sqlx.DB, fileSystem FileSystem) error {
 	executor := &Executor{
 		Provider: &Provider{

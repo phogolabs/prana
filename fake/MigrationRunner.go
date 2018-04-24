@@ -4,22 +4,22 @@ package fake
 import (
 	"sync"
 
-	"github.com/phogolabs/oak/migration"
+	"github.com/phogolabs/oak/sqlmigr"
 )
 
 type MigrationRunner struct {
-	RunStub        func(item *migration.Item) error
+	RunStub        func(item *sqlmigr.Item) error
 	runMutex       sync.RWMutex
 	runArgsForCall []struct {
-		item *migration.Item
+		item *sqlmigr.Item
 	}
 	runReturns struct {
 		result1 error
 	}
-	RevertStub        func(item *migration.Item) error
+	RevertStub        func(item *sqlmigr.Item) error
 	revertMutex       sync.RWMutex
 	revertArgsForCall []struct {
-		item *migration.Item
+		item *sqlmigr.Item
 	}
 	revertReturns struct {
 		result1 error
@@ -28,10 +28,10 @@ type MigrationRunner struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *MigrationRunner) Run(item *migration.Item) error {
+func (fake *MigrationRunner) Run(item *sqlmigr.Item) error {
 	fake.runMutex.Lock()
 	fake.runArgsForCall = append(fake.runArgsForCall, struct {
-		item *migration.Item
+		item *sqlmigr.Item
 	}{item})
 	fake.recordInvocation("Run", []interface{}{item})
 	fake.runMutex.Unlock()
@@ -47,7 +47,7 @@ func (fake *MigrationRunner) RunCallCount() int {
 	return len(fake.runArgsForCall)
 }
 
-func (fake *MigrationRunner) RunArgsForCall(i int) *migration.Item {
+func (fake *MigrationRunner) RunArgsForCall(i int) *sqlmigr.Item {
 	fake.runMutex.RLock()
 	defer fake.runMutex.RUnlock()
 	return fake.runArgsForCall[i].item
@@ -60,10 +60,10 @@ func (fake *MigrationRunner) RunReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *MigrationRunner) Revert(item *migration.Item) error {
+func (fake *MigrationRunner) Revert(item *sqlmigr.Item) error {
 	fake.revertMutex.Lock()
 	fake.revertArgsForCall = append(fake.revertArgsForCall, struct {
-		item *migration.Item
+		item *sqlmigr.Item
 	}{item})
 	fake.recordInvocation("Revert", []interface{}{item})
 	fake.revertMutex.Unlock()
@@ -79,7 +79,7 @@ func (fake *MigrationRunner) RevertCallCount() int {
 	return len(fake.revertArgsForCall)
 }
 
-func (fake *MigrationRunner) RevertArgsForCall(i int) *migration.Item {
+func (fake *MigrationRunner) RevertArgsForCall(i int) *sqlmigr.Item {
 	fake.revertMutex.RLock()
 	defer fake.revertMutex.RUnlock()
 	return fake.revertArgsForCall[i].item
@@ -114,4 +114,4 @@ func (fake *MigrationRunner) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ migration.ItemRunner = new(MigrationRunner)
+var _ sqlmigr.ItemRunner = new(MigrationRunner)

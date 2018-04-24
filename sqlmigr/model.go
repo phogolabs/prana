@@ -1,6 +1,6 @@
-// Package migration provides primitives and functions to work with SQL
-// migrations.
-package migration
+// Package sqlmigr provides primitives and functions to work with SQL
+// sqlmigrs.
+package sqlmigr
 
 import (
 	"fmt"
@@ -24,35 +24,35 @@ var (
 // FileSystem provides with primitives to work with the underlying file system
 type FileSystem = parcello.FileSystem
 
-// ItemRunner runs or reverts a given migration item.
+// ItemRunner runs or reverts a given sqlmigr item.
 type ItemRunner interface {
-	// Run runs a given migration item.
+	// Run runs a given sqlmigr item.
 	Run(item *Item) error
-	// Revert reverts a given migration item.
+	// Revert reverts a given sqlmigr item.
 	Revert(item *Item) error
 }
 
 // ItemProvider provides all items.
 type ItemProvider interface {
-	// Migrations returns all migration items.
+	// Migrations returns all sqlmigr items.
 	Migrations() ([]Item, error)
-	// Insert inserts executed migration item in the migrations table.
+	// Insert inserts executed sqlmigr item in the sqlmigrs table.
 	Insert(item *Item) error
-	// Delete deletes applied migration item from migrations table.
+	// Delete deletes applied sqlmigr item from sqlmigrs table.
 	Delete(item *Item) error
-	// Exists returns true if the migration exists
+	// Exists returns true if the sqlmigr exists
 	Exists(item *Item) bool
 }
 
-// ItemGenerator generates a migration item file.
+// ItemGenerator generates a sqlmigr item file.
 type ItemGenerator interface {
-	// Create creates a new migration.
+	// Create creates a new sqlmigr.
 	Create(m *Item) error
-	// Write creates a new migration for given content.
+	// Write creates a new sqlmigr for given content.
 	Write(m *Item, content *Content) error
 }
 
-// Content represents a migration content.
+// Content represents a sqlmigr content.
 type Content struct {
 	// UpCommand is the content for upgrade operation.
 	UpCommand io.Reader
@@ -60,13 +60,13 @@ type Content struct {
 	DownCommand io.Reader
 }
 
-// Item represents a single migration.
+// Item represents a single sqlmigr.
 type Item struct {
-	// Id is the primary key for this migration
+	// Id is the primary key for this sqlmigr
 	ID string `db:"id"`
-	// Description is the short description of this migration.
+	// Description is the short description of this sqlmigr.
 	Description string `db:"description"`
-	// CreatedAt returns the time of migration execution.
+	// CreatedAt returns the time of sqlmigr execution.
 	CreatedAt time.Time `db:"created_at"`
 }
 
@@ -75,7 +75,7 @@ func (m Item) Filename() string {
 	return fmt.Sprintf("%s_%s.sql", m.ID, m.Description)
 }
 
-// Parse parses a given file path to a migration item.
+// Parse parses a given file path to a sqlmigr item.
 func Parse(path string) (*Item, error) {
 	name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 	parts := strings.SplitN(name, "_", 2)

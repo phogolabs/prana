@@ -1,4 +1,4 @@
-package migration
+package sqlmigr
 
 import (
 	"fmt"
@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/oak/sqlexec"
 )
 
-// Runner runs or reverts a given migration item.
+// Runner runs or reverts a given sqlmigr item.
 type Runner struct {
 	// FileSystem represents the project directory file system.
 	FileSystem FileSystem
@@ -17,7 +17,7 @@ type Runner struct {
 	DB *sqlx.DB
 }
 
-// Run runs a given migration item.
+// Run runs a given sqlmigr item.
 func (r *Runner) Run(m *Item) error {
 	if err := r.exec("up", m); err != nil {
 		return err
@@ -26,7 +26,7 @@ func (r *Runner) Run(m *Item) error {
 	return nil
 }
 
-// Revert reverts a given migration item.
+// Revert reverts a given sqlmigr item.
 func (r *Runner) Revert(m *Item) error {
 	if err := r.exec("down", m); err != nil {
 		return err
@@ -61,13 +61,13 @@ func (r *Runner) command(name string, m *Item) ([]string, error) {
 		}
 	}()
 
-	scanner := &script.Scanner{}
+	scanner := &sqlexec.Scanner{}
 
 	queries := scanner.Scan(file)
 	statements, ok := queries[name]
 
 	if !ok {
-		return []string{}, fmt.Errorf("Command '%s' not found for migration '%s'", name, m.Filename())
+		return []string{}, fmt.Errorf("Command '%s' not found for sqlmigr '%s'", name, m.Filename())
 	}
 
 	commands := strings.Split(statements, ";")

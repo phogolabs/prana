@@ -10,7 +10,6 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/phogolabs/oak"
-	"github.com/phogolabs/oak/script"
 )
 
 var _ = Describe("Gateway", func() {
@@ -101,7 +100,7 @@ var _ = Describe("Gateway", func() {
 
 			Context("when an embedded statement is used", func() {
 				It("executes a query successfully", func() {
-					query := script.SQL("SELECT * FROM users WHERE first_name = ?", "John")
+					query := oak.SQL("SELECT * FROM users WHERE first_name = ?", "John")
 
 					persons := []Person{}
 					Expect(db.Select(&persons, query)).To(Succeed())
@@ -113,7 +112,7 @@ var _ = Describe("Gateway", func() {
 
 				Context("when the query does not exist", func() {
 					It("returns an error", func() {
-						query := script.SQL("SELECT * FROM categories")
+						query := oak.SQL("SELECT * FROM categories")
 
 						persons := []Person{}
 						Expect(db.Select(&persons, query)).To(MatchError("no such table: categories"))

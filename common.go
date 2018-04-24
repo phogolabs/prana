@@ -14,8 +14,8 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/oak/migration"
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/oak/sqlexec"
+	"github.com/phogolabs/oak/sqlmigr"
 	"github.com/phogolabs/parcello"
 )
 
@@ -57,10 +57,10 @@ type Row = sqlx.Row
 // A Result summarizes an executed SQL command.
 type Result = sql.Result
 
-var provider *script.Provider
+var provider *sqlexec.Provider
 
 func init() {
-	provider = &script.Provider{}
+	provider = &sqlexec.Provider{}
 }
 
 // Setup setups the oak environment for us
@@ -78,7 +78,7 @@ func Setup(gateway *Gateway, manager *parcello.Manager) error {
 
 // Migrate runs all pending migration
 func Migrate(gateway *Gateway, fileSystem FileSystem) error {
-	return migration.RunAll(gateway.db, fileSystem)
+	return sqlmigr.RunAll(gateway.db, fileSystem)
 }
 
 // LoadSQLCommandsFromReader loads all commands from a given reader.
@@ -95,7 +95,7 @@ func LoadSQLCommandsFrom(fileSystem FileSystem) error {
 
 // Command returns a command for given name and parameters. The operation can
 // panic if the command cannot be found.
-func Command(name string, params ...script.Param) *script.Cmd {
+func Command(name string, params ...sqlexec.Param) *sqlexec.Cmd {
 	cmd, err := provider.Command(name, params...)
 
 	if err != nil {
@@ -106,8 +106,8 @@ func Command(name string, params ...script.Param) *script.Cmd {
 }
 
 // SQL create a new command from raw query
-func SQL(query string, params ...script.Param) *script.Cmd {
-	return script.SQL(query, params...)
+func SQL(query string, params ...sqlexec.Param) *sqlexec.Cmd {
+	return sqlexec.SQL(query, params...)
 }
 
 // ParseURL parses a URL and returns the database driver and connection string to the database

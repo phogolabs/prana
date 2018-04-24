@@ -1,4 +1,4 @@
-package migration_test
+package sqlmigr_test
 
 import (
 	"bytes"
@@ -9,12 +9,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/migration"
+	"github.com/phogolabs/oak/sqlmigr"
 )
 
 var _ = Describe("Executor", func() {
 	var (
-		executor  *migration.Executor
+		executor  *sqlmigr.Executor
 		provider  *fake.MigrationProvider
 		generator *fake.MigrationGenerator
 		runner    *fake.MigrationRunner
@@ -27,7 +27,7 @@ var _ = Describe("Executor", func() {
 		runner = &fake.MigrationRunner{}
 		logger = &fake.Logger{}
 
-		executor = &migration.Executor{
+		executor = &sqlmigr.Executor{
 			Logger:    logger,
 			Provider:  provider,
 			Generator: generator,
@@ -36,7 +36,7 @@ var _ = Describe("Executor", func() {
 	})
 
 	Describe("Setup", func() {
-		It("setups the migrations successfully", func() {
+		It("setups the sqlmigrs successfully", func() {
 			format := "20060102150405"
 			min := time.Date(1, time.January, 1970, 0, 0, 0, 0, time.UTC)
 
@@ -70,7 +70,7 @@ var _ = Describe("Executor", func() {
 			Expect(item.Description).To(Equal("setup"))
 		})
 
-		Context("when the migration exists", func() {
+		Context("when the sqlmigr exists", func() {
 			It("does not setup the project", func() {
 				provider.ExistsReturns(true)
 				Expect(executor.Setup()).To(Succeed())
@@ -94,17 +94,17 @@ var _ = Describe("Executor", func() {
 	})
 
 	Describe("Create", func() {
-		It("creates migration successfully", func() {
+		It("creates sqlmigr successfully", func() {
 			format := "20060102150405"
 
-			migration, err := executor.Create("schema")
+			sqlmigr, err := executor.Create("schema")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(generator.CreateCallCount()).To(Equal(1))
 
 			item := generator.CreateArgsForCall(0)
 			Expect(item.ID).To(Equal(item.CreatedAt.Format(format)))
 			Expect(item.Description).To(Equal("schema"))
-			Expect(item).To(Equal(migration))
+			Expect(item).To(Equal(sqlmigr))
 		})
 
 		Context("when the generator fails", func() {
@@ -119,27 +119,27 @@ var _ = Describe("Executor", func() {
 
 	Describe("Migrations", func() {
 		It("returns the migrations successfully", func() {
-			provider.MigrationsReturns([]migration.Item{{ID: "id-123"}}, nil)
-			migrations, err := executor.Migrations()
+			provider.MigrationsReturns([]sqlmigr.Item{{ID: "id-123"}}, nil)
+			sqlmigrs, err := executor.Migrations()
 			Expect(err).To(BeNil())
-			Expect(migrations).To(HaveLen(1))
-			Expect(migrations[0].ID).To(Equal("id-123"))
+			Expect(sqlmigrs).To(HaveLen(1))
+			Expect(sqlmigrs[0].ID).To(Equal("id-123"))
 			Expect(provider.MigrationsCallCount()).To(Equal(1))
 		})
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]migration.Item{}, fmt.Errorf("oh no!"))
-				migrations, err := executor.Migrations()
+				provider.MigrationsReturns([]sqlmigr.Item{}, fmt.Errorf("oh no!"))
+				sqlmigrs, err := executor.Migrations()
 				Expect(err).To(MatchError("oh no!"))
-				Expect(migrations).To(BeEmpty())
+				Expect(sqlmigrs).To(BeEmpty())
 			})
 		})
 	})
 
 	Describe("Run", func() {
-		Context("when there are no migrations", func() {
-			It("does not run any migration", func() {
+		Context("when there are no sqlmigrs", func() {
+			It("does not run any sqlmigr", func() {
 				cnt, err := executor.Run(1)
 				Expect(err).To(Succeed())
 				Expect(cnt).To(Equal(0))
@@ -149,9 +149,9 @@ var _ = Describe("Executor", func() {
 			})
 		})
 
-		Context("when there are applied migrations", func() {
-			It("does not run any of the applied migrations", func() {
-				migrations := []migration.Item{
+		Context("when there are applied sqlmigrs", func() {
+			It("does not run any of the applied sqlmigrs", func() {
+				sqlmigrs := []sqlmigr.Item{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -167,7 +167,7 @@ var _ = Describe("Executor", func() {
 					},
 				}
 
-				provider.MigrationsReturns(migrations, nil)
+				provider.MigrationsReturns(sqlmigrs, nil)
 				cnt, err := executor.Run(1)
 				Expect(err).To(Succeed())
 				Expect(cnt).To(Equal(1))
@@ -176,15 +176,15 @@ var _ = Describe("Executor", func() {
 				Expect(runner.RunCallCount()).To(Equal(1))
 
 				item := runner.RunArgsForCall(0)
-				Expect(*item).To(Equal(migrations[1]))
+				Expect(*item).To(Equal(sqlmigrs[1]))
 
 				Expect(provider.InsertCallCount()).To(Equal(1))
 				item = provider.InsertArgsForCall(0)
-				Expect(*item).To(Equal(migrations[1]))
+				Expect(*item).To(Equal(sqlmigrs[1]))
 			})
 
-			It("runs all migrations", func() {
-				migrations := []migration.Item{
+			It("runs all sqlmigrs", func() {
+				sqlmigrs := []sqlmigr.Item{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -199,7 +199,7 @@ var _ = Describe("Executor", func() {
 					},
 				}
 
-				provider.MigrationsReturns(migrations, nil)
+				provider.MigrationsReturns(sqlmigrs, nil)
 				cnt, err := executor.RunAll()
 				Expect(err).To(Succeed())
 				Expect(cnt).To(Equal(3))
@@ -210,16 +210,16 @@ var _ = Describe("Executor", func() {
 
 				for i := 0; i < 3; i++ {
 					item := runner.RunArgsForCall(i)
-					Expect(*item).To(Equal(migrations[i]))
+					Expect(*item).To(Equal(sqlmigrs[i]))
 
 					item = provider.InsertArgsForCall(i)
-					Expect(*item).To(Equal(migrations[i]))
+					Expect(*item).To(Equal(sqlmigrs[i]))
 				}
 			})
 
 			Context("when the item name is wrong", func() {
 				It("returns an error", func() {
-					migrations := []migration.Item{
+					sqlmigrs := []sqlmigr.Item{
 						{
 							ID:          "timestamp",
 							Description: "First",
@@ -227,7 +227,7 @@ var _ = Describe("Executor", func() {
 						},
 					}
 
-					provider.MigrationsReturns(migrations, nil)
+					provider.MigrationsReturns(sqlmigrs, nil)
 					cnt, err := executor.Run(1)
 					Expect(err).To(MatchError(`parsing time "timestamp" as "20060102150405": cannot parse "timestamp" as "2006"`))
 					Expect(cnt).To(BeZero())
@@ -236,10 +236,10 @@ var _ = Describe("Executor", func() {
 		})
 
 		Context("when the step is negative number", func() {
-			var migrations []migration.Item
+			var sqlmigrs []sqlmigr.Item
 
 			BeforeEach(func() {
-				migrations = []migration.Item{
+				sqlmigrs = []sqlmigr.Item{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -255,10 +255,10 @@ var _ = Describe("Executor", func() {
 					},
 				}
 
-				provider.MigrationsReturns(migrations, nil)
+				provider.MigrationsReturns(sqlmigrs, nil)
 			})
 
-			It("runs all pending migrations", func() {
+			It("runs all pending sqlmigrs", func() {
 				cnt, err := executor.Run(-1)
 				Expect(err).To(Succeed())
 				Expect(cnt).To(Equal(2))
@@ -269,7 +269,7 @@ var _ = Describe("Executor", func() {
 
 				for i := 0; i < runner.RunCallCount(); i++ {
 					item := runner.RunArgsForCall(i)
-					Expect(*item).To(Equal(migrations[i+1]))
+					Expect(*item).To(Equal(sqlmigrs[i+1]))
 				}
 			})
 
@@ -300,7 +300,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]migration.Item{}, fmt.Errorf("Oh no!"))
+				provider.MigrationsReturns([]sqlmigr.Item{}, fmt.Errorf("Oh no!"))
 
 				cnt, err := executor.Run(1)
 				Expect(err).To(MatchError("Oh no!"))
@@ -310,8 +310,8 @@ var _ = Describe("Executor", func() {
 	})
 
 	Describe("Revert", func() {
-		Context("when there are no migrations", func() {
-			It("does not revert any migration", func() {
+		Context("when there are no sqlmigrs", func() {
+			It("does not revert any sqlmigr", func() {
 				cnt, err := executor.Revert(1)
 				Expect(err).To(Succeed())
 				Expect(cnt).To(Equal(0))
@@ -321,8 +321,8 @@ var _ = Describe("Executor", func() {
 			})
 		})
 
-		It("revert all migrations", func() {
-			migrations := []migration.Item{
+		It("revert all sqlmigrs", func() {
+			sqlmigrs := []sqlmigr.Item{
 				{
 					ID:          "20060102150405",
 					Description: "First",
@@ -340,7 +340,7 @@ var _ = Describe("Executor", func() {
 				},
 			}
 
-			provider.MigrationsReturns(migrations, nil)
+			provider.MigrationsReturns(sqlmigrs, nil)
 			cnt, err := executor.RevertAll()
 			Expect(err).To(Succeed())
 			Expect(cnt).To(Equal(3))
@@ -351,18 +351,18 @@ var _ = Describe("Executor", func() {
 
 			for i, j := 0, 2; i < 3; i++ {
 				item := runner.RevertArgsForCall(i)
-				Expect(*item).To(Equal(migrations[j]))
+				Expect(*item).To(Equal(sqlmigrs[j]))
 
 				item = provider.DeleteArgsForCall(i)
-				Expect(*item).To(Equal(migrations[j]))
+				Expect(*item).To(Equal(sqlmigrs[j]))
 
 				j = j - 1
 			}
 		})
 
-		Context("when there are pending migrations", func() {
-			It("does not revert any of the pending migrations", func() {
-				migrations := []migration.Item{
+		Context("when there are pending sqlmigrs", func() {
+			It("does not revert any of the pending sqlmigrs", func() {
+				sqlmigrs := []sqlmigr.Item{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -379,7 +379,7 @@ var _ = Describe("Executor", func() {
 					},
 				}
 
-				provider.MigrationsReturns(migrations, nil)
+				provider.MigrationsReturns(sqlmigrs, nil)
 
 				cnt, err := executor.Revert(1)
 				Expect(err).To(Succeed())
@@ -389,19 +389,19 @@ var _ = Describe("Executor", func() {
 				Expect(runner.RevertCallCount()).To(Equal(1))
 
 				item := runner.RevertArgsForCall(0)
-				Expect(*item).To(Equal(migrations[1]))
+				Expect(*item).To(Equal(sqlmigrs[1]))
 
 				Expect(provider.DeleteCallCount()).To(Equal(1))
 				item = provider.DeleteArgsForCall(0)
-				Expect(*item).To(Equal(migrations[1]))
+				Expect(*item).To(Equal(sqlmigrs[1]))
 			})
 		})
 
 		Context("when the step is negative number", func() {
-			var migrations []migration.Item
+			var sqlmigrs []sqlmigr.Item
 
 			BeforeEach(func() {
-				migrations = []migration.Item{
+				sqlmigrs = []sqlmigr.Item{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -418,10 +418,10 @@ var _ = Describe("Executor", func() {
 					},
 				}
 
-				provider.MigrationsReturns(migrations, nil)
+				provider.MigrationsReturns(sqlmigrs, nil)
 			})
 
-			It("reverts all applied migrations", func() {
+			It("reverts all applied sqlmigrs", func() {
 				cnt, err := executor.Revert(-1)
 				Expect(err).To(Succeed())
 				Expect(cnt).To(Equal(2))
@@ -431,7 +431,7 @@ var _ = Describe("Executor", func() {
 
 				for i := 0; i < runner.RunCallCount(); i++ {
 					item := runner.RevertArgsForCall(i)
-					Expect(*item).To(Equal(migrations[i+1]))
+					Expect(*item).To(Equal(sqlmigrs[i+1]))
 				}
 			})
 
@@ -450,7 +450,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the item name is wrong", func() {
 			It("returns an error", func() {
-				migrations := []migration.Item{
+				sqlmigrs := []sqlmigr.Item{
 					{
 						ID:          "timestamp",
 						Description: "First",
@@ -458,7 +458,7 @@ var _ = Describe("Executor", func() {
 					},
 				}
 
-				provider.MigrationsReturns(migrations, nil)
+				provider.MigrationsReturns(sqlmigrs, nil)
 				cnt, err := executor.Revert(1)
 				Expect(err).To(MatchError(`parsing time "timestamp" as "20060102150405": cannot parse "timestamp" as "2006"`))
 				Expect(cnt).To(BeZero())
@@ -467,7 +467,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]migration.Item{}, fmt.Errorf("Oh no!"))
+				provider.MigrationsReturns([]sqlmigr.Item{}, fmt.Errorf("Oh no!"))
 
 				cnt, err := executor.Revert(1)
 				Expect(err).To(MatchError("Oh no!"))
@@ -476,7 +476,7 @@ var _ = Describe("Executor", func() {
 
 			Context("when the delete fails", func() {
 				It("returns the error", func() {
-					migrations := []migration.Item{
+					sqlmigrs := []sqlmigr.Item{
 						{
 							ID:          "20060102150405",
 							Description: "First",
@@ -492,7 +492,7 @@ var _ = Describe("Executor", func() {
 						},
 					}
 
-					provider.MigrationsReturns(migrations, nil)
+					provider.MigrationsReturns(sqlmigrs, nil)
 					provider.DeleteReturns(fmt.Errorf("Oh no!"))
 
 					cnt, err := executor.Revert(1)
