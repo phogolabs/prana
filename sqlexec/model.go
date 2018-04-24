@@ -1,6 +1,6 @@
-// Package script provides primitives and functions to work with raw SQL
+// Package sqlexec provides primitives and functions to work with raw SQL
 // statements and pre-defined SQL Scripts.
-package script
+package sqlexec
 
 import (
 	"github.com/jmoiron/sqlx"

@@ -1,4 +1,4 @@
-package script_test
+package sqlexec_test
 
 import (
 	"bytes"
@@ -6,14 +6,14 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/oak/sqlexec"
 )
 
 var _ = Describe("Scanner", func() {
-	var scanner *script.Scanner
+	var scanner *sqlexec.Scanner
 
 	BeforeEach(func() {
-		scanner = &script.Scanner{}
+		scanner = &sqlexec.Scanner{}
 	})
 
 	It("returns the tagged statements successfully", func() {

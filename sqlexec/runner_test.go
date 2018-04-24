@@ -1,4 +1,4 @@
-package script_test
+package sqlexec_test
 
 import (
 	"bytes"
@@ -11,13 +11,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/oak/sqlexec"
 	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Runner", func() {
 	var (
-		runner *script.Runner
+		runner *sqlexec.Runner
 		dir    string
 	)
 
@@ -31,7 +31,7 @@ var _ = Describe("Runner", func() {
 		gateway, err := sqlx.Open("sqlite3", db)
 		Expect(err).To(BeNil())
 
-		runner = &script.Runner{
+		runner = &sqlexec.Runner{
 			FileSystem: parcello.Dir(dir),
 			DB:         gateway,
 		}

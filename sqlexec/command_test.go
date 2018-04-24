@@ -1,14 +1,14 @@
-package script_test
+package sqlexec_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/oak/sqlexec"
 )
 
 var _ = Describe("Command", func() {
 	It("prepares the command correctly", func() {
-		stmt := script.SQL("SELECT * FROM users WHERE id = ?", 1)
+		stmt := sqlexec.SQL("SELECT * FROM users WHERE id = ?", 1)
 		query, params := stmt.Prepare()
 		Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg0"))
 		Expect(params).To(HaveKeyWithValue("arg0", 1))
@@ -16,7 +16,7 @@ var _ = Describe("Command", func() {
 
 	Context("when parameters are more than the required number", func() {
 		It("returns the query", func() {
-			stmt := script.SQL("SELECT * FROM users WHERE id = ? and name = ?", 2)
+			stmt := sqlexec.SQL("SELECT * FROM users WHERE id = ? and name = ?", 2)
 			query, params := stmt.Prepare()
 			Expect(query).To(BeEmpty())
 			Expect(params).To(BeNil())

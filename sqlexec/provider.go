@@ -1,4 +1,4 @@
-package script
+package sqlexec
 
 import (
 	"fmt"
@@ -8,14 +8,14 @@ import (
 	"sync"
 )
 
-// Provider loads SQL scripts and provides all SQL statements as commands.
+// Provider loads SQL sqlexecs and provides all SQL statements as commands.
 type Provider struct {
 	mu         sync.RWMutex
 	repository map[string]string
 }
 
-// ReadDir loads all script commands from a given directory. Note that all
-// scripts should have .sql extension.
+// ReadDir loads all sqlexec commands from a given directory. Note that all
+// sqlexecs should have .sql extension.
 func (p *Provider) ReadDir(fs FileSystem) error {
 	return fs.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info == nil {
@@ -50,7 +50,7 @@ func (p *Provider) ReadDir(fs FileSystem) error {
 	})
 }
 
-// ReadFrom reads the script from a reader
+// ReadFrom reads the sqlexec from a reader
 func (p *Provider) ReadFrom(r io.Reader) (int64, error) {
 	p.mu.Lock()
 	defer p.mu.Unlock()

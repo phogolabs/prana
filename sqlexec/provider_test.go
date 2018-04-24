@@ -1,4 +1,4 @@
-package script_test
+package sqlexec_test
 
 import (
 	"bytes"
@@ -10,15 +10,15 @@ import (
 	. "github.com/onsi/gomega"
 
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/oak/sqlexec"
 	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Provider", func() {
-	var provider *script.Provider
+	var provider *sqlexec.Provider
 
 	BeforeEach(func() {
-		provider = &script.Provider{}
+		provider = &sqlexec.Provider{}
 	})
 
 	Describe("ReadFrom", func() {

@@ -1,4 +1,4 @@
-package script
+package sqlexec
 
 import "github.com/jmoiron/sqlx"
 

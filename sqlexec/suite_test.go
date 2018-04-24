@@ -1,4 +1,4 @@
-package script_test
+package sqlexec_test
 
 import (
 	"testing"
@@ -11,5 +11,5 @@ import (
 
 func TestScript(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "Script Suite")
+	RunSpecs(t, "SQLExec Suite")
 }

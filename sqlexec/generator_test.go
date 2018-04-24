@@ -1,4 +1,4 @@
-package script_test
+package sqlexec_test
 
 import (
 	"bytes"
@@ -11,13 +11,13 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/oak/sqlexec"
 	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Generator", func() {
 	var (
-		generator *script.Generator
+		generator *sqlexec.Generator
 		dir       string
 	)
 
@@ -26,7 +26,7 @@ var _ = Describe("Generator", func() {
 		dir, err = ioutil.TempDir("", "oak_generator")
 		Expect(err).To(BeNil())
 
-		generator = &script.Generator{
+		generator = &sqlexec.Generator{
 			FileSystem: parcello.Dir(dir),
 		}
 	})
@@ -43,8 +43,8 @@ var _ = Describe("Generator", func() {
 			data, err := ioutil.ReadFile(path)
 			Expect(err).To(BeNil())
 
-			script := string(data)
-			Expect(script).To(ContainSubstring("-- name: update"))
+			sqlexec := string(data)
+			Expect(sqlexec).To(ContainSubstring("-- name: update"))
 		})
 
 		Context("when the file is not provided", func() {
@@ -66,8 +66,8 @@ var _ = Describe("Generator", func() {
 				data, err := ioutil.ReadFile(path)
 				Expect(err).To(BeNil())
 
-				script := string(data)
-				Expect(script).To(ContainSubstring("-- name: update"))
+				sqlexec := string(data)
+				Expect(sqlexec).To(ContainSubstring("-- name: update"))
 			})
 		})
 
@@ -90,9 +90,9 @@ var _ = Describe("Generator", func() {
 				data, err := ioutil.ReadFile(path)
 				Expect(err).To(BeNil())
 
-				script := string(data)
-				Expect(script).To(ContainSubstring("-- name: update"))
-				Expect(script).To(ContainSubstring("-- name: delete"))
+				sqlexec := string(data)
+				Expect(sqlexec).To(ContainSubstring("-- name: update"))
+				Expect(sqlexec).To(ContainSubstring("-- name: delete"))
 			})
 		})
 

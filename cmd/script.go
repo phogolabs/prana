@@ -9,7 +9,7 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
 	"github.com/phogolabs/oak"
-	"github.com/phogolabs/oak/script"
+	"github.com/phogolabs/oak/sqlexec"
 	"github.com/phogolabs/parcello"
 	"github.com/urfave/cli"
 )
@@ -77,7 +77,7 @@ func (m *SQLScript) create(ctx *cli.Context) error {
 		return cli.NewExitError("Create command expects a single argument", ErrCodeCommand)
 	}
 
-	generator := &script.Generator{
+	generator := &sqlexec.Generator{
 		FileSystem: parcello.Dir(m.dir),
 	}
 
@@ -113,7 +113,7 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 		}
 	}()
 
-	runner := &script.Runner{
+	runner := &sqlexec.Runner{
 		FileSystem: parcello.Dir(m.dir),
 		DB:         db,
 	}

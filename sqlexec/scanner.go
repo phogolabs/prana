@@ -1,4 +1,4 @@
-package script
+package sqlexec
 
 import (
 	"bufio"

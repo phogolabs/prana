@@ -1,4 +1,4 @@
-package script
+package sqlexec
 
 import (
 	"bytes"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// Cmd represents a single command from SQL script.
+// Cmd represents a single command from SQL sqlexec.
 type Cmd struct {
 	query  string
 	params []Param
