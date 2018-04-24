@@ -220,7 +220,7 @@ func (m *SQLModel) script(ctx *cli.Context) error {
 	}
 
 	if path != "" {
-		log.Infof("Generated a database model at: '%s'", path)
+		log.Infof("Generated a SQL script at: '%s'", path)
 	}
 
 	return nil
