@@ -5,7 +5,7 @@ import (
 	"io"
 	"sync"
 
-	"github.com/phogolabs/oak/sqlmodel"
+	"github.com/phogolabs/prana/sqlmodel"
 )
 
 type ModelComposer struct {

@@ -8,8 +8,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/sqlmigr"
+	"github.com/phogolabs/prana/fake"
+	"github.com/phogolabs/prana/sqlmigr"
 	"github.com/phogolabs/parcello"
 )
 
@@ -23,7 +23,7 @@ var _ = Describe("Generator", func() {
 	BeforeEach(func() {
 		var err error
 
-		dir, err = ioutil.TempDir("", "oak_generator")
+		dir, err = ioutil.TempDir("", "prana_generator")
 		Expect(err).To(BeNil())
 
 		dir = filepath.Join(dir, "sqlmigr")

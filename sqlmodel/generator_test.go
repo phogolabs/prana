@@ -8,8 +8,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/sqlmodel"
+	"github.com/phogolabs/prana/fake"
+	"github.com/phogolabs/prana/sqlmodel"
 	"golang.org/x/tools/imports"
 )
 

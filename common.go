@@ -1,114 +1,12 @@
-// Package oak provides a wrapper to work with loukoum built queries as well
-// maitaining database version by creating, executing and reverting SQL
-// migrations.
-//
-// The package allows executing embedded SQL statements from script for a given
-// name.
-package oak
+// Package prana facilitates the work with applications that use database for
+// their store
+package prana
 
 import (
-	"database/sql"
 	"fmt"
-	"io"
 	"net/url"
 	"strings"
-
-	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/oak/sqlexec"
-	"github.com/phogolabs/oak/sqlmigr"
-	"github.com/phogolabs/parcello"
 )
-
-// FileSystem provides with primitives to work with the underlying file system
-type FileSystem = parcello.FileSystem
-
-// Dir implements FileSystem using the native file system restricted to a
-// specific directory tree.
-type Dir = parcello.Dir
-
-// Query represents an SQL Query that can be executed by Gateway.
-type Query interface {
-	// Prepare prepares the query for execution. It returns the actual query and
-	// a maps of its arguments.
-	Prepare() (string, map[string]interface{})
-}
-
-// Preparer prepares query for execution
-type Preparer interface {
-	// PrepareNamed returns a prepared named statement
-	PrepareNamed(query string) (*NamedStmt, error)
-}
-
-// NamedStmt is a prepared statement that executes named queries.  Prepare it
-// how you would execute a NamedQuery, but pass in a struct or map when executing.
-type NamedStmt = sqlx.NamedStmt
-
-// Entity is a destination object for given select operation.
-type Entity = interface{}
-
-// Rows is a wrapper around sql.Rows which caches costly reflect operations
-// during a looped StructScan
-type Rows = sqlx.Rows
-
-// Row is a reimplementation of sql.Row in order to gain access to the underlying
-// sql.Rows.Columns() data, necessary for StructScan.
-type Row = sqlx.Row
-
-// A Result summarizes an executed SQL command.
-type Result = sql.Result
-
-var provider *sqlexec.Provider
-
-func init() {
-	provider = &sqlexec.Provider{}
-}
-
-// Setup setups the oak environment for us
-func Setup(gateway *Gateway, manager *parcello.Manager) error {
-	if err := LoadSQLCommandsFrom(parcello.Root("script")); err != nil {
-		return err
-	}
-
-	if err := Migrate(gateway, parcello.Root("migration")); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// Migrate runs all pending migration
-func Migrate(gateway *Gateway, fileSystem FileSystem) error {
-	return sqlmigr.RunAll(gateway.db, fileSystem)
-}
-
-// LoadSQLCommandsFromReader loads all commands from a given reader.
-func LoadSQLCommandsFromReader(r io.Reader) error {
-	_, err := provider.ReadFrom(r)
-	return err
-}
-
-// LoadSQLCommandsFrom loads all script commands from a given directory. Note that all
-// scripts should have .sql extension.
-func LoadSQLCommandsFrom(fileSystem FileSystem) error {
-	return provider.ReadDir(fileSystem)
-}
-
-// Command returns a command for given name and parameters. The operation can
-// panic if the command cannot be found.
-func Command(name string, params ...sqlexec.Param) *sqlexec.Cmd {
-	cmd, err := provider.Command(name, params...)
-
-	if err != nil {
-		panic(err)
-	}
-
-	return cmd
-}
-
-// SQL create a new command from raw query
-func SQL(query string, params ...sqlexec.Param) *sqlexec.Cmd {
-	return sqlexec.SQL(query, params...)
-}
 
 // ParseURL parses a URL and returns the database driver and connection string to the database
 func ParseURL(conn string) (string, string, error) {

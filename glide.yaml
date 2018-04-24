@@ -1,4 +1,4 @@
-package: github.com/phogolabs/oak
+package: github.com/phogolabs/prana
 import:
 - package: github.com/apex/log
   version: v1.0.0

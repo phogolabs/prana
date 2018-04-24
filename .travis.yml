@@ -10,8 +10,8 @@ addons:
   postgresql: "9.4"
 
 before_script:
-  - mysql -e 'CREATE DATABASE oak;'
-  - psql -c 'CREATE DATABASE oak;' -U postgres
+  - mysql -e 'CREATE DATABASE prana;'
+  - psql -c 'CREATE DATABASE prana;' -U postgres
 
 install:
   - go get github.com/onsi/gomega

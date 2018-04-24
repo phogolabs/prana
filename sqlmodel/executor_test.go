@@ -8,8 +8,8 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/sqlmodel"
+	"github.com/phogolabs/prana/fake"
+	"github.com/phogolabs/prana/sqlmodel"
 )
 
 var _ = Describe("Executor", func() {
@@ -39,7 +39,7 @@ var _ = Describe("Executor", func() {
 			},
 		}
 
-		dir, err := ioutil.TempDir("", "oak")
+		dir, err := ioutil.TempDir("", "prana")
 		Expect(err).To(BeNil())
 
 		spec = &sqlmodel.Spec{

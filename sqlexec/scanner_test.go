@@ -6,7 +6,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/sqlexec"
+	"github.com/phogolabs/prana/sqlexec"
 )
 
 var _ = Describe("Scanner", func() {

@@ -7,7 +7,7 @@ import (
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/oak/sqlmigr"
+	"github.com/phogolabs/prana/sqlmigr"
 	"github.com/phogolabs/parcello"
 	"github.com/urfave/cli"
 )

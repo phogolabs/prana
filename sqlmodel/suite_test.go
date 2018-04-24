@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/phogolabs/oak/sqlmodel"
+	"github.com/phogolabs/prana/sqlmodel"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

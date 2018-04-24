@@ -1,4 +1,4 @@
-package oak_test
+package prana_test
 
 import (
 	"testing"
@@ -9,5 +9,5 @@ import (
 
 func TestOAK(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "OAK Suite")
+	RunSpecs(t, "Prana Suite")
 }

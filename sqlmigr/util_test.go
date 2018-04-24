@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/oak/sqlmigr"
+	"github.com/phogolabs/prana/sqlmigr"
 	"github.com/phogolabs/parcello"
 )
 
@@ -20,10 +20,10 @@ var _ = Describe("Util", func() {
 		)
 
 		BeforeEach(func() {
-			dir, err := ioutil.TempDir("", "oak_runner")
+			dir, err := ioutil.TempDir("", "prana_runner")
 			Expect(err).To(BeNil())
 
-			conn := filepath.Join(dir, "oak.db")
+			conn := filepath.Join(dir, "prana.db")
 			db, err = sqlx.Open("sqlite3", conn)
 			Expect(err).To(BeNil())
 

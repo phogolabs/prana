@@ -4,7 +4,7 @@ package fake
 import (
 	"sync"
 
-	"github.com/phogolabs/oak/sqlmigr"
+	"github.com/phogolabs/prana/sqlmigr"
 )
 
 type MigrationGenerator struct {

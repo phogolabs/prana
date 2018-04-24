@@ -9,8 +9,8 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/sqlexec"
+	"github.com/phogolabs/prana/fake"
+	"github.com/phogolabs/prana/sqlexec"
 	"github.com/phogolabs/parcello"
 )
 

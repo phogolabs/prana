@@ -1,4 +1,4 @@
-# OAK
+# Prana
 
 [![Documentation][godoc-img]][godoc-url]
 ![License][license-img]
@@ -8,11 +8,9 @@
 
 *Golang Database Manager*
 
-[![OAK][oak-img]][oak-url]
-
 ## Overview
 
-OAK is a package for rapid application development with relational databases in
+Prana is a package for rapid application development with relational databases in
 Golang.  It has a command line interface that provides:
 
 - SQL Migrations
@@ -22,8 +20,8 @@ Golang.  It has a command line interface that provides:
 ## Installation
 
 ```console
-$ go get -u github.com/phogolabs/oak
-$ go install github.com/phogolabs/oak/cmd/oak
+$ go get -u github.com/phogolabs/prana
+$ go install github.com/phogolabs/prana/cmd/prana
 ```
 
 ## Introduction
@@ -36,13 +34,13 @@ comments which have statements for run and revert operations.
 In order to prepare the project for migration, you have to set it up:
 
 ```console
-$ oak migration setup
+$ prana migration setup
 ```
 
 Then you can create a migration with the following command:
 
 ```console
-$ oak migration create schema
+$ prana migration create schema
 ```
 
 The command will create the following migration file in `/database/migration`:
@@ -76,26 +74,26 @@ DROP TABLE IF EXISTS users;
 You can run the migration with the following command:
 
 ```console
-$ oak migration run
+$ prana migration run
 ```
 
 If you want to rollback the migration you have to revert it:
 
 ```console
-$ oak migration revert
+$ prana migration revert
 ```
 
 ## SQL Schema and Code Generation
 
 Let's assume that we want to generate a mode for the `users` table.
 
-You can use the `oak` command line interface to generate a package that
+You can use the `prana` command line interface to generate a package that
 contains Golang structs, which represents each table from the desired schema.
 
 For that purpose you should call the following subcommand:
 
 ```bash
-$ oak model sync
+$ prana model sync
 ```
 
 By default the command will place the generated code in single `schema.go` file
@@ -109,7 +107,7 @@ You can print the source code without generating a package by executing the
 following command:
 
 ```bash
-$ oak model print
+$ prana model print
 ```
 
 Note that you can specify the desired schema or tables by providing the correct
@@ -152,74 +150,12 @@ installed:
 - [null](https://github.com/guregu/null) package
 
 The generated `db` tag is recognized by
-[parcel.Gateway](https://godoc.org/github.com/phogolabs/oak#Gateway) as well as
+[prana.Gateway](https://godoc.org/github.com/phogolabs/prana#Gateway) as well as
 [sqlx](https://github.com/jmoiron/sqlx).
 
 If you wan to generate models for [gorm](http://gorm.io), you should
 pass `--orm-tag gorm`. Note that constraints like unique or indexes are not
 included for now.
-
-### SQL Queries with Loukoum
-
-Gateway API facilitates object relation mapping and query building by using
-[loukoum](loukoum-url) and [sqlx][sqlx-url]. Before start working you should
-import the desired packages:
-
-```golang
-import (
-  lk "github.com/ulule/loukoum"
-  "github.com/phogolabs/oak"
-)
-```
-
-Let's first establish the connection:
-
-```golang
-gateway, err := oak.Open("sqlite3", "example.db")
-if err != nil {
- return err
-}
-```
-
-#### Insert a new record
-
-```golang
-
-query := lk.Insert("users").
-	Set(
-		lk.Pair("first_name", "John"),
-		lk.Pair("last_name", "Doe"),
-	)
-
-if _, err := gateway.Exec(query); err != nil {
-  return err
-}
-```
-
-#### Select all records
-
-```golang
-query := lk.Select("id", "first_name", "last_name").From("users")
-users := []User{}
-
-if err := gateway.Select(&users, query); err != nil {
-  return err
-}
-```
-
-#### Select a record
-
-```golang
-query := lk.Select("id", "first_name", "last_name").
-	From("users").
-	Where(oak.Condition("first_name").Equal("John"))
-
-user := User{}
-
-if err := gateway.SelectOne(&user, query); err != nil {
-  return err
-}
-```
 
 ### SQL Scripts and Commands
 
@@ -227,11 +163,11 @@ Also, it provides a way to work with embeddable SQL scripts by exposing them as
 SQL Commands. First of all you have create a script that contains your SQL
 statements.
 
-The easies way to generate a SQL script with correct format is by using `oak`
+The easies way to generate a SQL script with correct format is by using `prana`
 command line interface:
 
 ```console
-$ oak script create show-sqlite-master
+$ prana script create show-sqlite-master
 ```
 
 The command above will generate a script in your `$PWD/database/script`;
@@ -256,10 +192,10 @@ The `-- name: show-sqlite-master` comment define the name of the command in
 your SQL script. The SQL statement afterwards is considered as the command
 body. Note that the command must have only one statement.
 
-Then you can use the `oak` command line interface to execute the command:
+Then you can use the `prana` command line interface to execute the command:
 
 ```console
-$ oak script run show-sqlite-master
+$ prana script run show-sqlite-master
 
 Running command 'show-sqlite-master' from '$PWD/database/script'
 +-------+-------------------------------+----------+
@@ -270,35 +206,12 @@ Running command 'show-sqlite-master' from '$PWD/database/script'
 +-------+-------------------------------+----------+
 ```
 
-You can run the command by using the `Gateway API` as well:
-
-Let's first load the file:
-
-```golang
-if err = oak.LoadSQLCommandsFromReader(file); err != nil {
-	log.WithError(err).Fatal("Failed to load script")
-}
-```
-
-Then you can execute the desired script by just passing its name:
-
-```golang
-_, err = gateway.Exec(oak.Command("show-sqlite-master"))
-```
-
-If you want to run Raw SQL Scripts from your code, you should follow this
-example:
-
-```golang
-rows, err := gateway.Query(oak.SQL("SELECT * FROM users WHERE id = ?", 5432))
-```
-
 ### Command Line Interface Advance Usage
 
-By default the CLI work with `sqlite3` database called `oak.db` at your current
+By default the CLI work with `sqlite3` database called `prana.db` at your current
 directory.
 
-oak supports:
+Prana supports:
 
 - PostgreSQL
 - MySQL
@@ -308,28 +221,26 @@ If you want to change the default connection, you can pass it via command line
 argument:
 
 ```bash
-$ oak --database-url [driver-name]://[connection-string] [command]
+$ prana --database-url [driver-name]://[connection-string] [command]
 ```
 
-oak uses a URL schema to determines the right database driver. If you want to
+prana uses a URL schema to determines the right database driver. If you want to
 pass the connection string via environment variable, you should export
-`OAK_DB_URL`.
+`PRANA_DB_URL`.
 
-### Example
-
-You can check our [Getting Started Example](/example).
+### Help
 
 For more information, how you can change the default behavior you can read the
 help documentation by executing:
 
 ```console
-$ oak -h
+$ prana -h
 
 NAME:
-   oak - Golang Database Object Manager
+   prana - Golang Database Object Manager
 
 USAGE:
-   oak [global options]
+   prana [global options]
 
 VERSION:
    1.0
@@ -341,9 +252,9 @@ COMMANDS:
      help, h    Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
-   --database-url value  Database URL (default: "sqlite3://oak.db") [$OAK_DB_URL]
-   --log-format value    format of the logs [$OAK_LOG_FORMAT]
-   --log-level value     level of logging (default: "info") [$OAK_LOG_LEVEL]
+   --database-url value  Database URL (default: "sqlite3://prana.db") [$PRANA_DB_URL]
+   --log-format value    format of the logs [$PRANA_LOG_FORMAT]
+   --log-level value     level of logging (default: "info") [$PRANA_LOG_LEVEL]
    --help, -h            show help
    --version, -v         print the version
 ```
@@ -351,23 +262,23 @@ GLOBAL OPTIONS:
 ## Contributing
 
 We are welcome to any contributions. Just fork the
-[project](https://github.com/phogolabs/oak).
+[project](https://github.com/phogolabs/prana).
 
 *logo made by [Free Pik][logo-author-url]*
 
-[report-img]: https://goreportcard.com/badge/github.com/phogolabs/oak
-[report-url]: https://goreportcard.com/report/github.com/phogolabs/oak
+[report-img]: https://goreportcard.com/badge/github.com/phogolabs/prana
+[report-url]: https://goreportcard.com/report/github.com/phogolabs/prana
 [logo-author-url]: https://www.freepik.com/free-photos-vectors/tree
 [logo-license]: http://creativecommons.org/licenses/by/3.0/
-[oak-url]: https://github.com/phogolabs/oak
-[oak-img]: doc/img/logo.png
-[codecov-url]: https://codecov.io/gh/phogolabs/oak
-[codecov-img]: https://codecov.io/gh/phogolabs/oak/branch/master/graph/badge.svg
-[travis-img]: https://travis-ci.org/phogolabs/oak.svg?branch=master
-[travis-url]: https://travis-ci.org/phogolabs/oak
-[oak-url]: https://github.com/phogolabs/oak
-[godoc-url]: https://godoc.org/github.com/phogolabs/oak
-[godoc-img]: https://godoc.org/github.com/phogolabs/oak?status.svg
+[prana-url]: https://github.com/phogolabs/prana
+[prana-img]: doc/img/logo.png
+[codecov-url]: https://codecov.io/gh/phogolabs/prana
+[codecov-img]: https://codecov.io/gh/phogolabs/prana/branch/master/graph/badge.svg
+[travis-img]: https://travis-ci.org/phogolabs/prana.svg?branch=master
+[travis-url]: https://travis-ci.org/phogolabs/prana
+[prana-url]: https://github.com/phogolabs/prana
+[godoc-url]: https://godoc.org/github.com/phogolabs/prana
+[godoc-img]: https://godoc.org/github.com/phogolabs/prana?status.svg
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
 [software-license-url]: LICENSE
 [loukoum-url]: https://github.com/ulule/loukoum

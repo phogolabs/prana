@@ -8,9 +8,8 @@ import (
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
 	"github.com/olekukonko/tablewriter"
-	"github.com/phogolabs/oak"
-	"github.com/phogolabs/oak/sqlexec"
 	"github.com/phogolabs/parcello"
+	"github.com/phogolabs/prana/sqlexec"
 	"github.com/urfave/cli"
 )
 
@@ -118,7 +117,7 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 		DB:         db,
 	}
 
-	var rows *oak.Rows
+	var rows *sqlx.Rows
 	rows, err = runner.Run(name, params...)
 
 	if err != nil {

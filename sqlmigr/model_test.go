@@ -3,7 +3,7 @@ package sqlmigr_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/sqlmigr"
+	"github.com/phogolabs/prana/sqlmigr"
 )
 
 var _ = Describe("Model", func() {

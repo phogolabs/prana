@@ -9,7 +9,7 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 
-	"github.com/phogolabs/oak/cmd"
+	"github.com/phogolabs/prana/cmd"
 	"github.com/urfave/cli"
 )
 
@@ -18,19 +18,19 @@ var flags = []cli.Flag{
 		Name:   "log-level",
 		Value:  "info",
 		Usage:  "level of logging",
-		EnvVar: "OAK_LOG_LEVEL",
+		EnvVar: "PRANA_LOG_LEVEL",
 	},
 	cli.StringFlag{
 		Name:   "log-format",
 		Value:  "",
 		Usage:  "format of the logs",
-		EnvVar: "OAK_LOG_FORMAT",
+		EnvVar: "PRANA_LOG_FORMAT",
 	},
 	cli.StringFlag{
 		Name:   "database-url",
-		Value:  "sqlite3://oak.db",
+		Value:  "sqlite3://prana.db",
 		Usage:  "Database URL",
-		EnvVar: "OAK_DB_URL",
+		EnvVar: "PRANA_DB_URL",
 	},
 }
 
@@ -46,10 +46,10 @@ func main() {
 	}
 
 	app := &cli.App{
-		Name:                 "oak",
-		HelpName:             "oak",
+		Name:                 "prana",
+		HelpName:             "prana",
 		Usage:                "Golang Database Object Manager",
-		UsageText:            "oak [global options]",
+		UsageText:            "prana [global options]",
 		Version:              "1.0",
 		BashComplete:         cli.DefaultAppComplete,
 		EnableBashCompletion: true,

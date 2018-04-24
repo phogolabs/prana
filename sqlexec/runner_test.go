@@ -10,8 +10,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/sqlexec"
+	"github.com/phogolabs/prana/fake"
+	"github.com/phogolabs/prana/sqlexec"
 	"github.com/phogolabs/parcello"
 )
 
@@ -24,10 +24,10 @@ var _ = Describe("Runner", func() {
 	BeforeEach(func() {
 		var err error
 
-		dir, err = ioutil.TempDir("", "oak_runner")
+		dir, err = ioutil.TempDir("", "prana_runner")
 		Expect(err).To(BeNil())
 
-		db := filepath.Join(dir, "oak.db")
+		db := filepath.Join(dir, "prana.db")
 		gateway, err := sqlx.Open("sqlite3", db)
 		Expect(err).To(BeNil())
 

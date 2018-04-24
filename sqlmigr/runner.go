@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/oak/sqlexec"
+	"github.com/phogolabs/prana/sqlexec"
 )
 
 var _ MigrationRunner = &Runner{}
