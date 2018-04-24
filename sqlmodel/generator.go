@@ -63,6 +63,8 @@ func (g *Generator) GenerateSQLScript(schema *Schema) (io.Reader, error) {
 
 	for _, table := range tables {
 		g.writeSQLComment(buffer)
+		g.writeSQLQuerySelect(buffer, schema, &table)
+		g.writeSQLComment(buffer)
 		g.writeSQLQueryInsert(buffer, schema, &table)
 		g.writeSQLComment(buffer)
 		g.writeSQLQueryUpdate(buffer, schema, &table)
@@ -188,6 +190,12 @@ func (g *Generator) format(buffer *bytes.Buffer) error {
 
 	_, err = buffer.Write(data)
 	return err
+}
+
+func (g *Generator) writeSQLQuerySelect(w io.Writer, schema *Schema, table *Table) {
+	tableName := g.tableName(schema, table)
+	fmt.Fprintf(w, "-- name: select-%s\n", g.commandName(tableName))
+	fmt.Fprintf(w, "SELECT * FROM %s\n", tableName)
 }
 
 func (g *Generator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Table) {

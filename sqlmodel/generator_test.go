@@ -98,6 +98,8 @@ var _ = Describe("Generator", func() {
 		It("generates the SQL script successfully", func() {
 			w := &bytes.Buffer{}
 			t := strings.Replace(table, ".", "-", -1)
+			fmt.Fprintf(w, "-- name: select-%s\n", t)
+			fmt.Fprintf(w, "SELECT * FROM %s\n", table)
 			fmt.Fprintf(w, "-- name: insert-%s\n", t)
 			fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
 			fmt.Fprint(w, "VALUES (?, ?)\n\n")
