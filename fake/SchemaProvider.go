@@ -7,7 +7,7 @@ import (
 	"github.com/phogolabs/prana/sqlmodel"
 )
 
-type ModelProvider struct {
+type SchemaProvider struct {
 	TablesStub        func(schema string) ([]string, error)
 	tablesMutex       sync.RWMutex
 	tablesArgsForCall []struct {
@@ -31,7 +31,7 @@ type ModelProvider struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ModelProvider) Tables(schema string) ([]string, error) {
+func (fake *SchemaProvider) Tables(schema string) ([]string, error) {
 	fake.tablesMutex.Lock()
 	fake.tablesArgsForCall = append(fake.tablesArgsForCall, struct {
 		schema string
@@ -44,19 +44,19 @@ func (fake *ModelProvider) Tables(schema string) ([]string, error) {
 	return fake.tablesReturns.result1, fake.tablesReturns.result2
 }
 
-func (fake *ModelProvider) TablesCallCount() int {
+func (fake *SchemaProvider) TablesCallCount() int {
 	fake.tablesMutex.RLock()
 	defer fake.tablesMutex.RUnlock()
 	return len(fake.tablesArgsForCall)
 }
 
-func (fake *ModelProvider) TablesArgsForCall(i int) string {
+func (fake *SchemaProvider) TablesArgsForCall(i int) string {
 	fake.tablesMutex.RLock()
 	defer fake.tablesMutex.RUnlock()
 	return fake.tablesArgsForCall[i].schema
 }
 
-func (fake *ModelProvider) TablesReturns(result1 []string, result2 error) {
+func (fake *SchemaProvider) TablesReturns(result1 []string, result2 error) {
 	fake.TablesStub = nil
 	fake.tablesReturns = struct {
 		result1 []string
@@ -64,7 +64,7 @@ func (fake *ModelProvider) TablesReturns(result1 []string, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *ModelProvider) Schema(schema string, tables ...string) (*sqlmodel.Schema, error) {
+func (fake *SchemaProvider) Schema(schema string, tables ...string) (*sqlmodel.Schema, error) {
 	fake.schemaMutex.Lock()
 	fake.schemaArgsForCall = append(fake.schemaArgsForCall, struct {
 		schema string
@@ -78,19 +78,19 @@ func (fake *ModelProvider) Schema(schema string, tables ...string) (*sqlmodel.Sc
 	return fake.schemaReturns.result1, fake.schemaReturns.result2
 }
 
-func (fake *ModelProvider) SchemaCallCount() int {
+func (fake *SchemaProvider) SchemaCallCount() int {
 	fake.schemaMutex.RLock()
 	defer fake.schemaMutex.RUnlock()
 	return len(fake.schemaArgsForCall)
 }
 
-func (fake *ModelProvider) SchemaArgsForCall(i int) (string, []string) {
+func (fake *SchemaProvider) SchemaArgsForCall(i int) (string, []string) {
 	fake.schemaMutex.RLock()
 	defer fake.schemaMutex.RUnlock()
 	return fake.schemaArgsForCall[i].schema, fake.schemaArgsForCall[i].tables
 }
 
-func (fake *ModelProvider) SchemaReturns(result1 *sqlmodel.Schema, result2 error) {
+func (fake *SchemaProvider) SchemaReturns(result1 *sqlmodel.Schema, result2 error) {
 	fake.SchemaStub = nil
 	fake.schemaReturns = struct {
 		result1 *sqlmodel.Schema
@@ -98,7 +98,7 @@ func (fake *ModelProvider) SchemaReturns(result1 *sqlmodel.Schema, result2 error
 	}{result1, result2}
 }
 
-func (fake *ModelProvider) Invocations() map[string][][]interface{} {
+func (fake *SchemaProvider) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
 	fake.tablesMutex.RLock()
@@ -108,7 +108,7 @@ func (fake *ModelProvider) Invocations() map[string][][]interface{} {
 	return fake.invocations
 }
 
-func (fake *ModelProvider) recordInvocation(key string, args []interface{}) {
+func (fake *SchemaProvider) recordInvocation(key string, args []interface{}) {
 	fake.invocationsMutex.Lock()
 	defer fake.invocationsMutex.Unlock()
 	if fake.invocations == nil {
@@ -120,4 +120,4 @@ func (fake *ModelProvider) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ sqlmodel.Provider = new(ModelProvider)
+var _ sqlmodel.SchemaProvider = new(SchemaProvider)

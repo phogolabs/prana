@@ -102,7 +102,7 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 			KeepSchema: ctx.Bool("keep-schema-as-package"),
 		},
 		Provider: provider,
-		Composer: &sqlmodel.Generator{
+		Generator: &sqlmodel.Generator{
 			TagBuilder: builder,
 			Config: &sqlmodel.GeneratorConfig{
 				KeepSchema:   ctx.Bool("keep-schema-as-package"),
@@ -115,7 +115,7 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLModel) provider(db *sqlx.DB) (sqlmodel.Provider, error) {
+func (m *SQLModel) provider(db *sqlx.DB) (sqlmodel.SchemaProvider, error) {
 	switch db.DriverName() {
 	case "sqlite3":
 		return &sqlmodel.SQLiteProvider{DB: db}, nil

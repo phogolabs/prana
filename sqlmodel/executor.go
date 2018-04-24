@@ -18,10 +18,10 @@ type ExecutorConfig struct {
 type Executor struct {
 	// Config of the executor
 	Config *ExecutorConfig
-	// Composer is the sqlmodel generator
-	Composer Composer
+	// Generator is the sqlmodel generator
+	Generator ModelGenerator
 	// Provider provides information the database schema
-	Provider Provider
+	Provider SchemaProvider
 }
 
 // Write writes the generated schema sqlmodels to a writer
@@ -32,7 +32,7 @@ func (e *Executor) Write(w io.Writer, spec *Spec) error {
 	}
 
 	pkg := e.packageOf(schema, spec)
-	r, err := e.Composer.Compose(pkg, schema)
+	r, err := e.Generator.Generate(pkg, schema)
 
 	if err != nil {
 		return err
@@ -49,7 +49,7 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", err
 	}
 
-	reader, err := e.Composer.Compose(e.packageOf(schema, spec), schema)
+	reader, err := e.Generator.Generate(e.packageOf(schema, spec), schema)
 	if err != nil {
 		return "", err
 	}

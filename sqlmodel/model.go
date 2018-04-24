@@ -90,22 +90,22 @@ var (
 	}
 )
 
-//go:generate counterfeiter -fake-name ModelProvider -o ../fake/ModelProvider.go . Provider
-//go:generate counterfeiter -fake-name ModelComposer -o ../fake/ModelComposer.go . Composer
-//go:generate counterfeiter -fake-name ModelTagBuilder -o ../fake/ModelTagBuilder.go . TagBuilder
+//go:generate counterfeiter -fake-name SchemaProvider -o ../fake/SchemaProvider.go . SchemaProvider
+//go:generate counterfeiter -fake-name ModelGenerator -o ../fake/ModelGenerator.go . ModelGenerator
+//go:generate counterfeiter -fake-name TagBuilder -o ../fake/TagBuilder.go . TagBuilder
 
-// Provider provides a metadata for database schema
-type Provider interface {
+// SchemaProvider provides a metadata for database schema
+type SchemaProvider interface {
 	// Tables returns all tables for this schema
 	Tables(schema string) ([]string, error)
 	// Schema returns the schema definition
 	Schema(schema string, tables ...string) (*Schema, error)
 }
 
-// Composer composes the sqlmodels
-type Composer interface {
-	// Compose generates the golang structs from database schema
-	Compose(pkg string, sch *Schema) (io.Reader, error)
+// ModelGenerator generates the sqlmodels
+type ModelGenerator interface {
+	// Generate generates the golang structs from database schema
+	Generate(pkg string, sch *Schema) (io.Reader, error)
 }
 
 // Schema represents a database schema

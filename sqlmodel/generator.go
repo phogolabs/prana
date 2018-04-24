@@ -13,7 +13,7 @@ import (
 	"golang.org/x/tools/imports"
 )
 
-var _ Composer = &Generator{}
+var _ ModelGenerator = &Generator{}
 
 // GeneratorConfig controls how the code generation happens
 type GeneratorConfig struct {
@@ -33,8 +33,8 @@ type Generator struct {
 	Config *GeneratorConfig
 }
 
-// Compose generates the golang structs from database schema
-func (g *Generator) Compose(pkg string, schema *Schema) (io.Reader, error) {
+// Generate generates the golang structs from database schema
+func (g *Generator) Generate(pkg string, schema *Schema) (io.Reader, error) {
 	buffer := &bytes.Buffer{}
 	tables := g.tables(schema)
 

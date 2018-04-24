@@ -16,8 +16,8 @@ var _ = Describe("Executor", func() {
 	var (
 		executor  *sqlmodel.Executor
 		spec      *sqlmodel.Spec
-		provider  *fake.ModelProvider
-		composer  *fake.ModelComposer
+		provider  *fake.SchemaProvider
+		composer  *fake.ModelGenerator
 		reader    *fake.Buffer
 		schemaDef *sqlmodel.Schema
 	)
@@ -50,26 +50,26 @@ var _ = Describe("Executor", func() {
 
 		reader = &fake.Buffer{}
 
-		provider = &fake.ModelProvider{}
+		provider = &fake.SchemaProvider{}
 		provider.TablesReturns([]string{"table1"}, nil)
 		provider.SchemaReturns(schemaDef, nil)
 
-		composer = &fake.ModelComposer{}
-		composer.ComposeReturns(reader, nil)
+		composer = &fake.ModelGenerator{}
+		composer.GenerateReturns(reader, nil)
 
 		executor = &sqlmodel.Executor{
 			Config: &sqlmodel.ExecutorConfig{
 				KeepSchema: true,
 			},
-			Provider: provider,
-			Composer: composer,
+			Provider:  provider,
+			Generator: composer,
 		}
 	})
 
 	Describe("Write", func() {
 		BeforeEach(func() {
 			reader := bytes.NewBufferString("source")
-			composer.ComposeReturns(reader, nil)
+			composer.GenerateReturns(reader, nil)
 		})
 
 		It("writes the generated source successfully", func() {
@@ -84,8 +84,8 @@ var _ = Describe("Executor", func() {
 			Expect(schemaName).To(Equal("public"))
 			Expect(tables).To(ContainElement("table1"))
 
-			Expect(composer.ComposeCallCount()).To(Equal(1))
-			packageName, schemaDefintion := composer.ComposeArgsForCall(0)
+			Expect(composer.GenerateCallCount()).To(Equal(1))
+			packageName, schemaDefintion := composer.GenerateArgsForCall(0)
 
 			Expect(packageName).To(Equal("entity"))
 			Expect(schemaDefintion).To(Equal(schemaDef))
@@ -98,8 +98,8 @@ var _ = Describe("Executor", func() {
 
 			It("uses the schema name as package name", func() {
 				Expect(executor.Write(ioutil.Discard, spec)).To(Succeed())
-				Expect(composer.ComposeCallCount()).To(Equal(1))
-				packageName, _ := composer.ComposeArgsForCall(0)
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				packageName, _ := composer.GenerateArgsForCall(0)
 
 				Expect(packageName).To(Equal(schemaDef.Name))
 			})
@@ -113,7 +113,7 @@ var _ = Describe("Executor", func() {
 			It("writes the generated source successfully", func() {
 				writer := &bytes.Buffer{}
 				reader := bytes.NewBufferString("source")
-				composer.ComposeReturns(reader, nil)
+				composer.GenerateReturns(reader, nil)
 
 				Expect(executor.Write(writer, spec)).To(Succeed())
 				Expect(writer.String()).To(Equal("source"))
@@ -127,8 +127,8 @@ var _ = Describe("Executor", func() {
 				Expect(schemaName).To(Equal("public"))
 				Expect(tables).To(ContainElement("table1"))
 
-				Expect(composer.ComposeCallCount()).To(Equal(1))
-				packageName, schemaDefintion := composer.ComposeArgsForCall(0)
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				packageName, schemaDefintion := composer.GenerateArgsForCall(0)
 
 				Expect(packageName).To(Equal("entity"))
 				Expect(schemaDefintion).To(Equal(schemaDef))
@@ -149,7 +149,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the composer fails", func() {
 			BeforeEach(func() {
-				composer.ComposeReturns(nil, fmt.Errorf("Oh no!"))
+				composer.GenerateReturns(nil, fmt.Errorf("Oh no!"))
 			})
 
 			It("returns the error", func() {
@@ -160,7 +160,7 @@ var _ = Describe("Executor", func() {
 		Context("when the copy fails", func() {
 			BeforeEach(func() {
 				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
-				composer.ComposeReturns(reader, nil)
+				composer.GenerateReturns(reader, nil)
 			})
 
 			It("returns the error", func() {
@@ -171,7 +171,7 @@ var _ = Describe("Executor", func() {
 
 	Describe("Create", func() {
 		BeforeEach(func() {
-			composer.ComposeReturns(bytes.NewBufferString("source"), nil)
+			composer.GenerateReturns(bytes.NewBufferString("source"), nil)
 		})
 
 		ItCreatesTheSchemaInRootPkg := func(filename, pkg string) {
@@ -190,8 +190,8 @@ var _ = Describe("Executor", func() {
 				Expect(schemaName).To(Equal("public"))
 				Expect(tables).To(ContainElement("table1"))
 
-				Expect(composer.ComposeCallCount()).To(Equal(1))
-				packageName, schemaDefintion := composer.ComposeArgsForCall(0)
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				packageName, schemaDefintion := composer.GenerateArgsForCall(0)
 
 				Expect(packageName).To(Equal(pkg))
 				Expect(schemaDefintion).To(Equal(schemaDef))
@@ -245,8 +245,8 @@ var _ = Describe("Executor", func() {
 				Expect(schemaName).To(Equal("public"))
 				Expect(tables).To(ContainElement("table1"))
 
-				Expect(composer.ComposeCallCount()).To(Equal(1))
-				packageName, schemaDefintion := composer.ComposeArgsForCall(0)
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				packageName, schemaDefintion := composer.GenerateArgsForCall(0)
 
 				Expect(packageName).To(Equal("entity"))
 				Expect(schemaDefintion).To(Equal(schemaDef))
@@ -294,7 +294,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the reader has empty content", func() {
 			BeforeEach(func() {
-				composer.ComposeReturns(&bytes.Buffer{}, nil)
+				composer.GenerateReturns(&bytes.Buffer{}, nil)
 			})
 
 			It("creates a package with generated source successfully", func() {
@@ -306,7 +306,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the composer fails", func() {
 			BeforeEach(func() {
-				composer.ComposeReturns(nil, fmt.Errorf("Oh no!"))
+				composer.GenerateReturns(nil, fmt.Errorf("Oh no!"))
 			})
 
 			It("returns the error", func() {
@@ -331,7 +331,7 @@ var _ = Describe("Executor", func() {
 		Context("when the copy fails", func() {
 			BeforeEach(func() {
 				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
-				composer.ComposeReturns(reader, nil)
+				composer.GenerateReturns(reader, nil)
 			})
 
 			It("returns the error", func() {

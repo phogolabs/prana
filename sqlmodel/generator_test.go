@@ -80,7 +80,7 @@ var _ = Describe("Generator", func() {
 			data, err = format.Source(data)
 			Expect(err).To(BeNil())
 
-			reader, err := generator.Compose("model", schemaDef)
+			reader, err := generator.Generate("model", schemaDef)
 			Expect(err).To(BeNil())
 
 			Expect(builder.BuildCallCount()).To(Equal(2))
@@ -117,7 +117,7 @@ var _ = Describe("Generator", func() {
 		})
 
 		It("generates the schema successfully", func() {
-			reader, err := generator.Compose("model", schemaDef)
+			reader, err := generator.Generate("model", schemaDef)
 			Expect(err).To(BeNil())
 
 			data, err := ioutil.ReadAll(reader)
@@ -132,7 +132,7 @@ var _ = Describe("Generator", func() {
 		})
 
 		It("generates the schema successfully", func() {
-			reader, err := generator.Compose("model", schemaDef)
+			reader, err := generator.Generate("model", schemaDef)
 			Expect(err).To(BeNil())
 
 			data, err := ioutil.ReadAll(reader)
@@ -150,7 +150,7 @@ var _ = Describe("Generator", func() {
 		})
 
 		It("generates the schema successfully", func() {
-			reader, err := generator.Compose("model", schemaDef)
+			reader, err := generator.Generate("model", schemaDef)
 			Expect(err).To(BeNil())
 
 			data, err := ioutil.ReadAll(reader)
@@ -165,7 +165,7 @@ var _ = Describe("Generator", func() {
 		})
 
 		It("generates the schema successfully", func() {
-			reader, err := generator.Compose("model", schemaDef)
+			reader, err := generator.Generate("model", schemaDef)
 			Expect(err).To(BeNil())
 
 			data, err := ioutil.ReadAll(reader)
@@ -176,7 +176,7 @@ var _ = Describe("Generator", func() {
 
 	Context("when the package name is not provided", func() {
 		It("returns an error", func() {
-			reader, err := generator.Compose("", schemaDef)
+			reader, err := generator.Generate("", schemaDef)
 			Expect(reader).To(BeNil())
 			Expect(err).To(MatchError("model:2:1: expected 'IDENT', found 'type'"))
 		})

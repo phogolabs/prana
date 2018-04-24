@@ -12,9 +12,9 @@ import (
 )
 
 var (
-	_ Provider = &PostgreSQLProvider{}
-	_ Provider = &MySQLProvider{}
-	_ Provider = &SQLiteProvider{}
+	_ SchemaProvider = &PostgreSQLProvider{}
+	_ SchemaProvider = &MySQLProvider{}
+	_ SchemaProvider = &SQLiteProvider{}
 )
 
 // PostgreSQLProvider represents a metadata provider for PostgreSQL
