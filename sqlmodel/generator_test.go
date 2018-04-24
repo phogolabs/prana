@@ -112,7 +112,7 @@ var _ = Describe("Generator", func() {
 			fmt.Fprint(w, "WHERE id = ?\n\n")
 			fmt.Fprintf(w, "-- name: delete-%s\n", t)
 			fmt.Fprintf(w, "DELETE FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = ?\n\n")
+			fmt.Fprint(w, "WHERE id = ?")
 
 			reader, err := generator.GenerateSQLScript(schemaDef)
 			Expect(err).To(BeNil())

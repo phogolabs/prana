@@ -224,7 +224,7 @@ func (g *Generator) writeSQLQueryDelete(w io.Writer, schema *Schema, table *Tabl
 	tableName := g.tableName(schema, table)
 	fmt.Fprintf(w, "-- name: delete-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "DELETE FROM %s\n", tableName)
-	fmt.Fprintf(w, "WHERE %s\n\n", g.pkCondition(table))
+	fmt.Fprintf(w, "WHERE %s", g.pkCondition(table))
 }
 
 func (g *Generator) writeSQLComment(w io.Writer) {
