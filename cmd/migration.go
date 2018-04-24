@@ -4,12 +4,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/apex/log"
-	"github.com/fatih/color"
 	"github.com/jmoiron/sqlx"
-	"github.com/olekukonko/tablewriter"
 	"github.com/phogolabs/oak/sqlmigr"
 	"github.com/phogolabs/parcello"
 	"github.com/urfave/cli"
@@ -198,51 +195,10 @@ func (m *SQLMigration) status(ctx *cli.Context) error {
 	}
 
 	if strings.EqualFold("json", ctx.GlobalString("log-format")) {
-		m.log(migrations)
+		sqlmigr.Flog(log.Log, migrations)
 		return nil
 	}
 
-	m.table(migrations)
+	sqlmigr.Ftable(os.Stdout, migrations)
 	return nil
-}
-
-func (m *SQLMigration) log(migrations []sqlmigr.Item) {
-	for _, m := range migrations {
-		status := "pending"
-		timestamp := ""
-
-		if !m.CreatedAt.IsZero() {
-			status = "executed"
-			timestamp = m.CreatedAt.Format(time.UnixDate)
-		}
-
-		fields := log.Fields{
-			"Id":          m.ID,
-			"Description": m.Description,
-			"Status":      status,
-			"CreatedAt":   timestamp,
-		}
-
-		log.WithFields(fields).Info("Migration")
-	}
-}
-
-func (m *SQLMigration) table(migrations []sqlmigr.Item) {
-	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Id", "Description", "Status", "Created At"})
-
-	for _, m := range migrations {
-		status := color.YellowString("pending")
-		timestamp := ""
-
-		if !m.CreatedAt.IsZero() {
-			status = color.GreenString("executed")
-			timestamp = m.CreatedAt.Format(time.UnixDate)
-		}
-
-		row := []string{m.ID, m.Description, status, timestamp}
-		table.Append(row)
-	}
-
-	table.Render()
 }

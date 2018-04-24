@@ -16,7 +16,7 @@ import (
 var _ = Describe("Generator", func() {
 	var (
 		generator *sqlmigr.Generator
-		item      *sqlmigr.Item
+		item      *sqlmigr.Migration
 		dir       string
 	)
 
@@ -32,7 +32,7 @@ var _ = Describe("Generator", func() {
 			FileSystem: parcello.Dir(dir),
 		}
 
-		item = &sqlmigr.Item{
+		item = &sqlmigr.Migration{
 			ID:          "20160102150",
 			Description: "schema",
 		}

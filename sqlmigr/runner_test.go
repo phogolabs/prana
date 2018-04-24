@@ -17,7 +17,7 @@ import (
 var _ = Describe("Runner", func() {
 	var (
 		runner *sqlmigr.Runner
-		item   *sqlmigr.Item
+		item   *sqlmigr.Migration
 		dir    string
 	)
 
@@ -36,7 +36,7 @@ var _ = Describe("Runner", func() {
 			DB:         db,
 		}
 
-		item = &sqlmigr.Item{
+		item = &sqlmigr.Migration{
 			ID:          "20160102150",
 			Description: "schema",
 		}

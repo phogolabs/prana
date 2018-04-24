@@ -10,7 +10,9 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-// Provider provides all sqlmigr for given project.
+var _ MigrationProvider = &Provider{}
+
+// Provider provides all migration for given project.
 type Provider struct {
 	// FileSystem represents the project directory file system.
 	FileSystem FileSystem
@@ -18,9 +20,9 @@ type Provider struct {
 	DB *sqlx.DB
 }
 
-// Migrations returns the project sqlmigrs.
-func (m *Provider) Migrations() ([]Item, error) {
-	sqlmigrs := []Item{}
+// Migrations returns the project migrations.
+func (m *Provider) Migrations() ([]Migration, error) {
+	local := []Migration{}
 
 	err := m.FileSystem.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info == nil {
@@ -41,46 +43,30 @@ func (m *Provider) Migrations() ([]Item, error) {
 			return err
 		}
 
-		sqlmigrs = append(sqlmigrs, *sqlmigr)
+		local = append(local, *sqlmigr)
 		return nil
 	})
 
 	if err != nil {
-		return []Item{}, err
+		return []Migration{}, err
 	}
 
-	applied := []Item{}
+	remote := []Migration{}
 
 	query := &bytes.Buffer{}
 	query.WriteString("SELECT id, description, created_at ")
 	query.WriteString("FROM migrations ")
 	query.WriteString("ORDER BY id ASC")
 
-	if err := m.DB.Select(&applied, query.String()); err != nil {
-		return []Item{}, err
+	if err := m.DB.Select(&remote, query.String()); err != nil {
+		return []Migration{}, err
 	}
 
-	for index, sqlmigr := range applied {
-		m := sqlmigrs[index]
-
-		if m.ID != sqlmigr.ID {
-			err = fmt.Errorf("Mismatched sqlmigr id. Expected: '%s' but has '%s'", sqlmigr.ID, m.ID)
-			return []Item{}, err
-		}
-
-		if m.Description != sqlmigr.Description {
-			err = fmt.Errorf("Mismatched sqlmigr description. Expected: '%s' but has '%s'", sqlmigr.Description, m.Description)
-			return []Item{}, err
-		}
-
-		sqlmigrs[index] = sqlmigr
-	}
-
-	return sqlmigrs, err
+	return m.merge(remote, local)
 }
 
 // Insert inserts executed sqlmigr item in the sqlmigrs table.
-func (m *Provider) Insert(item *Item) error {
+func (m *Provider) Insert(item *Migration) error {
 	item.CreatedAt = time.Now()
 
 	query := &bytes.Buffer{}
@@ -95,7 +81,7 @@ func (m *Provider) Insert(item *Item) error {
 }
 
 // Delete deletes applied sqlmigr item from sqlmigrs table.
-func (m *Provider) Delete(item *Item) error {
+func (m *Provider) Delete(item *Migration) error {
 	query := &bytes.Buffer{}
 	query.WriteString("DELETE FROM migrations ")
 	query.WriteString("WHERE id = ?")
@@ -108,7 +94,7 @@ func (m *Provider) Delete(item *Item) error {
 }
 
 // Exists returns true if the sqlmigr exists
-func (m *Provider) Exists(item *Item) bool {
+func (m *Provider) Exists(item *Migration) bool {
 	count := 0
 
 	if err := m.DB.Get(&count, "SELECT count(id) FROM migrations WHERE id = ?", item.ID); err != nil {
@@ -116,4 +102,24 @@ func (m *Provider) Exists(item *Item) bool {
 	}
 
 	return count == 1
+}
+
+func (m *Provider) merge(remote, local []Migration) ([]Migration, error) {
+	result := local
+
+	for index, r := range remote {
+		l := local[index]
+
+		if r.ID != l.ID {
+			return []Migration{}, fmt.Errorf("Mismatched migration id. Expected: '%s' but has '%s'", r.ID, l.ID)
+		}
+
+		if r.Description != l.Description {
+			return []Migration{}, fmt.Errorf("Mismatched migration description. Expected: '%s' but has '%s'", r.Description, l.Description)
+		}
+
+		result[index] = r
+	}
+
+	return result, nil
 }

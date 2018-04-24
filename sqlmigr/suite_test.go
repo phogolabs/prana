@@ -1,6 +1,7 @@
 package sqlmigr_test
 
 import (
+	"log"
 	"testing"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -10,6 +11,7 @@ import (
 )
 
 func TestMigration(t *testing.T) {
+	log.SetOutput(GinkgoWriter)
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Migration Suite")
 }

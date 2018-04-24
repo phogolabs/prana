@@ -9,6 +9,8 @@ import (
 	"github.com/phogolabs/oak/sqlexec"
 )
 
+var _ MigrationRunner = &Runner{}
+
 // Runner runs or reverts a given sqlmigr item.
 type Runner struct {
 	// FileSystem represents the project directory file system.
@@ -18,7 +20,7 @@ type Runner struct {
 }
 
 // Run runs a given sqlmigr item.
-func (r *Runner) Run(m *Item) error {
+func (r *Runner) Run(m *Migration) error {
 	if err := r.exec("up", m); err != nil {
 		return err
 	}
@@ -27,14 +29,14 @@ func (r *Runner) Run(m *Item) error {
 }
 
 // Revert reverts a given sqlmigr item.
-func (r *Runner) Revert(m *Item) error {
+func (r *Runner) Revert(m *Migration) error {
 	if err := r.exec("down", m); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (r *Runner) exec(step string, m *Item) error {
+func (r *Runner) exec(step string, m *Migration) error {
 	statements, err := r.command(step, m)
 	if err != nil {
 		return err
@@ -49,7 +51,7 @@ func (r *Runner) exec(step string, m *Item) error {
 	return nil
 }
 
-func (r *Runner) command(name string, m *Item) ([]string, error) {
+func (r *Runner) command(name string, m *Migration) ([]string, error) {
 	file, err := r.FileSystem.OpenFile(m.Filename(), os.O_RDONLY, 0)
 	if err != nil {
 		return nil, err

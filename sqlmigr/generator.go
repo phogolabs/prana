@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+var _ MigrationGenerator = &Generator{}
+
 // Generator generates a new sqlmigr file for given directory.
 type Generator struct {
 	// FileSystem is the file system where all sqlmigrs are created.
@@ -15,12 +17,12 @@ type Generator struct {
 }
 
 // Create creates a new sqlmigr.
-func (g *Generator) Create(m *Item) error {
+func (g *Generator) Create(m *Migration) error {
 	return g.Write(m, nil)
 }
 
 // Write creates a new sqlmigr for given content.
-func (g *Generator) Write(m *Item, content *Content) error {
+func (g *Generator) Write(m *Migration, content *Content) error {
 	buffer := &bytes.Buffer{}
 
 	fmt.Fprintln(buffer, "-- Auto-generated at", m.CreatedAt.Format(time.UnixDate))

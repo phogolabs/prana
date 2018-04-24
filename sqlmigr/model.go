@@ -12,9 +12,9 @@ import (
 	"github.com/phogolabs/parcello"
 )
 
-//go:generate counterfeiter -fake-name MigrationRunner -o ../fake/MigrationRunner.go . ItemRunner
-//go:generate counterfeiter -fake-name MigrationProvider -o ../fake/MigrationProvider.go . ItemProvider
-//go:generate counterfeiter -fake-name MigrationGenerator -o ../fake/MigrationGenerator.go . ItemGenerator
+//go:generate counterfeiter -fake-name MigrationRunner -o ../fake/MigrationRunner.go . MigrationRunner
+//go:generate counterfeiter -fake-name MigrationProvider -o ../fake/MigrationProvider.go . MigrationProvider
+//go:generate counterfeiter -fake-name MigrationGenerator -o ../fake/MigrationGenerator.go . MigrationGenerator
 
 var (
 	format = "20060102150405"
@@ -24,35 +24,35 @@ var (
 // FileSystem provides with primitives to work with the underlying file system
 type FileSystem = parcello.FileSystem
 
-// ItemRunner runs or reverts a given sqlmigr item.
-type ItemRunner interface {
+// MigrationRunner runs or reverts a given sqlmigr item.
+type MigrationRunner interface {
 	// Run runs a given sqlmigr item.
-	Run(item *Item) error
+	Run(item *Migration) error
 	// Revert reverts a given sqlmigr item.
-	Revert(item *Item) error
+	Revert(item *Migration) error
 }
 
-// ItemProvider provides all items.
-type ItemProvider interface {
+// MigrationProvider provides all items.
+type MigrationProvider interface {
 	// Migrations returns all sqlmigr items.
-	Migrations() ([]Item, error)
+	Migrations() ([]Migration, error)
 	// Insert inserts executed sqlmigr item in the sqlmigrs table.
-	Insert(item *Item) error
+	Insert(item *Migration) error
 	// Delete deletes applied sqlmigr item from sqlmigrs table.
-	Delete(item *Item) error
+	Delete(item *Migration) error
 	// Exists returns true if the sqlmigr exists
-	Exists(item *Item) bool
+	Exists(item *Migration) bool
 }
 
-// ItemGenerator generates a sqlmigr item file.
-type ItemGenerator interface {
+// MigrationGenerator generates a migration item file.
+type MigrationGenerator interface {
 	// Create creates a new sqlmigr.
-	Create(m *Item) error
+	Create(m *Migration) error
 	// Write creates a new sqlmigr for given content.
-	Write(m *Item, content *Content) error
+	Write(m *Migration, content *Content) error
 }
 
-// Content represents a sqlmigr content.
+// Content represents a migration content.
 type Content struct {
 	// UpCommand is the content for upgrade operation.
 	UpCommand io.Reader
@@ -60,8 +60,8 @@ type Content struct {
 	DownCommand io.Reader
 }
 
-// Item represents a single sqlmigr.
-type Item struct {
+// Migration represents a single migration record.
+type Migration struct {
 	// Id is the primary key for this sqlmigr
 	ID string `db:"id"`
 	// Description is the short description of this sqlmigr.
@@ -71,12 +71,12 @@ type Item struct {
 }
 
 // Filename returns the item filename
-func (m Item) Filename() string {
+func (m Migration) Filename() string {
 	return fmt.Sprintf("%s_%s.sql", m.ID, m.Description)
 }
 
 // Parse parses a given file path to a sqlmigr item.
-func Parse(path string) (*Item, error) {
+func Parse(path string) (*Migration, error) {
 	name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 	parts := strings.SplitN(name, "_", 2)
 	parseErr := fmt.Errorf("Migration '%s' has an invalid file name", path)
@@ -89,7 +89,7 @@ func Parse(path string) (*Item, error) {
 		return nil, parseErr
 	}
 
-	return &Item{
+	return &Migration{
 		ID:          parts[0],
 		Description: parts[1],
 	}, nil

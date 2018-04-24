@@ -119,7 +119,7 @@ var _ = Describe("Executor", func() {
 
 	Describe("Migrations", func() {
 		It("returns the migrations successfully", func() {
-			provider.MigrationsReturns([]sqlmigr.Item{{ID: "id-123"}}, nil)
+			provider.MigrationsReturns([]sqlmigr.Migration{{ID: "id-123"}}, nil)
 			sqlmigrs, err := executor.Migrations()
 			Expect(err).To(BeNil())
 			Expect(sqlmigrs).To(HaveLen(1))
@@ -129,7 +129,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]sqlmigr.Item{}, fmt.Errorf("oh no!"))
+				provider.MigrationsReturns([]sqlmigr.Migration{}, fmt.Errorf("oh no!"))
 				sqlmigrs, err := executor.Migrations()
 				Expect(err).To(MatchError("oh no!"))
 				Expect(sqlmigrs).To(BeEmpty())
@@ -151,7 +151,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when there are applied sqlmigrs", func() {
 			It("does not run any of the applied sqlmigrs", func() {
-				sqlmigrs := []sqlmigr.Item{
+				sqlmigrs := []sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -184,7 +184,7 @@ var _ = Describe("Executor", func() {
 			})
 
 			It("runs all sqlmigrs", func() {
-				sqlmigrs := []sqlmigr.Item{
+				sqlmigrs := []sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -219,7 +219,7 @@ var _ = Describe("Executor", func() {
 
 			Context("when the item name is wrong", func() {
 				It("returns an error", func() {
-					sqlmigrs := []sqlmigr.Item{
+					sqlmigrs := []sqlmigr.Migration{
 						{
 							ID:          "timestamp",
 							Description: "First",
@@ -236,10 +236,10 @@ var _ = Describe("Executor", func() {
 		})
 
 		Context("when the step is negative number", func() {
-			var sqlmigrs []sqlmigr.Item
+			var sqlmigrs []sqlmigr.Migration
 
 			BeforeEach(func() {
-				sqlmigrs = []sqlmigr.Item{
+				sqlmigrs = []sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -300,7 +300,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]sqlmigr.Item{}, fmt.Errorf("Oh no!"))
+				provider.MigrationsReturns([]sqlmigr.Migration{}, fmt.Errorf("Oh no!"))
 
 				cnt, err := executor.Run(1)
 				Expect(err).To(MatchError("Oh no!"))
@@ -322,7 +322,7 @@ var _ = Describe("Executor", func() {
 		})
 
 		It("revert all sqlmigrs", func() {
-			sqlmigrs := []sqlmigr.Item{
+			sqlmigrs := []sqlmigr.Migration{
 				{
 					ID:          "20060102150405",
 					Description: "First",
@@ -362,7 +362,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when there are pending sqlmigrs", func() {
 			It("does not revert any of the pending sqlmigrs", func() {
-				sqlmigrs := []sqlmigr.Item{
+				sqlmigrs := []sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -398,10 +398,10 @@ var _ = Describe("Executor", func() {
 		})
 
 		Context("when the step is negative number", func() {
-			var sqlmigrs []sqlmigr.Item
+			var sqlmigrs []sqlmigr.Migration
 
 			BeforeEach(func() {
-				sqlmigrs = []sqlmigr.Item{
+				sqlmigrs = []sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -450,7 +450,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the item name is wrong", func() {
 			It("returns an error", func() {
-				sqlmigrs := []sqlmigr.Item{
+				sqlmigrs := []sqlmigr.Migration{
 					{
 						ID:          "timestamp",
 						Description: "First",
@@ -467,7 +467,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]sqlmigr.Item{}, fmt.Errorf("Oh no!"))
+				provider.MigrationsReturns([]sqlmigr.Migration{}, fmt.Errorf("Oh no!"))
 
 				cnt, err := executor.Revert(1)
 				Expect(err).To(MatchError("Oh no!"))
@@ -476,7 +476,7 @@ var _ = Describe("Executor", func() {
 
 			Context("when the delete fails", func() {
 				It("returns the error", func() {
-					sqlmigrs := []sqlmigr.Item{
+					sqlmigrs := []sqlmigr.Migration{
 						{
 							ID:          "20060102150405",
 							Description: "First",

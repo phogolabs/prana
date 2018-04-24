@@ -8,33 +8,33 @@ import (
 )
 
 type MigrationProvider struct {
-	MigrationsStub        func() ([]sqlmigr.Item, error)
+	MigrationsStub        func() ([]sqlmigr.Migration, error)
 	migrationsMutex       sync.RWMutex
 	migrationsArgsForCall []struct{}
 	migrationsReturns     struct {
-		result1 []sqlmigr.Item
+		result1 []sqlmigr.Migration
 		result2 error
 	}
-	InsertStub        func(item *sqlmigr.Item) error
+	InsertStub        func(item *sqlmigr.Migration) error
 	insertMutex       sync.RWMutex
 	insertArgsForCall []struct {
-		item *sqlmigr.Item
+		item *sqlmigr.Migration
 	}
 	insertReturns struct {
 		result1 error
 	}
-	DeleteStub        func(item *sqlmigr.Item) error
+	DeleteStub        func(item *sqlmigr.Migration) error
 	deleteMutex       sync.RWMutex
 	deleteArgsForCall []struct {
-		item *sqlmigr.Item
+		item *sqlmigr.Migration
 	}
 	deleteReturns struct {
 		result1 error
 	}
-	ExistsStub        func(item *sqlmigr.Item) bool
+	ExistsStub        func(item *sqlmigr.Migration) bool
 	existsMutex       sync.RWMutex
 	existsArgsForCall []struct {
-		item *sqlmigr.Item
+		item *sqlmigr.Migration
 	}
 	existsReturns struct {
 		result1 bool
@@ -43,7 +43,7 @@ type MigrationProvider struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *MigrationProvider) Migrations() ([]sqlmigr.Item, error) {
+func (fake *MigrationProvider) Migrations() ([]sqlmigr.Migration, error) {
 	fake.migrationsMutex.Lock()
 	fake.migrationsArgsForCall = append(fake.migrationsArgsForCall, struct{}{})
 	fake.recordInvocation("Migrations", []interface{}{})
@@ -60,18 +60,18 @@ func (fake *MigrationProvider) MigrationsCallCount() int {
 	return len(fake.migrationsArgsForCall)
 }
 
-func (fake *MigrationProvider) MigrationsReturns(result1 []sqlmigr.Item, result2 error) {
+func (fake *MigrationProvider) MigrationsReturns(result1 []sqlmigr.Migration, result2 error) {
 	fake.MigrationsStub = nil
 	fake.migrationsReturns = struct {
-		result1 []sqlmigr.Item
+		result1 []sqlmigr.Migration
 		result2 error
 	}{result1, result2}
 }
 
-func (fake *MigrationProvider) Insert(item *sqlmigr.Item) error {
+func (fake *MigrationProvider) Insert(item *sqlmigr.Migration) error {
 	fake.insertMutex.Lock()
 	fake.insertArgsForCall = append(fake.insertArgsForCall, struct {
-		item *sqlmigr.Item
+		item *sqlmigr.Migration
 	}{item})
 	fake.recordInvocation("Insert", []interface{}{item})
 	fake.insertMutex.Unlock()
@@ -87,7 +87,7 @@ func (fake *MigrationProvider) InsertCallCount() int {
 	return len(fake.insertArgsForCall)
 }
 
-func (fake *MigrationProvider) InsertArgsForCall(i int) *sqlmigr.Item {
+func (fake *MigrationProvider) InsertArgsForCall(i int) *sqlmigr.Migration {
 	fake.insertMutex.RLock()
 	defer fake.insertMutex.RUnlock()
 	return fake.insertArgsForCall[i].item
@@ -100,10 +100,10 @@ func (fake *MigrationProvider) InsertReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *MigrationProvider) Delete(item *sqlmigr.Item) error {
+func (fake *MigrationProvider) Delete(item *sqlmigr.Migration) error {
 	fake.deleteMutex.Lock()
 	fake.deleteArgsForCall = append(fake.deleteArgsForCall, struct {
-		item *sqlmigr.Item
+		item *sqlmigr.Migration
 	}{item})
 	fake.recordInvocation("Delete", []interface{}{item})
 	fake.deleteMutex.Unlock()
@@ -119,7 +119,7 @@ func (fake *MigrationProvider) DeleteCallCount() int {
 	return len(fake.deleteArgsForCall)
 }
 
-func (fake *MigrationProvider) DeleteArgsForCall(i int) *sqlmigr.Item {
+func (fake *MigrationProvider) DeleteArgsForCall(i int) *sqlmigr.Migration {
 	fake.deleteMutex.RLock()
 	defer fake.deleteMutex.RUnlock()
 	return fake.deleteArgsForCall[i].item
@@ -132,10 +132,10 @@ func (fake *MigrationProvider) DeleteReturns(result1 error) {
 	}{result1}
 }
 
-func (fake *MigrationProvider) Exists(item *sqlmigr.Item) bool {
+func (fake *MigrationProvider) Exists(item *sqlmigr.Migration) bool {
 	fake.existsMutex.Lock()
 	fake.existsArgsForCall = append(fake.existsArgsForCall, struct {
-		item *sqlmigr.Item
+		item *sqlmigr.Migration
 	}{item})
 	fake.recordInvocation("Exists", []interface{}{item})
 	fake.existsMutex.Unlock()
@@ -151,7 +151,7 @@ func (fake *MigrationProvider) ExistsCallCount() int {
 	return len(fake.existsArgsForCall)
 }
 
-func (fake *MigrationProvider) ExistsArgsForCall(i int) *sqlmigr.Item {
+func (fake *MigrationProvider) ExistsArgsForCall(i int) *sqlmigr.Migration {
 	fake.existsMutex.RLock()
 	defer fake.existsMutex.RUnlock()
 	return fake.existsArgsForCall[i].item
@@ -190,4 +190,4 @@ func (fake *MigrationProvider) recordInvocation(key string, args []interface{}) 
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ sqlmigr.ItemProvider = new(MigrationProvider)
+var _ sqlmigr.MigrationProvider = new(MigrationProvider)

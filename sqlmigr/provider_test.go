@@ -63,7 +63,7 @@ var _ = Describe("Provider", func() {
 	Describe("Exists", func() {
 		Context("when the migrations exists", func() {
 			It("returns true", func() {
-				item := sqlmigr.Item{
+				item := sqlmigr.Migration{
 					ID:          "20060102150405",
 					Description: "schema",
 				}
@@ -73,7 +73,7 @@ var _ = Describe("Provider", func() {
 
 		Context("when the migration NOT exists", func() {
 			It("returns true", func() {
-				item := sqlmigr.Item{
+				item := sqlmigr.Migration{
 					ID:          "20070102150405",
 					Description: "schema",
 				}
@@ -88,7 +88,7 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				item := sqlmigr.Item{
+				item := sqlmigr.Migration{
 					ID:          "20070102150405",
 					Description: "schema",
 				}
@@ -100,14 +100,14 @@ var _ = Describe("Provider", func() {
 
 	Describe("Insert", func() {
 		It("inserts a sqlmigr item successfully", func() {
-			item := sqlmigr.Item{
+			item := sqlmigr.Migration{
 				ID:          "20070102150405",
 				Description: "trigger",
 			}
 
 			Expect(provider.Insert(&item)).To(Succeed())
 
-			items := []sqlmigr.Item{}
+			items := []sqlmigr.Migration{}
 			query := "SELECT * FROM migrations ORDER BY id ASC"
 
 			Expect(provider.DB.Select(&items, query)).To(Succeed())
@@ -126,7 +126,7 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				item := sqlmigr.Item{
+				item := sqlmigr.Migration{
 					ID:          "20070102150405",
 					Description: "trigger",
 				}
@@ -138,14 +138,14 @@ var _ = Describe("Provider", func() {
 
 	Describe("Delete", func() {
 		It("deletes a sqlmigr item successfully", func() {
-			item := sqlmigr.Item{
+			item := sqlmigr.Migration{
 				ID:          "20060102150405",
 				Description: "schema",
 			}
 
 			Expect(provider.Delete(&item)).To(Succeed())
 
-			items := []sqlmigr.Item{}
+			items := []sqlmigr.Migration{}
 			query := "SELECT * FROM migrations"
 
 			Expect(provider.DB.Select(&items, query)).To(Succeed())
@@ -158,7 +158,7 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns an error", func() {
-				item := sqlmigr.Item{
+				item := sqlmigr.Migration{
 					ID:          "20060102150405",
 					Description: "setup",
 				}
@@ -233,7 +233,7 @@ var _ = Describe("Provider", func() {
 			It("returns an error", func() {
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError("Mismatched sqlmigr id. Expected: '20060102150405' but has '20070102150405'"))
+				Expect(err).To(MatchError("Mismatched migration id. Expected: '20060102150405' but has '20070102150405'"))
 			})
 		})
 
@@ -247,7 +247,7 @@ var _ = Describe("Provider", func() {
 			It("returns an error", func() {
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError("Mismatched sqlmigr description. Expected: 'schema' but has 'tables'"))
+				Expect(err).To(MatchError("Mismatched migration description. Expected: 'schema' but has 'tables'"))
 			})
 		})
 	})

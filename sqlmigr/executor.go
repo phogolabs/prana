@@ -15,17 +15,17 @@ type Executor struct {
 	// Logger logs each execution step
 	Logger log.Interface
 	// Provider provides all sqlmigrs for the current project.
-	Provider ItemProvider
+	Provider MigrationProvider
 	// Runner runs or reverts sqlmigrs for the current project.
-	Runner ItemRunner
+	Runner MigrationRunner
 	// Generator generates a sqlmigr file.
-	Generator ItemGenerator
+	Generator MigrationGenerator
 }
 
 // Setup setups the current project for database sqlmigrs by creating
 // sqlmigr directory and related database.
 func (m *Executor) Setup() error {
-	sqlmigr := &Item{
+	sqlmigr := &Migration{
 		ID:          min.Format(format),
 		Description: "setup",
 		CreatedAt:   time.Now(),
@@ -62,12 +62,12 @@ func (m *Executor) Setup() error {
 
 // Create creates a sqlmigr script successfully if the project has already
 // been setup, otherwise returns an error.
-func (m *Executor) Create(name string) (*Item, error) {
+func (m *Executor) Create(name string) (*Migration, error) {
 	name = strings.Replace(name, " ", "_", -1)
 
 	timestamp := time.Now()
 
-	sqlmigr := &Item{
+	sqlmigr := &Migration{
 		ID:          timestamp.Format(format),
 		Description: name,
 		CreatedAt:   timestamp,
@@ -180,7 +180,7 @@ func (m *Executor) RevertAll() (int, error) {
 }
 
 // Migrations returns all sqlmigrs.
-func (m *Executor) Migrations() ([]Item, error) {
+func (m *Executor) Migrations() ([]Migration, error) {
 	return m.Provider.Migrations()
 }
 

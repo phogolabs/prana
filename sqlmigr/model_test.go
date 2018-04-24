@@ -7,9 +7,9 @@ import (
 )
 
 var _ = Describe("Model", func() {
-	Describe("Item", func() {
+	Describe("Migration", func() {
 		It("returns the filename correctly", func() {
-			item := &sqlmigr.Item{
+			item := &sqlmigr.Migration{
 				ID:          "id",
 				Description: "schema",
 			}
