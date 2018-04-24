@@ -1,4 +1,4 @@
-package model_test
+package sqlmodel_test
 
 import (
 	"bytes"
@@ -9,7 +9,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -72,7 +72,7 @@ func CreateTable(reader *bytes.Buffer) string {
 	return query.String()
 }
 
-func ExpectColumnsForPostgreSQL(columns []model.Column) {
+func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	column := columns[0]
 	Expect(column.Name).To(Equal("char_field_null"))
 	Expect(column.Type.Name).To(Equal("character"))
@@ -704,7 +704,7 @@ func ExpectColumnsForPostgreSQL(columns []model.Column) {
 	Expect(column.ScanType).To(Equal("string"))
 }
 
-func ExpectColumnsForMySQL(columns []model.Column) {
+func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column := columns[0]
 	Expect(column.Name).To(Equal("char_field_null"))
 	Expect(column.Type.Name).To(Equal("char"))
@@ -1300,7 +1300,7 @@ func ExpectColumnsForMySQL(columns []model.Column) {
 	Expect(column.ScanType).To(Equal("byte"))
 }
 
-func ExpectColumnsForSQLite(columns []model.Column) {
+func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	column := columns[0]
 	Expect(column.Name).To(Equal("char_field_null"))
 	Expect(column.Type.Name).To(Equal("char"))

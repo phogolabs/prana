@@ -1,4 +1,4 @@
-package model_test
+package sqlmodel_test
 
 import (
 	"bytes"
@@ -10,12 +10,12 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 )
 
 var _ = Describe("PostgreSQLProvider", func() {
 	var (
-		provider *model.PostgreSQLProvider
+		provider *sqlmodel.PostgreSQLProvider
 		db       *sqlx.DB
 	)
 
@@ -25,7 +25,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 		db, err = sqlx.Open("postgres", "postgres://localhost/oak?sslmode=disable")
 		Expect(err).NotTo(HaveOccurred())
 
-		provider = &model.PostgreSQLProvider{
+		provider = &sqlmodel.PostgreSQLProvider{
 			DB: db,
 		}
 	})
@@ -200,7 +200,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 var _ = Describe("MySQLProvider", func() {
 	var (
-		provider *model.MySQLProvider
+		provider *sqlmodel.MySQLProvider
 		db       *sqlx.DB
 	)
 
@@ -210,7 +210,7 @@ var _ = Describe("MySQLProvider", func() {
 		db, err = sqlx.Open("mysql", "root@/oak")
 		Expect(err).NotTo(HaveOccurred())
 
-		provider = &model.MySQLProvider{
+		provider = &sqlmodel.MySQLProvider{
 			DB: db,
 		}
 	})
@@ -370,7 +370,7 @@ var _ = Describe("MySQLProvider", func() {
 
 var _ = Describe("SQLiteProvider", func() {
 	var (
-		provider *model.SQLiteProvider
+		provider *sqlmodel.SQLiteProvider
 		db       *sqlx.DB
 	)
 
@@ -384,7 +384,7 @@ var _ = Describe("SQLiteProvider", func() {
 		db, err = sqlx.Open("sqlite3", conn)
 		Expect(err).NotTo(HaveOccurred())
 
-		provider = &model.SQLiteProvider{
+		provider = &sqlmodel.SQLiteProvider{
 			DB: db,
 		}
 	})

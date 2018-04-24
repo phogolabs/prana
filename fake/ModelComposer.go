@@ -5,15 +5,15 @@ import (
 	"io"
 	"sync"
 
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 )
 
 type ModelComposer struct {
-	ComposeStub        func(pkg string, sch *model.Schema) (io.Reader, error)
+	ComposeStub        func(pkg string, sch *sqlmodel.Schema) (io.Reader, error)
 	composeMutex       sync.RWMutex
 	composeArgsForCall []struct {
 		pkg string
-		sch *model.Schema
+		sch *sqlmodel.Schema
 	}
 	composeReturns struct {
 		result1 io.Reader
@@ -23,11 +23,11 @@ type ModelComposer struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ModelComposer) Compose(pkg string, sch *model.Schema) (io.Reader, error) {
+func (fake *ModelComposer) Compose(pkg string, sch *sqlmodel.Schema) (io.Reader, error) {
 	fake.composeMutex.Lock()
 	fake.composeArgsForCall = append(fake.composeArgsForCall, struct {
 		pkg string
-		sch *model.Schema
+		sch *sqlmodel.Schema
 	}{pkg, sch})
 	fake.recordInvocation("Compose", []interface{}{pkg, sch})
 	fake.composeMutex.Unlock()
@@ -43,7 +43,7 @@ func (fake *ModelComposer) ComposeCallCount() int {
 	return len(fake.composeArgsForCall)
 }
 
-func (fake *ModelComposer) ComposeArgsForCall(i int) (string, *model.Schema) {
+func (fake *ModelComposer) ComposeArgsForCall(i int) (string, *sqlmodel.Schema) {
 	fake.composeMutex.RLock()
 	defer fake.composeMutex.RUnlock()
 	return fake.composeArgsForCall[i].pkg, fake.composeArgsForCall[i].sch
@@ -77,4 +77,4 @@ func (fake *ModelComposer) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ model.Composer = new(ModelComposer)
+var _ sqlmodel.Composer = new(ModelComposer)

@@ -1,4 +1,4 @@
-package model_test
+package sqlmodel_test
 
 import (
 	"bytes"
@@ -9,27 +9,27 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 )
 
 var _ = Describe("Executor", func() {
 	var (
-		executor  *model.Executor
-		spec      *model.Spec
+		executor  *sqlmodel.Executor
+		spec      *sqlmodel.Spec
 		provider  *fake.ModelProvider
 		composer  *fake.ModelComposer
 		reader    *fake.Buffer
-		schemaDef *model.Schema
+		schemaDef *sqlmodel.Schema
 	)
 
 	BeforeEach(func() {
-		schemaDef = &model.Schema{
+		schemaDef = &sqlmodel.Schema{
 			Name:      "public",
 			IsDefault: true,
-			Tables: []model.Table{
+			Tables: []sqlmodel.Table{
 				{
 					Name: "table1",
-					Columns: []model.Column{
+					Columns: []sqlmodel.Column{
 						{
 							Name:     "ID",
 							ScanType: "string",
@@ -42,7 +42,7 @@ var _ = Describe("Executor", func() {
 		dir, err := ioutil.TempDir("", "oak")
 		Expect(err).To(BeNil())
 
-		spec = &model.Spec{
+		spec = &sqlmodel.Spec{
 			Schema: "public",
 			Tables: []string{"table1"},
 			Dir:    filepath.Join(dir, "entity"),
@@ -57,8 +57,8 @@ var _ = Describe("Executor", func() {
 		composer = &fake.ModelComposer{}
 		composer.ComposeReturns(reader, nil)
 
-		executor = &model.Executor{
-			Config: &model.ExecutorConfig{
+		executor = &sqlmodel.Executor{
+			Config: &sqlmodel.ExecutorConfig{
 				KeepSchema: true,
 			},
 			Provider: provider,

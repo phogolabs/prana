@@ -4,14 +4,14 @@ package fake
 import (
 	"sync"
 
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 )
 
 type ModelTagBuilder struct {
-	BuildStub        func(column *model.Column) string
+	BuildStub        func(column *sqlmodel.Column) string
 	buildMutex       sync.RWMutex
 	buildArgsForCall []struct {
-		column *model.Column
+		column *sqlmodel.Column
 	}
 	buildReturns struct {
 		result1 string
@@ -20,10 +20,10 @@ type ModelTagBuilder struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ModelTagBuilder) Build(column *model.Column) string {
+func (fake *ModelTagBuilder) Build(column *sqlmodel.Column) string {
 	fake.buildMutex.Lock()
 	fake.buildArgsForCall = append(fake.buildArgsForCall, struct {
-		column *model.Column
+		column *sqlmodel.Column
 	}{column})
 	fake.recordInvocation("Build", []interface{}{column})
 	fake.buildMutex.Unlock()
@@ -39,7 +39,7 @@ func (fake *ModelTagBuilder) BuildCallCount() int {
 	return len(fake.buildArgsForCall)
 }
 
-func (fake *ModelTagBuilder) BuildArgsForCall(i int) *model.Column {
+func (fake *ModelTagBuilder) BuildArgsForCall(i int) *sqlmodel.Column {
 	fake.buildMutex.RLock()
 	defer fake.buildMutex.RUnlock()
 	return fake.buildArgsForCall[i].column
@@ -72,4 +72,4 @@ func (fake *ModelTagBuilder) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ model.TagBuilder = new(ModelTagBuilder)
+var _ sqlmodel.TagBuilder = new(ModelTagBuilder)

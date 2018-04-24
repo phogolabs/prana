@@ -1,21 +1,21 @@
-package model_test
+package sqlmodel_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 )
 
 var _ = Describe("Model", func() {
 	Describe("TypeDef", func() {
 		It("returns the type name", func() {
-			def := &model.TypeDef{Type: "int"}
+			def := &sqlmodel.TypeDef{Type: "int"}
 			Expect(def.As(false)).To(Equal("int"))
 		})
 
 		Context("when the type is nullable", func() {
 			It("returns the nullable type name", func() {
-				def := &model.TypeDef{
+				def := &sqlmodel.TypeDef{
 					Type:         "int",
 					NullableType: "null.int",
 				}
@@ -25,10 +25,10 @@ var _ = Describe("Model", func() {
 	})
 
 	Describe("ColumnType", func() {
-		var columnType model.ColumnType
+		var columnType sqlmodel.ColumnType
 
 		BeforeEach(func() {
-			columnType = model.ColumnType{
+			columnType = sqlmodel.ColumnType{
 				Name:          "varchar",
 				IsPrimaryKey:  true,
 				IsNullable:    true,

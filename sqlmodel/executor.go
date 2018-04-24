@@ -1,4 +1,4 @@
-package model
+package sqlmodel
 
 import (
 	"fmt"
@@ -18,13 +18,13 @@ type ExecutorConfig struct {
 type Executor struct {
 	// Config of the executor
 	Config *ExecutorConfig
-	// Composer is the model generator
+	// Composer is the sqlmodel generator
 	Composer Composer
 	// Provider provides information the database schema
 	Provider Provider
 }
 
-// Write writes the generated schema models to a writer
+// Write writes the generated schema sqlmodels to a writer
 func (e *Executor) Write(w io.Writer, spec *Spec) error {
 	schema, err := e.schemaOf(spec)
 	if err != nil {
@@ -42,7 +42,7 @@ func (e *Executor) Write(w io.Writer, spec *Spec) error {
 	return err
 }
 
-// Create creates a package with the generated schema models
+// Create creates a package with the generated schema sqlmodels
 func (e *Executor) Create(spec *Spec) (string, error) {
 	schema, err := e.schemaOf(spec)
 	if err != nil {

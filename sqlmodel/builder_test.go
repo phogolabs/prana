@@ -1,16 +1,16 @@
-package model_test
+package sqlmodel_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 )
 
 var _ = Describe("CompositeTagBuilder", func() {
 	It("delegate the build operation to underlying builders", func() {
-		builder := model.CompositeTagBuilder{}
+		builder := sqlmodel.CompositeTagBuilder{}
 
 		builder1 := &fake.ModelTagBuilder{}
 		builder1.BuildReturns("tag1")
@@ -20,7 +20,7 @@ var _ = Describe("CompositeTagBuilder", func() {
 		builder2.BuildReturns("tag2")
 		builder = append(builder, builder2)
 
-		column := &model.Column{}
+		column := &sqlmodel.Column{}
 		Expect(builder.Build(column)).To(Equal("`tag1 tag2`"))
 
 		Expect(builder1.BuildCallCount()).To(Equal(1))
@@ -32,7 +32,7 @@ var _ = Describe("CompositeTagBuilder", func() {
 
 	Context("when some of the builders return an space string", func() {
 		It("skips the result", func() {
-			builder := model.CompositeTagBuilder{}
+			builder := sqlmodel.CompositeTagBuilder{}
 
 			builder1 := &fake.ModelTagBuilder{}
 			builder1.BuildReturns(" ")
@@ -42,7 +42,7 @@ var _ = Describe("CompositeTagBuilder", func() {
 			builder2.BuildReturns(" tag2")
 			builder = append(builder, builder2)
 
-			column := &model.Column{}
+			column := &sqlmodel.Column{}
 			Expect(builder.Build(column)).To(Equal("`tag2`"))
 
 			Expect(builder1.BuildCallCount()).To(Equal(1))
@@ -56,15 +56,15 @@ var _ = Describe("CompositeTagBuilder", func() {
 
 var _ = Describe("SQLXTagBuilder", func() {
 	var (
-		column  *model.Column
-		builder *model.SQLXTagBuilder
+		column  *sqlmodel.Column
+		builder *sqlmodel.SQLXTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &model.SQLXTagBuilder{}
-		column = &model.Column{
+		builder = &sqlmodel.SQLXTagBuilder{}
+		column = &sqlmodel.Column{
 			Name: "id",
-			Type: model.ColumnType{},
+			Type: sqlmodel.ColumnType{},
 		}
 	})
 
@@ -115,15 +115,15 @@ var _ = Describe("SQLXTagBuilder", func() {
 
 var _ = Describe("GORMTagBuilder", func() {
 	var (
-		column  *model.Column
-		builder *model.GORMTagBuilder
+		column  *sqlmodel.Column
+		builder *sqlmodel.GORMTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &model.GORMTagBuilder{}
-		column = &model.Column{
+		builder = &sqlmodel.GORMTagBuilder{}
+		column = &sqlmodel.Column{
 			Name: "id",
-			Type: model.ColumnType{
+			Type: sqlmodel.ColumnType{
 				Name: "db_type",
 			},
 		}
@@ -187,13 +187,13 @@ var _ = Describe("GORMTagBuilder", func() {
 
 var _ = Describe("JSONTagBuilder", func() {
 	var (
-		column  *model.Column
-		builder *model.JSONTagBuilder
+		column  *sqlmodel.Column
+		builder *sqlmodel.JSONTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &model.JSONTagBuilder{}
-		column = &model.Column{
+		builder = &sqlmodel.JSONTagBuilder{}
+		column = &sqlmodel.Column{
 			Name: "id",
 		}
 	})
@@ -205,13 +205,13 @@ var _ = Describe("JSONTagBuilder", func() {
 
 var _ = Describe("XMLTagBuilder", func() {
 	var (
-		column  *model.Column
-		builder *model.XMLTagBuilder
+		column  *sqlmodel.Column
+		builder *sqlmodel.XMLTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &model.XMLTagBuilder{}
-		column = &model.Column{
+		builder = &sqlmodel.XMLTagBuilder{}
+		column = &sqlmodel.Column{
 			Name: "id",
 		}
 	})
@@ -223,13 +223,13 @@ var _ = Describe("XMLTagBuilder", func() {
 
 var _ = Describe("ValidateTagBuilder", func() {
 	var (
-		column  *model.Column
-		builder *model.ValidateTagBuilder
+		column  *sqlmodel.Column
+		builder *sqlmodel.ValidateTagBuilder
 	)
 
 	BeforeEach(func() {
-		builder = &model.ValidateTagBuilder{}
-		column = &model.Column{
+		builder = &sqlmodel.ValidateTagBuilder{}
+		column = &sqlmodel.Column{
 			Name: "id",
 		}
 	})

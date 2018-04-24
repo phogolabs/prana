@@ -1,5 +1,5 @@
-// Package model provides primitives for generating structs from database schema
-package model
+// Package sqlmodel provides primitives for generating structs from database schema
+package sqlmodel
 
 import (
 	"fmt"
@@ -102,7 +102,7 @@ type Provider interface {
 	Schema(schema string, tables ...string) (*Schema, error)
 }
 
-// Composer composes the models
+// Composer composes the sqlmodels
 type Composer interface {
 	// Compose generates the golang structs from database schema
 	Compose(pkg string, sch *Schema) (io.Reader, error)
@@ -210,7 +210,7 @@ type Spec struct {
 	Schema string
 	// Tables is the list of the desired tables from the database schema
 	Tables []string
-	// Dir is a path to root model package directory
+	// Dir is a path to root sqlmodel package directory
 	Dir string
 }
 

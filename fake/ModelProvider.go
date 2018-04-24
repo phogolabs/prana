@@ -4,7 +4,7 @@ package fake
 import (
 	"sync"
 
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 )
 
 type ModelProvider struct {
@@ -17,14 +17,14 @@ type ModelProvider struct {
 		result1 []string
 		result2 error
 	}
-	SchemaStub        func(schema string, tables ...string) (*model.Schema, error)
+	SchemaStub        func(schema string, tables ...string) (*sqlmodel.Schema, error)
 	schemaMutex       sync.RWMutex
 	schemaArgsForCall []struct {
 		schema string
 		tables []string
 	}
 	schemaReturns struct {
-		result1 *model.Schema
+		result1 *sqlmodel.Schema
 		result2 error
 	}
 	invocations      map[string][][]interface{}
@@ -64,7 +64,7 @@ func (fake *ModelProvider) TablesReturns(result1 []string, result2 error) {
 	}{result1, result2}
 }
 
-func (fake *ModelProvider) Schema(schema string, tables ...string) (*model.Schema, error) {
+func (fake *ModelProvider) Schema(schema string, tables ...string) (*sqlmodel.Schema, error) {
 	fake.schemaMutex.Lock()
 	fake.schemaArgsForCall = append(fake.schemaArgsForCall, struct {
 		schema string
@@ -90,10 +90,10 @@ func (fake *ModelProvider) SchemaArgsForCall(i int) (string, []string) {
 	return fake.schemaArgsForCall[i].schema, fake.schemaArgsForCall[i].tables
 }
 
-func (fake *ModelProvider) SchemaReturns(result1 *model.Schema, result2 error) {
+func (fake *ModelProvider) SchemaReturns(result1 *sqlmodel.Schema, result2 error) {
 	fake.SchemaStub = nil
 	fake.schemaReturns = struct {
-		result1 *model.Schema
+		result1 *sqlmodel.Schema
 		result2 error
 	}{result1, result2}
 }
@@ -120,4 +120,4 @@ func (fake *ModelProvider) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ model.Provider = new(ModelProvider)
+var _ sqlmodel.Provider = new(ModelProvider)

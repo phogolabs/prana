@@ -1,4 +1,4 @@
-package model_test
+package sqlmodel_test
 
 import (
 	"bytes"
@@ -9,29 +9,29 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/oak/fake"
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 	"golang.org/x/tools/imports"
 )
 
 var _ = Describe("Generator", func() {
 	var (
-		generator *model.Generator
+		generator *sqlmodel.Generator
 		builder   *fake.ModelTagBuilder
-		schemaDef *model.Schema
+		schemaDef *sqlmodel.Schema
 	)
 
 	BeforeEach(func() {
-		schemaDef = &model.Schema{
+		schemaDef = &sqlmodel.Schema{
 			Name:      "schema",
 			IsDefault: true,
-			Tables: []model.Table{
+			Tables: []sqlmodel.Table{
 				{
 					Name: "table1",
-					Columns: []model.Column{
+					Columns: []sqlmodel.Column{
 						{
 							Name:     "id",
 							ScanType: "string",
-							Type: model.ColumnType{
+							Type: sqlmodel.ColumnType{
 								Name:          "varchar",
 								IsPrimaryKey:  true,
 								IsNullable:    true,
@@ -41,7 +41,7 @@ var _ = Describe("Generator", func() {
 						{
 							Name:     "name",
 							ScanType: "string",
-							Type: model.ColumnType{
+							Type: sqlmodel.ColumnType{
 								Name:          "varchar",
 								IsPrimaryKey:  false,
 								IsNullable:    false,
@@ -55,9 +55,9 @@ var _ = Describe("Generator", func() {
 
 		builder = &fake.ModelTagBuilder{}
 		builder.BuildReturns("`db`")
-		generator = &model.Generator{
+		generator = &sqlmodel.Generator{
 			TagBuilder: builder,
-			Config: &model.GeneratorConfig{
+			Config: &sqlmodel.GeneratorConfig{
 				KeepSchema: true,
 				InlcudeDoc: false,
 			},
@@ -161,7 +161,7 @@ var _ = Describe("Generator", func() {
 
 	Context("when no tables are provided", func() {
 		BeforeEach(func() {
-			schemaDef.Tables = []model.Table{}
+			schemaDef.Tables = []sqlmodel.Table{}
 		})
 
 		It("generates the schema successfully", func() {

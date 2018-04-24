@@ -7,14 +7,14 @@ import (
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/oak/model"
+	"github.com/phogolabs/oak/sqlmodel"
 	"github.com/urfave/cli"
 )
 
 // SQLModel provides a subcommands to work generate structs from existing schema
 type SQLModel struct {
 	db       *sqlx.DB
-	executor *model.Executor
+	executor *sqlmodel.Executor
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
@@ -97,14 +97,14 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 	}
 
 	m.db = db
-	m.executor = &model.Executor{
-		Config: &model.ExecutorConfig{
+	m.executor = &sqlmodel.Executor{
+		Config: &sqlmodel.ExecutorConfig{
 			KeepSchema: ctx.Bool("keep-schema-as-package"),
 		},
 		Provider: provider,
-		Composer: &model.Generator{
+		Composer: &sqlmodel.Generator{
 			TagBuilder: builder,
-			Config: &model.GeneratorConfig{
+			Config: &sqlmodel.GeneratorConfig{
 				KeepSchema:   ctx.Bool("keep-schema-as-package"),
 				InlcudeDoc:   ctx.BoolT("include-docs"),
 				IgnoreTables: ctx.StringSlice("ignore-table-name"),
@@ -115,23 +115,23 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLModel) provider(db *sqlx.DB) (model.Provider, error) {
+func (m *SQLModel) provider(db *sqlx.DB) (sqlmodel.Provider, error) {
 	switch db.DriverName() {
 	case "sqlite3":
-		return &model.SQLiteProvider{DB: db}, nil
+		return &sqlmodel.SQLiteProvider{DB: db}, nil
 	case "postgres":
-		return &model.PostgreSQLProvider{DB: db}, nil
+		return &sqlmodel.PostgreSQLProvider{DB: db}, nil
 	case "mysql":
-		return &model.MySQLProvider{DB: db}, nil
+		return &sqlmodel.MySQLProvider{DB: db}, nil
 	default:
 		err := fmt.Errorf("Cannot find provider for database driver '%s'", db.DriverName())
 		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
 	}
 }
 
-func (m *SQLModel) builder(ctx *cli.Context) (model.TagBuilder, error) {
+func (m *SQLModel) builder(ctx *cli.Context) (sqlmodel.TagBuilder, error) {
 	registered := make(map[string]struct{})
-	builder := model.CompositeTagBuilder{}
+	builder := sqlmodel.CompositeTagBuilder{}
 
 	tags := []string{}
 	tags = append(tags, ctx.String("orm-tag"))
@@ -146,15 +146,15 @@ func (m *SQLModel) builder(ctx *cli.Context) (model.TagBuilder, error) {
 
 		switch strings.ToLower(tag) {
 		case "sqlx":
-			builder = append(builder, model.SQLXTagBuilder{})
+			builder = append(builder, sqlmodel.SQLXTagBuilder{})
 		case "gorm":
-			builder = append(builder, model.GORMTagBuilder{})
+			builder = append(builder, sqlmodel.GORMTagBuilder{})
 		case "json":
-			builder = append(builder, model.JSONTagBuilder{})
+			builder = append(builder, sqlmodel.JSONTagBuilder{})
 		case "xml":
-			builder = append(builder, model.XMLTagBuilder{})
+			builder = append(builder, sqlmodel.XMLTagBuilder{})
 		case "validate":
-			builder = append(builder, model.ValidateTagBuilder{})
+			builder = append(builder, sqlmodel.ValidateTagBuilder{})
 		default:
 			err := fmt.Errorf("Cannot find tag builder for '%s'", tag)
 			return nil, cli.NewExitError(err.Error(), ErrCodeArg)
@@ -172,7 +172,7 @@ func (m *SQLModel) after(ctx *cli.Context) error {
 }
 
 func (m *SQLModel) print(ctx *cli.Context) error {
-	spec := &model.Spec{
+	spec := &sqlmodel.Spec{
 		Dir:    ctx.GlobalString("package-dir"),
 		Schema: ctx.GlobalString("schema-name"),
 		Tables: ctx.GlobalStringSlice("table-name"),
@@ -186,7 +186,7 @@ func (m *SQLModel) print(ctx *cli.Context) error {
 }
 
 func (m *SQLModel) sync(ctx *cli.Context) error {
-	spec := &model.Spec{
+	spec := &sqlmodel.Spec{
 		Dir:    ctx.GlobalString("package-dir"),
 		Schema: ctx.GlobalString("schema-name"),
 		Tables: ctx.GlobalStringSlice("table-name"),
