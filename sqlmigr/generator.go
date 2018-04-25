@@ -29,7 +29,6 @@ func (g *Generator) Write(m *Migration, content *Content) error {
 	fmt.Fprintln(buffer, "-- Please do not change the name attributes")
 	fmt.Fprintln(buffer)
 	fmt.Fprintln(buffer, "-- name: up")
-	fmt.Fprintln(buffer)
 
 	if content != nil {
 		if _, err := io.Copy(buffer, content.UpCommand); err != nil {
@@ -38,7 +37,6 @@ func (g *Generator) Write(m *Migration, content *Content) error {
 	}
 
 	fmt.Fprintln(buffer, "-- name: down")
-	fmt.Fprintln(buffer)
 
 	if content != nil {
 		if _, err := io.Copy(buffer, content.DownCommand); err != nil {

@@ -41,8 +41,10 @@ func (m *Executor) Setup() error {
 	fmt.Fprintln(up, " description TEXT      NOT NULL,")
 	fmt.Fprintln(up, " created_at  TIMESTAMP NOT NULL")
 	fmt.Fprintln(up, ");")
+	fmt.Fprintln(up)
 
 	down := bytes.NewBufferString("DROP TABLE IF EXISTS migrations;")
+	fmt.Fprintln(down)
 
 	content := &Content{
 		UpCommand:   up,

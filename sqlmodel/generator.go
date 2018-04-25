@@ -172,14 +172,14 @@ func (g *QueryGenerator) Generate(ctx *GeneratorContext) error {
 func (g *QueryGenerator) writeSQLQuerySelectAll(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	fmt.Fprintf(w, "-- name: select-all-%s\n", g.commandName(tableName, false))
-	fmt.Fprintf(w, "SELECT * FROM %s\n\n", tableName)
+	fmt.Fprintf(w, "SELECT * FROM %s;\n\n", tableName)
 }
 
 func (g *QueryGenerator) writeSQLQuerySelect(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	fmt.Fprintf(w, "-- name: select-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "SELECT * FROM %s\n", tableName)
-	fmt.Fprintf(w, "WHERE %s\n\n", g.pkCondition(table))
+	fmt.Fprintf(w, "WHERE %s;\n\n", g.pkCondition(table))
 }
 
 func (g *QueryGenerator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Table) {
@@ -187,7 +187,7 @@ func (g *QueryGenerator) writeSQLQueryInsert(w io.Writer, schema *Schema, table 
 	columns, values := g.insertParam(table)
 	fmt.Fprintf(w, "-- name: insert-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "INSERT INTO %s (%s)\n", tableName, columns)
-	fmt.Fprintf(w, "VALUES (%s)\n\n", values)
+	fmt.Fprintf(w, "VALUES (%s);\n\n", values)
 }
 
 func (g *QueryGenerator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table *Table) {
@@ -196,14 +196,14 @@ func (g *QueryGenerator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table 
 	fmt.Fprintf(w, "-- name: update-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "UPDATE %s\n", tableName)
 	fmt.Fprintf(w, "SET %s\n", values)
-	fmt.Fprintf(w, "WHERE %s\n\n", condition)
+	fmt.Fprintf(w, "WHERE %s;\n\n", condition)
 }
 
 func (g *QueryGenerator) writeSQLQueryDelete(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	fmt.Fprintf(w, "-- name: delete-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "DELETE FROM %s\n", tableName)
-	fmt.Fprintf(w, "WHERE %s", g.pkCondition(table))
+	fmt.Fprintf(w, "WHERE %s;", g.pkCondition(table))
 }
 
 func (g *QueryGenerator) writeSQLComment(w io.Writer) {

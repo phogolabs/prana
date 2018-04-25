@@ -234,20 +234,20 @@ var _ = Describe("QueryGenerator", func() {
 			w := &bytes.Buffer{}
 			t := strings.Replace(table, ".", "-", -1)
 			fmt.Fprintf(w, "-- name: select-all-%s\n", t)
-			fmt.Fprintf(w, "SELECT * FROM %s\n\n", table)
+			fmt.Fprintf(w, "SELECT * FROM %s;\n\n", table)
 			fmt.Fprintf(w, "-- name: select-%s\n", t)
 			fmt.Fprintf(w, "SELECT * FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = ?\n\n")
+			fmt.Fprint(w, "WHERE id = ?;\n\n")
 			fmt.Fprintf(w, "-- name: insert-%s\n", t)
 			fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
-			fmt.Fprint(w, "VALUES (?, ?)\n\n")
+			fmt.Fprint(w, "VALUES (?, ?);\n\n")
 			fmt.Fprintf(w, "-- name: update-%s\n", t)
 			fmt.Fprintf(w, "UPDATE %s\n", table)
 			fmt.Fprint(w, "SET name = ?\n")
-			fmt.Fprint(w, "WHERE id = ?\n\n")
+			fmt.Fprint(w, "WHERE id = ?;\n\n")
 			fmt.Fprintf(w, "-- name: delete-%s\n", t)
 			fmt.Fprintf(w, "DELETE FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = ?")
+			fmt.Fprint(w, "WHERE id = ?;")
 
 			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
@@ -281,20 +281,20 @@ var _ = Describe("QueryGenerator", func() {
 			w := &bytes.Buffer{}
 			t := strings.Replace(table, ".", "-", -1)
 			fmt.Fprintf(w, "-- name: select-all-%s\n", t)
-			fmt.Fprintf(w, "SELECT * FROM %s\n\n", table)
+			fmt.Fprintf(w, "SELECT * FROM %s;\n\n", table)
 			fmt.Fprintf(w, "-- name: select-%s\n", t)
 			fmt.Fprintf(w, "SELECT * FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = :id\n\n")
+			fmt.Fprint(w, "WHERE id = :id;\n\n")
 			fmt.Fprintf(w, "-- name: insert-%s\n", t)
 			fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
-			fmt.Fprint(w, "VALUES (:id, :name)\n\n")
+			fmt.Fprint(w, "VALUES (:id, :name);\n\n")
 			fmt.Fprintf(w, "-- name: update-%s\n", t)
 			fmt.Fprintf(w, "UPDATE %s\n", table)
 			fmt.Fprint(w, "SET name = :name\n")
-			fmt.Fprint(w, "WHERE id = :id\n\n")
+			fmt.Fprint(w, "WHERE id = :id;\n\n")
 			fmt.Fprintf(w, "-- name: delete-%s\n", t)
 			fmt.Fprintf(w, "DELETE FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = :id")
+			fmt.Fprint(w, "WHERE id = :id;")
 
 			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{

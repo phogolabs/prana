@@ -57,11 +57,12 @@ var _ = Describe("Executor", func() {
 			fmt.Fprintln(up, " description TEXT      NOT NULL,")
 			fmt.Fprintln(up, " created_at  TIMESTAMP NOT NULL")
 			fmt.Fprintln(up, ");")
+			fmt.Fprintln(up)
 			Expect(string(data)).To(Equal(up.String()))
 
 			data, err = ioutil.ReadAll(content.DownCommand)
 			Expect(err).NotTo(HaveOccurred())
-			Expect(string(data)).To(Equal("DROP TABLE IF EXISTS migrations;"))
+			Expect(string(data)).To(Equal("DROP TABLE IF EXISTS migrations;\n"))
 
 			Expect(runner.RunCallCount()).To(Equal(1))
 			item = runner.RunArgsForCall(0)
