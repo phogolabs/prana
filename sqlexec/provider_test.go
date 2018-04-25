@@ -9,9 +9,9 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlexec"
-	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Provider", func() {
@@ -84,7 +84,7 @@ var _ = Describe("Provider", func() {
 		It("skips non sql files", func() {
 			data := []byte{}
 			node := &parcello.Node{
-				Name:    "file.sql",
+				Name:    "file.txt",
 				Content: &data,
 				Mutex:   &sync.RWMutex{},
 			}
