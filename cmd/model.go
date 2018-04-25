@@ -96,23 +96,25 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 		return err
 	}
 
-	config := &sqlmodel.GeneratorConfig{
-		KeepSchema:   ctx.Bool("keep-schema"),
-		InlcudeDoc:   ctx.BoolT("include-docs"),
-		IgnoreTables: ctx.StringSlice("ignore-table-name"),
-	}
-
 	m.executor = &sqlmodel.Executor{
 		Config: &sqlmodel.ExecutorConfig{
 			KeepSchema: ctx.Bool("keep-schema"),
 		},
 		Provider: provider,
 		QueryGenerator: &sqlmodel.QueryGenerator{
-			Config: config,
+			Config: &sqlmodel.QueryGeneratorConfig{
+				UseNamedParams: ctx.Bool("use-named-params"),
+				InlcudeDoc:     ctx.BoolT("include-docs"),
+				IgnoreTables:   ctx.StringSlice("ignore-table-name"),
+			},
 		},
 		ModelGenerator: &sqlmodel.ModelGenerator{
 			TagBuilder: builder,
-			Config:     config,
+			Config: &sqlmodel.ModelGeneratorConfig{
+				KeepSchema:   ctx.Bool("keep-schema"),
+				InlcudeDoc:   ctx.BoolT("include-docs"),
+				IgnoreTables: ctx.StringSlice("ignore-table-name"),
+			},
 		},
 	}
 

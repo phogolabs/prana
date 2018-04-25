@@ -58,7 +58,7 @@ var _ = Describe("ModelGenerator", func() {
 
 		generator = &sqlmodel.ModelGenerator{
 			TagBuilder: builder,
-			Config: &sqlmodel.GeneratorConfig{
+			Config: &sqlmodel.ModelGeneratorConfig{
 				KeepSchema: true,
 				InlcudeDoc: false,
 			},
@@ -223,8 +223,7 @@ var _ = Describe("QueryGenerator", func() {
 		}
 
 		generator = &sqlmodel.QueryGenerator{
-			Config: &sqlmodel.GeneratorConfig{
-				KeepSchema: true,
+			Config: &sqlmodel.QueryGeneratorConfig{
 				InlcudeDoc: false,
 			},
 		}
@@ -262,21 +261,50 @@ var _ = Describe("QueryGenerator", func() {
 		})
 	}
 
-	ItGeneratesTheScriptSuccessfully("schema.table1")
+	ItGeneratesTheScriptSuccessfully("table1")
 
-	Context("when KeepSchema is disabled", func() {
+	Context("when the schema is not default", func() {
 		BeforeEach(func() {
-			generator.Config.KeepSchema = false
+			schemaDef.IsDefault = false
 		})
 
-		ItGeneratesTheScriptSuccessfully("table1")
+		ItGeneratesTheScriptSuccessfully("schema.table1")
+	})
 
-		Context("when the schema is not default", func() {
-			BeforeEach(func() {
-				schemaDef.IsDefault = false
-			})
+	Context("when named parameters are used", func() {
+		BeforeEach(func() {
+			generator.Config.UseNamedParams = true
+		})
 
-			ItGeneratesTheScriptSuccessfully("schema.table1")
+		It("generates the SQL script successfully", func() {
+			table := "table1"
+			w := &bytes.Buffer{}
+			t := strings.Replace(table, ".", "-", -1)
+			fmt.Fprintf(w, "-- name: select-all-%s\n", t)
+			fmt.Fprintf(w, "SELECT * FROM %s\n\n", table)
+			fmt.Fprintf(w, "-- name: select-%s\n", t)
+			fmt.Fprintf(w, "SELECT * FROM %s\n", table)
+			fmt.Fprint(w, "WHERE id = :id\n\n")
+			fmt.Fprintf(w, "-- name: insert-%s\n", t)
+			fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
+			fmt.Fprint(w, "VALUES (:id, :name)\n\n")
+			fmt.Fprintf(w, "-- name: update-%s\n", t)
+			fmt.Fprintf(w, "UPDATE %s\n", table)
+			fmt.Fprint(w, "SET name = :name\n")
+			fmt.Fprint(w, "WHERE id = :id\n\n")
+			fmt.Fprintf(w, "-- name: delete-%s\n", t)
+			fmt.Fprintf(w, "DELETE FROM %s\n", table)
+			fmt.Fprint(w, "WHERE id = :id")
+
+			reader := &bytes.Buffer{}
+			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
+				Package: "model",
+				Schema:  schemaDef,
+			}
+
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(Equal(w.String()))
 		})
 	})
 

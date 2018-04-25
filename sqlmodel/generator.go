@@ -21,7 +21,7 @@ type ModelGenerator struct {
 	// TagBuilder builds struct tags from column type
 	TagBuilder TagBuilder
 	// Config controls how the code generation happens
-	Config *GeneratorConfig
+	Config *ModelGeneratorConfig
 }
 
 // Generate generates the golang structs from database schema
@@ -145,7 +145,7 @@ func (g *ModelGenerator) format(buffer *bytes.Buffer) error {
 // QueryGenerator generates queries for give schema
 type QueryGenerator struct {
 	// Config controls how the code generation happens
-	Config *GeneratorConfig
+	Config *QueryGeneratorConfig
 }
 
 // Generate generates a script for given schema
@@ -223,7 +223,7 @@ func (g *QueryGenerator) commandName(name string, singularize bool) string {
 func (g *QueryGenerator) tableName(schema *Schema, table *Table) string {
 	name := table.Name
 
-	if !schema.IsDefault || g.Config.KeepSchema {
+	if !schema.IsDefault {
 		name = fmt.Sprintf("%s.%s", schema.Name, name)
 	}
 
@@ -231,40 +231,69 @@ func (g *QueryGenerator) tableName(schema *Schema, table *Table) string {
 }
 
 func (g *QueryGenerator) insertParam(table *Table) (string, string) {
-	columns := []string{}
-	values := []string{}
+	var (
+		columns []string
+		values  []string
+		param   string
+	)
 
 	for _, column := range table.Columns {
 		columns = append(columns, column.Name)
-		values = append(values, "?")
+
+		if g.Config.UseNamedParams {
+			param = fmt.Sprintf(":%s", column.Name)
+		} else {
+			param = "?"
+		}
+
+		values = append(values, param)
 	}
 
 	return strings.Join(columns, ", "), strings.Join(values, ", ")
 }
 
 func (g *QueryGenerator) updateParam(table *Table) (string, string) {
-	values := []string{}
-	conditions := []string{}
+	var (
+		values     []string
+		conditions []string
+		param      string
+	)
 
 	for _, column := range table.Columns {
-		if column.Type.IsPrimaryKey {
-			conditions = append(conditions, fmt.Sprintf("%s = ?", column.Name))
-			continue
+		if g.Config.UseNamedParams {
+			param = fmt.Sprintf("%s = :%s", column.Name, column.Name)
+		} else {
+			param = fmt.Sprintf("%s = ?", column.Name)
 		}
-		values = append(values, fmt.Sprintf("%s = ?", column.Name))
+
+		if column.Type.IsPrimaryKey {
+			conditions = append(conditions, param)
+		} else {
+			values = append(values, param)
+		}
 	}
 
 	return strings.Join(conditions, ", "), strings.Join(values, ", ")
 }
 
 func (g *QueryGenerator) pkCondition(table *Table) string {
-	conditions := []string{}
+	var (
+		conditions []string
+		param      string
+	)
 
 	for _, column := range table.Columns {
 		if !column.Type.IsPrimaryKey {
 			continue
 		}
-		conditions = append(conditions, fmt.Sprintf("%s = ?", column.Name))
+
+		if g.Config.UseNamedParams {
+			param = fmt.Sprintf("%s = :%s", column.Name, column.Name)
+		} else {
+			param = fmt.Sprintf("%s = ?", column.Name)
+		}
+
+		conditions = append(conditions, param)
 	}
 
 	return strings.Join(conditions, " AND ")

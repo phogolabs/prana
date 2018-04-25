@@ -114,10 +114,20 @@ type GeneratorContext struct {
 	Schema *Schema
 }
 
-// GeneratorConfig controls how the code generation happens
-type GeneratorConfig struct {
+// ModelGeneratorConfig controls how the code generation happens
+type ModelGeneratorConfig struct {
 	// KeepSchema controlls whether the database schema to be kept as package
 	KeepSchema bool
+	// InlcudeDoc determines whether to include documentation
+	InlcudeDoc bool
+	// IgnoreTables ecludes the those tables from generation
+	IgnoreTables []string
+}
+
+// QueryGeneratorConfig controls how the code generation happens
+type QueryGeneratorConfig struct {
+	// UseNamedParams determines whether to use named params
+	UseNamedParams bool
 	// InlcudeDoc determines whether to include documentation
 	InlcudeDoc bool
 	// IgnoreTables ecludes the those tables from generation

@@ -56,8 +56,8 @@ func (m *SQLScript) CreateCommand() cli.Command {
 						Value: &cli.StringSlice{"migrations"},
 					},
 					cli.BoolFlag{
-						Name:  "keep-schema, k",
-						Usage: "keep the schema name for the default schema",
+						Name:  "use-named-params, n",
+						Usage: "use named parameter instead of questionmark",
 					},
 					cli.BoolTFlag{
 						Name:  "include-docs, d",
