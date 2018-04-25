@@ -23,6 +23,11 @@ type PostgreSQLProvider struct {
 	DB *sqlx.DB
 }
 
+// Close closes connection to the db
+func (m *PostgreSQLProvider) Close() error {
+	return m.DB.Close()
+}
+
 // Tables returns all tables for this schema
 func (m *PostgreSQLProvider) Tables(schema string) ([]string, error) {
 	schema = m.nameOf(schema)
@@ -161,6 +166,11 @@ type SQLiteProvider struct {
 	DB *sqlx.DB
 }
 
+// Close closes connection to the db
+func (m *SQLiteProvider) Close() error {
+	return m.DB.Close()
+}
+
 // Tables returns all tables for this schema
 func (m *SQLiteProvider) Tables(schema string) ([]string, error) {
 	tables := []string{}
@@ -284,6 +294,11 @@ func (m *SQLiteProvider) create(info *sqliteInf) ColumnType {
 type MySQLProvider struct {
 	// DB is a connection to PostgreSQL database
 	DB *sqlx.DB
+}
+
+// Close closes connection to the db
+func (m *MySQLProvider) Close() error {
+	return m.DB.Close()
 }
 
 // Tables returns all tables for this schema

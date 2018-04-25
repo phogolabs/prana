@@ -14,7 +14,6 @@ import (
 // SQLModel provides a subcommands to work generate structs from existing schema
 type SQLModel struct {
 	skip     bool
-	db       *sqlx.DB
 	executor *sqlmodel.Executor
 }
 
@@ -103,7 +102,6 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 		IgnoreTables: ctx.StringSlice("ignore-table-name"),
 	}
 
-	m.db = db
 	m.executor = &sqlmodel.Executor{
 		Config: &sqlmodel.ExecutorConfig{
 			KeepSchema: ctx.Bool("keep-schema"),
@@ -173,7 +171,7 @@ func (m *SQLModel) builder(ctx *cli.Context) (sqlmodel.TagBuilder, error) {
 }
 
 func (m *SQLModel) after(ctx *cli.Context) error {
-	if err := m.db.Close(); err != nil {
+	if err := m.executor.Provider.Close(); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeSchema)
 	}
 	return nil

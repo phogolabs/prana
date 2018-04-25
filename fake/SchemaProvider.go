@@ -27,6 +27,12 @@ type SchemaProvider struct {
 		result1 *sqlmodel.Schema
 		result2 error
 	}
+	CloseStub        func() error
+	closeMutex       sync.RWMutex
+	closeArgsForCall []struct{}
+	closeReturns     struct {
+		result1 error
+	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
@@ -98,6 +104,30 @@ func (fake *SchemaProvider) SchemaReturns(result1 *sqlmodel.Schema, result2 erro
 	}{result1, result2}
 }
 
+func (fake *SchemaProvider) Close() error {
+	fake.closeMutex.Lock()
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
+	fake.recordInvocation("Close", []interface{}{})
+	fake.closeMutex.Unlock()
+	if fake.CloseStub != nil {
+		return fake.CloseStub()
+	}
+	return fake.closeReturns.result1
+}
+
+func (fake *SchemaProvider) CloseCallCount() int {
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return len(fake.closeArgsForCall)
+}
+
+func (fake *SchemaProvider) CloseReturns(result1 error) {
+	fake.CloseStub = nil
+	fake.closeReturns = struct {
+		result1 error
+	}{result1}
+}
+
 func (fake *SchemaProvider) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
@@ -105,6 +135,8 @@ func (fake *SchemaProvider) Invocations() map[string][][]interface{} {
 	defer fake.tablesMutex.RUnlock()
 	fake.schemaMutex.RLock()
 	defer fake.schemaMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
 	return fake.invocations
 }
 

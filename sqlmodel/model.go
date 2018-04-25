@@ -100,6 +100,8 @@ type SchemaProvider interface {
 	Tables(schema string) ([]string, error)
 	// Schema returns the schema definition
 	Schema(schema string, tables ...string) (*Schema, error)
+	// Close closes connection to the db
+	Close() error
 }
 
 // GeneratorContext is the generator's context
