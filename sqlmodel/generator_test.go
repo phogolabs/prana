@@ -247,7 +247,7 @@ var _ = Describe("QueryGenerator", func() {
 			fmt.Fprint(w, "WHERE id = ?;\n\n")
 			fmt.Fprintf(w, "-- name: delete-%s\n", t)
 			fmt.Fprintf(w, "DELETE FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = ?;")
+			fmt.Fprint(w, "WHERE id = ?;\n")
 
 			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
@@ -294,7 +294,7 @@ var _ = Describe("QueryGenerator", func() {
 			fmt.Fprint(w, "WHERE id = :id;\n\n")
 			fmt.Fprintf(w, "-- name: delete-%s\n", t)
 			fmt.Fprintf(w, "DELETE FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = :id;")
+			fmt.Fprint(w, "WHERE id = :id;\n")
 
 			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
