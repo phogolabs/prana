@@ -18,8 +18,10 @@ type ExecutorConfig struct {
 type Executor struct {
 	// Config of the executor
 	Config *ExecutorConfig
-	// Generator is the sqlmodel generator
-	Generator ModelGenerator
+	// ModelGenerator is the SQL model generator
+	ModelGenerator Generator
+	// QueryGenerator is the SQL script generator
+	QueryGenerator Generator
 	// Provider provides information the database schema
 	Provider SchemaProvider
 }
@@ -31,9 +33,12 @@ func (e *Executor) Write(w io.Writer, spec *Spec) error {
 		return err
 	}
 
-	pkg := e.packageOf(schema, spec)
-	r, err := e.Generator.GenerateModel(pkg, schema)
+	ctx := &GeneratorContext{
+		Package: e.packageOf(schema, spec),
+		Schema:  schema,
+	}
 
+	r, err := e.ModelGenerator.Generate(ctx)
 	if err != nil {
 		return err
 	}
@@ -49,7 +54,12 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", err
 	}
 
-	reader, err := e.Generator.GenerateModel(e.packageOf(schema, spec), schema)
+	ctx := &GeneratorContext{
+		Package: e.packageOf(schema, spec),
+		Schema:  schema,
+	}
+
+	reader, err := e.ModelGenerator.Generate(ctx)
 	if err != nil {
 		return "", err
 	}
@@ -93,7 +103,11 @@ func (e *Executor) CreateScript(spec *Spec) (string, error) {
 		return "", err
 	}
 
-	reader, err := e.Generator.GenerateSQLScript(schema)
+	ctx := &GeneratorContext{
+		Package: e.packageOf(schema, spec),
+		Schema:  schema,
+	}
+	reader, err := e.QueryGenerator.Generate(ctx)
 	if err != nil {
 		return "", err
 	}

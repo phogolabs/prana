@@ -91,7 +91,7 @@ var (
 )
 
 //go:generate counterfeiter -fake-name SchemaProvider -o ../fake/SchemaProvider.go . SchemaProvider
-//go:generate counterfeiter -fake-name ModelGenerator -o ../fake/ModelGenerator.go . ModelGenerator
+//go:generate counterfeiter -fake-name ModelGenerator -o ../fake/ModelGenerator.go . Generator
 //go:generate counterfeiter -fake-name TagBuilder -o ../fake/TagBuilder.go . TagBuilder
 
 // SchemaProvider provides a metadata for database schema
@@ -102,12 +102,28 @@ type SchemaProvider interface {
 	Schema(schema string, tables ...string) (*Schema, error)
 }
 
-// ModelGenerator generates the sqlmodels
-type ModelGenerator interface {
-	// GenerateModel generates the golang structs from database schema
-	GenerateModel(pkg string, sch *Schema) (io.Reader, error)
-	// GenerateSQLScript generates the SQL script that contains CRUD operations
-	GenerateSQLScript(sch *Schema) (io.Reader, error)
+// GeneratorContext is the generator's context
+type GeneratorContext struct {
+	// Package name
+	Package string
+	// Schema definition
+	Schema *Schema
+}
+
+// GeneratorConfig controls how the code generation happens
+type GeneratorConfig struct {
+	// KeepSchema controlls whether the database schema to be kept as package
+	KeepSchema bool
+	// InlcudeDoc determines whether to include documentation
+	InlcudeDoc bool
+	// IgnoreTables ecludes the those tables from generation
+	IgnoreTables []string
+}
+
+// Generator generates the sqlmodels
+type Generator interface {
+	// Generate generates a model or script
+	Generate(ctx *GeneratorContext) (io.Reader, error)
 }
 
 // Schema represents a database schema

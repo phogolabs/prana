@@ -9,22 +9,12 @@ import (
 )
 
 type ModelGenerator struct {
-	GenerateModelStub        func(pkg string, sch *sqlmodel.Schema) (io.Reader, error)
-	generateModelMutex       sync.RWMutex
-	generateModelArgsForCall []struct {
-		pkg string
-		sch *sqlmodel.Schema
+	GenerateStub        func(ctx *sqlmodel.GeneratorContext) (io.Reader, error)
+	generateMutex       sync.RWMutex
+	generateArgsForCall []struct {
+		ctx *sqlmodel.GeneratorContext
 	}
-	generateModelReturns struct {
-		result1 io.Reader
-		result2 error
-	}
-	GenerateSQLScriptStub        func(sch *sqlmodel.Schema) (io.Reader, error)
-	generateSQLScriptMutex       sync.RWMutex
-	generateSQLScriptArgsForCall []struct {
-		sch *sqlmodel.Schema
-	}
-	generateSQLScriptReturns struct {
+	generateReturns struct {
 		result1 io.Reader
 		result2 error
 	}
@@ -32,68 +22,34 @@ type ModelGenerator struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ModelGenerator) GenerateModel(pkg string, sch *sqlmodel.Schema) (io.Reader, error) {
-	fake.generateModelMutex.Lock()
-	fake.generateModelArgsForCall = append(fake.generateModelArgsForCall, struct {
-		pkg string
-		sch *sqlmodel.Schema
-	}{pkg, sch})
-	fake.recordInvocation("GenerateModel", []interface{}{pkg, sch})
-	fake.generateModelMutex.Unlock()
-	if fake.GenerateModelStub != nil {
-		return fake.GenerateModelStub(pkg, sch)
+func (fake *ModelGenerator) Generate(ctx *sqlmodel.GeneratorContext) (io.Reader, error) {
+	fake.generateMutex.Lock()
+	fake.generateArgsForCall = append(fake.generateArgsForCall, struct {
+		ctx *sqlmodel.GeneratorContext
+	}{ctx})
+	fake.recordInvocation("Generate", []interface{}{ctx})
+	fake.generateMutex.Unlock()
+	if fake.GenerateStub != nil {
+		return fake.GenerateStub(ctx)
 	}
-	return fake.generateModelReturns.result1, fake.generateModelReturns.result2
+	return fake.generateReturns.result1, fake.generateReturns.result2
 }
 
-func (fake *ModelGenerator) GenerateModelCallCount() int {
-	fake.generateModelMutex.RLock()
-	defer fake.generateModelMutex.RUnlock()
-	return len(fake.generateModelArgsForCall)
+func (fake *ModelGenerator) GenerateCallCount() int {
+	fake.generateMutex.RLock()
+	defer fake.generateMutex.RUnlock()
+	return len(fake.generateArgsForCall)
 }
 
-func (fake *ModelGenerator) GenerateModelArgsForCall(i int) (string, *sqlmodel.Schema) {
-	fake.generateModelMutex.RLock()
-	defer fake.generateModelMutex.RUnlock()
-	return fake.generateModelArgsForCall[i].pkg, fake.generateModelArgsForCall[i].sch
+func (fake *ModelGenerator) GenerateArgsForCall(i int) *sqlmodel.GeneratorContext {
+	fake.generateMutex.RLock()
+	defer fake.generateMutex.RUnlock()
+	return fake.generateArgsForCall[i].ctx
 }
 
-func (fake *ModelGenerator) GenerateModelReturns(result1 io.Reader, result2 error) {
-	fake.GenerateModelStub = nil
-	fake.generateModelReturns = struct {
-		result1 io.Reader
-		result2 error
-	}{result1, result2}
-}
-
-func (fake *ModelGenerator) GenerateSQLScript(sch *sqlmodel.Schema) (io.Reader, error) {
-	fake.generateSQLScriptMutex.Lock()
-	fake.generateSQLScriptArgsForCall = append(fake.generateSQLScriptArgsForCall, struct {
-		sch *sqlmodel.Schema
-	}{sch})
-	fake.recordInvocation("GenerateSQLScript", []interface{}{sch})
-	fake.generateSQLScriptMutex.Unlock()
-	if fake.GenerateSQLScriptStub != nil {
-		return fake.GenerateSQLScriptStub(sch)
-	}
-	return fake.generateSQLScriptReturns.result1, fake.generateSQLScriptReturns.result2
-}
-
-func (fake *ModelGenerator) GenerateSQLScriptCallCount() int {
-	fake.generateSQLScriptMutex.RLock()
-	defer fake.generateSQLScriptMutex.RUnlock()
-	return len(fake.generateSQLScriptArgsForCall)
-}
-
-func (fake *ModelGenerator) GenerateSQLScriptArgsForCall(i int) *sqlmodel.Schema {
-	fake.generateSQLScriptMutex.RLock()
-	defer fake.generateSQLScriptMutex.RUnlock()
-	return fake.generateSQLScriptArgsForCall[i].sch
-}
-
-func (fake *ModelGenerator) GenerateSQLScriptReturns(result1 io.Reader, result2 error) {
-	fake.GenerateSQLScriptStub = nil
-	fake.generateSQLScriptReturns = struct {
+func (fake *ModelGenerator) GenerateReturns(result1 io.Reader, result2 error) {
+	fake.GenerateStub = nil
+	fake.generateReturns = struct {
 		result1 io.Reader
 		result2 error
 	}{result1, result2}
@@ -102,10 +58,8 @@ func (fake *ModelGenerator) GenerateSQLScriptReturns(result1 io.Reader, result2 
 func (fake *ModelGenerator) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
-	fake.generateModelMutex.RLock()
-	defer fake.generateModelMutex.RUnlock()
-	fake.generateSQLScriptMutex.RLock()
-	defer fake.generateSQLScriptMutex.RUnlock()
+	fake.generateMutex.RLock()
+	defer fake.generateMutex.RUnlock()
 	return fake.invocations
 }
 
@@ -121,4 +75,4 @@ func (fake *ModelGenerator) recordInvocation(key string, args []interface{}) {
 	fake.invocations[key] = append(fake.invocations[key], args)
 }
 
-var _ sqlmodel.ModelGenerator = new(ModelGenerator)
+var _ sqlmodel.Generator = new(ModelGenerator)

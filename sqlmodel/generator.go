@@ -13,30 +13,23 @@ import (
 	"golang.org/x/tools/imports"
 )
 
-var _ ModelGenerator = &Generator{}
+var _ Generator = &ModelGenerator{}
+var _ Generator = &QueryGenerator{}
 
-// GeneratorConfig controls how the code generation happens
-type GeneratorConfig struct {
-	// KeepSchema controlls whether the database schema to be kept as package
-	KeepSchema bool
-	// InlcudeDoc determines whether to include documentation
-	InlcudeDoc bool
-	// IgnoreTables ecludes the those tables from generation
-	IgnoreTables []string
-}
-
-// Generator generates Golang structs from database schema
-type Generator struct {
+// ModelGenerator generates Golang structs from database schema
+type ModelGenerator struct {
 	// TagBuilder builds struct tags from column type
 	TagBuilder TagBuilder
 	// Config controls how the code generation happens
 	Config *GeneratorConfig
 }
 
-// GenerateModel generates the golang structs from database schema
-func (g *Generator) GenerateModel(pkg string, schema *Schema) (io.Reader, error) {
+// Generate generates the golang structs from database schema
+func (g *ModelGenerator) Generate(ctx *GeneratorContext) (io.Reader, error) {
+	pkg := ctx.Package
+	schema := ctx.Schema
 	buffer := &bytes.Buffer{}
-	tables := g.tables(schema)
+	tables := tables(g.Config.IgnoreTables, schema)
 
 	if len(tables) == 0 {
 		return buffer, nil
@@ -55,39 +48,7 @@ func (g *Generator) GenerateModel(pkg string, schema *Schema) (io.Reader, error)
 	return buffer, nil
 }
 
-// GenerateSQLScript generates a script for given schema
-func (g *Generator) GenerateSQLScript(schema *Schema) (io.Reader, error) {
-	buffer := &bytes.Buffer{}
-	g.writeSQLComment(buffer)
-
-	tables := g.tables(schema)
-
-	for _, table := range tables {
-		g.writeSQLQuerySelectAll(buffer, schema, &table)
-		g.writeSQLQuerySelect(buffer, schema, &table)
-		g.writeSQLQueryInsert(buffer, schema, &table)
-		g.writeSQLQueryUpdate(buffer, schema, &table)
-		g.writeSQLQueryDelete(buffer, schema, &table)
-	}
-
-	return buffer, nil
-}
-
-func (g *Generator) tables(schema *Schema) []Table {
-	tables := []Table{}
-	ignore := g.ignore()
-
-	for _, table := range schema.Tables {
-		if index := sort.SearchStrings(ignore, table.Name); index >= 0 && index < len(ignore) {
-			continue
-		}
-
-		tables = append(tables, table)
-	}
-	return tables
-}
-
-func (g *Generator) writePackage(pkg, name string, buffer io.Writer) {
+func (g *ModelGenerator) writePackage(pkg, name string, buffer io.Writer) {
 	if g.Config.InlcudeDoc {
 		fmt.Fprintf(buffer, "// Package %s contains an object model of database schema '%s'", pkg, name)
 		fmt.Fprintln(buffer)
@@ -99,7 +60,7 @@ func (g *Generator) writePackage(pkg, name string, buffer io.Writer) {
 	fmt.Fprintln(buffer)
 }
 
-func (g *Generator) writeTable(pkg string, isDefaultSchema bool, table *Table, buffer io.Writer) {
+func (g *ModelGenerator) writeTable(pkg string, isDefaultSchema bool, table *Table, buffer io.Writer) {
 	columns := table.Columns
 	length := len(columns)
 	typeName := g.typeName(pkg, isDefaultSchema, table)
@@ -141,17 +102,7 @@ func (g *Generator) writeTable(pkg string, isDefaultSchema bool, table *Table, b
 	}
 }
 
-func (g *Generator) ignore() []string {
-	ignore := g.Config.IgnoreTables
-
-	if !sort.StringsAreSorted(ignore) {
-		sort.Strings(ignore)
-	}
-
-	return ignore
-}
-
-func (g *Generator) typeName(pkg string, isDefaultSchema bool, table *Table) string {
+func (g *ModelGenerator) typeName(pkg string, isDefaultSchema bool, table *Table) string {
 	name := inflect.Camelize(table.Name)
 	name = inflect.Singularize(name)
 
@@ -163,17 +114,17 @@ func (g *Generator) typeName(pkg string, isDefaultSchema bool, table *Table) str
 	return name
 }
 
-func (g *Generator) fieldName(column *Column) string {
+func (g *ModelGenerator) fieldName(column *Column) string {
 	name := inflect.Camelize(column.Name)
 	name = strings.Replace(name, "Id", "ID", -1)
 	return name
 }
 
-func (g *Generator) fieldType(column *Column) string {
+func (g *ModelGenerator) fieldType(column *Column) string {
 	return column.ScanType
 }
 
-func (g *Generator) format(buffer *bytes.Buffer) error {
+func (g *ModelGenerator) format(buffer *bytes.Buffer) error {
 	data, err := imports.Process("model", buffer.Bytes(), nil)
 	if err != nil {
 		return err
@@ -190,20 +141,45 @@ func (g *Generator) format(buffer *bytes.Buffer) error {
 	return err
 }
 
-func (g *Generator) writeSQLQuerySelectAll(w io.Writer, schema *Schema, table *Table) {
+// QueryGenerator generates queries for give schema
+type QueryGenerator struct {
+	// Config controls how the code generation happens
+	Config *GeneratorConfig
+}
+
+// Generate generates a script for given schema
+func (g *QueryGenerator) Generate(ctx *GeneratorContext) (io.Reader, error) {
+	schema := ctx.Schema
+	buffer := &bytes.Buffer{}
+	g.writeSQLComment(buffer)
+
+	tables := tables(g.Config.IgnoreTables, schema)
+
+	for _, table := range tables {
+		g.writeSQLQuerySelectAll(buffer, schema, &table)
+		g.writeSQLQuerySelect(buffer, schema, &table)
+		g.writeSQLQueryInsert(buffer, schema, &table)
+		g.writeSQLQueryUpdate(buffer, schema, &table)
+		g.writeSQLQueryDelete(buffer, schema, &table)
+	}
+
+	return buffer, nil
+}
+
+func (g *QueryGenerator) writeSQLQuerySelectAll(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	fmt.Fprintf(w, "-- name: select-all-%s\n", g.commandName(tableName, false))
 	fmt.Fprintf(w, "SELECT * FROM %s\n\n", tableName)
 }
 
-func (g *Generator) writeSQLQuerySelect(w io.Writer, schema *Schema, table *Table) {
+func (g *QueryGenerator) writeSQLQuerySelect(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	fmt.Fprintf(w, "-- name: select-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "SELECT * FROM %s\n", tableName)
 	fmt.Fprintf(w, "WHERE %s\n\n", g.pkCondition(table))
 }
 
-func (g *Generator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Table) {
+func (g *QueryGenerator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	columns, values := g.insertParam(table)
 	fmt.Fprintf(w, "-- name: insert-%s\n", g.commandName(tableName, true))
@@ -211,7 +187,7 @@ func (g *Generator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Tabl
 	fmt.Fprintf(w, "VALUES (%s)\n\n", values)
 }
 
-func (g *Generator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table *Table) {
+func (g *QueryGenerator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	condition, values := g.updateParam(table)
 	fmt.Fprintf(w, "-- name: update-%s\n", g.commandName(tableName, true))
@@ -220,21 +196,21 @@ func (g *Generator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table *Tabl
 	fmt.Fprintf(w, "WHERE %s\n\n", condition)
 }
 
-func (g *Generator) writeSQLQueryDelete(w io.Writer, schema *Schema, table *Table) {
+func (g *QueryGenerator) writeSQLQueryDelete(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	fmt.Fprintf(w, "-- name: delete-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "DELETE FROM %s\n", tableName)
 	fmt.Fprintf(w, "WHERE %s", g.pkCondition(table))
 }
 
-func (g *Generator) writeSQLComment(w io.Writer) {
+func (g *QueryGenerator) writeSQLComment(w io.Writer) {
 	if g.Config.InlcudeDoc {
 		fmt.Fprintln(w, "-- Auto-generated at", time.Now().Format(time.UnixDate))
 		fmt.Fprintln(w)
 	}
 }
 
-func (g *Generator) commandName(name string, singularize bool) string {
+func (g *QueryGenerator) commandName(name string, singularize bool) string {
 	name = strings.Replace(name, ".", "-", -1)
 	if singularize {
 		name = inflect.Singularize(name)
@@ -242,7 +218,7 @@ func (g *Generator) commandName(name string, singularize bool) string {
 	return name
 }
 
-func (g *Generator) tableName(schema *Schema, table *Table) string {
+func (g *QueryGenerator) tableName(schema *Schema, table *Table) string {
 	name := table.Name
 
 	if !schema.IsDefault || g.Config.KeepSchema {
@@ -252,7 +228,7 @@ func (g *Generator) tableName(schema *Schema, table *Table) string {
 	return name
 }
 
-func (g *Generator) insertParam(table *Table) (string, string) {
+func (g *QueryGenerator) insertParam(table *Table) (string, string) {
 	columns := []string{}
 	values := []string{}
 
@@ -264,7 +240,7 @@ func (g *Generator) insertParam(table *Table) (string, string) {
 	return strings.Join(columns, ", "), strings.Join(values, ", ")
 }
 
-func (g *Generator) updateParam(table *Table) (string, string) {
+func (g *QueryGenerator) updateParam(table *Table) (string, string) {
 	values := []string{}
 	conditions := []string{}
 
@@ -279,7 +255,7 @@ func (g *Generator) updateParam(table *Table) (string, string) {
 	return strings.Join(conditions, ", "), strings.Join(values, ", ")
 }
 
-func (g *Generator) pkCondition(table *Table) string {
+func (g *QueryGenerator) pkCondition(table *Table) string {
 	conditions := []string{}
 
 	for _, column := range table.Columns {
@@ -290,4 +266,21 @@ func (g *Generator) pkCondition(table *Table) string {
 	}
 
 	return strings.Join(conditions, " AND ")
+}
+
+func tables(ignore []string, schema *Schema) []Table {
+	tables := []Table{}
+
+	if !sort.StringsAreSorted(ignore) {
+		sort.Strings(ignore)
+	}
+
+	for _, table := range schema.Tables {
+		if index := sort.SearchStrings(ignore, table.Name); index >= 0 && index < len(ignore) {
+			continue
+		}
+
+		tables = append(tables, table)
+	}
+	return tables
 }

@@ -55,21 +55,22 @@ var _ = Describe("Executor", func() {
 		provider.SchemaReturns(schemaDef, nil)
 
 		composer = &fake.ModelGenerator{}
-		composer.GenerateModelReturns(reader, nil)
+		composer.GenerateReturns(reader, nil)
 
 		executor = &sqlmodel.Executor{
 			Config: &sqlmodel.ExecutorConfig{
 				KeepSchema: true,
 			},
-			Provider:  provider,
-			Generator: composer,
+			Provider:       provider,
+			ModelGenerator: composer,
+			QueryGenerator: composer,
 		}
 	})
 
 	Describe("Write", func() {
 		BeforeEach(func() {
 			reader := bytes.NewBufferString("source")
-			composer.GenerateModelReturns(reader, nil)
+			composer.GenerateReturns(reader, nil)
 		})
 
 		It("writes the generated source successfully", func() {
@@ -84,11 +85,11 @@ var _ = Describe("Executor", func() {
 			Expect(schemaName).To(Equal("public"))
 			Expect(tables).To(ContainElement("table1"))
 
-			Expect(composer.GenerateModelCallCount()).To(Equal(1))
-			packageName, schemaDefintion := composer.GenerateModelArgsForCall(0)
+			Expect(composer.GenerateCallCount()).To(Equal(1))
+			ctx := composer.GenerateArgsForCall(0)
 
-			Expect(packageName).To(Equal("entity"))
-			Expect(schemaDefintion).To(Equal(schemaDef))
+			Expect(ctx.Package).To(Equal("entity"))
+			Expect(ctx.Schema).To(Equal(schemaDef))
 		})
 
 		Context("when the schema is not default", func() {
@@ -98,10 +99,10 @@ var _ = Describe("Executor", func() {
 
 			It("uses the schema name as package name", func() {
 				Expect(executor.Write(ioutil.Discard, spec)).To(Succeed())
-				Expect(composer.GenerateModelCallCount()).To(Equal(1))
-				packageName, _ := composer.GenerateModelArgsForCall(0)
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(packageName).To(Equal(schemaDef.Name))
+				Expect(ctx.Package).To(Equal(schemaDef.Name))
 			})
 		})
 
@@ -113,7 +114,7 @@ var _ = Describe("Executor", func() {
 			It("writes the generated source successfully", func() {
 				writer := &bytes.Buffer{}
 				reader := bytes.NewBufferString("source")
-				composer.GenerateModelReturns(reader, nil)
+				composer.GenerateReturns(reader, nil)
 
 				Expect(executor.Write(writer, spec)).To(Succeed())
 				Expect(writer.String()).To(Equal("source"))
@@ -127,11 +128,11 @@ var _ = Describe("Executor", func() {
 				Expect(schemaName).To(Equal("public"))
 				Expect(tables).To(ContainElement("table1"))
 
-				Expect(composer.GenerateModelCallCount()).To(Equal(1))
-				packageName, schemaDefintion := composer.GenerateModelArgsForCall(0)
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(packageName).To(Equal("entity"))
-				Expect(schemaDefintion).To(Equal(schemaDef))
+				Expect(ctx.Package).To(Equal("entity"))
+				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 
 			Context("when getting the schema tables fails", func() {
@@ -149,7 +150,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the composer fails", func() {
 			BeforeEach(func() {
-				composer.GenerateModelReturns(nil, fmt.Errorf("Oh no!"))
+				composer.GenerateReturns(nil, fmt.Errorf("Oh no!"))
 			})
 
 			It("returns the error", func() {
@@ -160,7 +161,7 @@ var _ = Describe("Executor", func() {
 		Context("when the copy fails", func() {
 			BeforeEach(func() {
 				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
-				composer.GenerateModelReturns(reader, nil)
+				composer.GenerateReturns(reader, nil)
 			})
 
 			It("returns the error", func() {
@@ -171,7 +172,7 @@ var _ = Describe("Executor", func() {
 
 	Describe("Create", func() {
 		BeforeEach(func() {
-			composer.GenerateModelReturns(bytes.NewBufferString("source"), nil)
+			composer.GenerateReturns(bytes.NewBufferString("source"), nil)
 		})
 
 		ItCreatesTheSchemaInRootPkg := func(filename, pkg string) {
@@ -190,11 +191,11 @@ var _ = Describe("Executor", func() {
 				Expect(schemaName).To(Equal("public"))
 				Expect(tables).To(ContainElement("table1"))
 
-				Expect(composer.GenerateModelCallCount()).To(Equal(1))
-				packageName, schemaDefintion := composer.GenerateModelArgsForCall(0)
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(packageName).To(Equal(pkg))
-				Expect(schemaDefintion).To(Equal(schemaDef))
+				Expect(ctx.Package).To(Equal(pkg))
+				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 		}
 
@@ -245,11 +246,11 @@ var _ = Describe("Executor", func() {
 				Expect(schemaName).To(Equal("public"))
 				Expect(tables).To(ContainElement("table1"))
 
-				Expect(composer.GenerateModelCallCount()).To(Equal(1))
-				packageName, schemaDefintion := composer.GenerateModelArgsForCall(0)
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(packageName).To(Equal("entity"))
-				Expect(schemaDefintion).To(Equal(schemaDef))
+				Expect(ctx.Package).To(Equal("entity"))
+				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 
 			Context("when the provider fails to get table names", func() {
@@ -294,7 +295,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the reader has empty content", func() {
 			BeforeEach(func() {
-				composer.GenerateModelReturns(&bytes.Buffer{}, nil)
+				composer.GenerateReturns(&bytes.Buffer{}, nil)
 			})
 
 			It("creates a package with generated source successfully", func() {
@@ -306,7 +307,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the composer fails", func() {
 			BeforeEach(func() {
-				composer.GenerateModelReturns(nil, fmt.Errorf("Oh no!"))
+				composer.GenerateReturns(nil, fmt.Errorf("Oh no!"))
 			})
 
 			It("returns the error", func() {
@@ -331,7 +332,7 @@ var _ = Describe("Executor", func() {
 		Context("when the copy fails", func() {
 			BeforeEach(func() {
 				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
-				composer.GenerateModelReturns(reader, nil)
+				composer.GenerateReturns(reader, nil)
 			})
 
 			It("returns the error", func() {
@@ -344,7 +345,7 @@ var _ = Describe("Executor", func() {
 
 	Describe("CreateScript", func() {
 		BeforeEach(func() {
-			composer.GenerateSQLScriptReturns(bytes.NewBufferString("source"), nil)
+			composer.GenerateReturns(bytes.NewBufferString("source"), nil)
 		})
 
 		ItCreatesTheSQLScript := func(filename string) {
@@ -363,9 +364,9 @@ var _ = Describe("Executor", func() {
 				Expect(schemaName).To(Equal("public"))
 				Expect(tables).To(ContainElement("table1"))
 
-				Expect(composer.GenerateSQLScriptCallCount()).To(Equal(1))
-				schemaDefintion := composer.GenerateSQLScriptArgsForCall(0)
-				Expect(schemaDefintion).To(Equal(schemaDef))
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				ctx := composer.GenerateArgsForCall(0)
+				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 		}
 
@@ -416,9 +417,9 @@ var _ = Describe("Executor", func() {
 				Expect(schemaName).To(Equal("public"))
 				Expect(tables).To(ContainElement("table1"))
 
-				Expect(composer.GenerateSQLScriptCallCount()).To(Equal(1))
-				schemaDefintion := composer.GenerateSQLScriptArgsForCall(0)
-				Expect(schemaDefintion).To(Equal(schemaDef))
+				Expect(composer.GenerateCallCount()).To(Equal(1))
+				ctx := composer.GenerateArgsForCall(0)
+				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 
 			Context("when the provider fails to get table names", func() {
@@ -462,7 +463,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the reader has empty content", func() {
 			BeforeEach(func() {
-				composer.GenerateSQLScriptReturns(&bytes.Buffer{}, nil)
+				composer.GenerateReturns(&bytes.Buffer{}, nil)
 			})
 
 			It("generates a script successfully", func() {
@@ -474,7 +475,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the generator fails", func() {
 			BeforeEach(func() {
-				composer.GenerateSQLScriptReturns(nil, fmt.Errorf("Oh no!"))
+				composer.GenerateReturns(nil, fmt.Errorf("Oh no!"))
 			})
 
 			It("returns the error", func() {
@@ -499,7 +500,7 @@ var _ = Describe("Executor", func() {
 		Context("when the copy fails", func() {
 			BeforeEach(func() {
 				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
-				composer.GenerateSQLScriptReturns(reader, nil)
+				composer.GenerateReturns(reader, nil)
 			})
 
 			It("returns the error", func() {
