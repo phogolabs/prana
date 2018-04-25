@@ -18,7 +18,6 @@ var _ = Describe("Executor", func() {
 		spec      *sqlmodel.Spec
 		provider  *fake.SchemaProvider
 		composer  *fake.ModelGenerator
-		reader    *fake.Buffer
 		schemaDef *sqlmodel.Schema
 	)
 
@@ -48,15 +47,11 @@ var _ = Describe("Executor", func() {
 			Dir:    filepath.Join(dir, "entity"),
 		}
 
-		reader = &fake.Buffer{}
-
 		provider = &fake.SchemaProvider{}
 		provider.TablesReturns([]string{"table1"}, nil)
 		provider.SchemaReturns(schemaDef, nil)
 
 		composer = &fake.ModelGenerator{}
-		composer.GenerateReturns(reader, nil)
-
 		executor = &sqlmodel.Executor{
 			Config: &sqlmodel.ExecutorConfig{
 				KeepSchema: true,
@@ -69,8 +64,10 @@ var _ = Describe("Executor", func() {
 
 	Describe("Write", func() {
 		BeforeEach(func() {
-			reader := bytes.NewBufferString("source")
-			composer.GenerateReturns(reader, nil)
+			composer.GenerateStub = func(ctx *sqlmodel.GeneratorContext) error {
+				ctx.Writer.Write([]byte("source"))
+				return nil
+			}
 		})
 
 		It("writes the generated source successfully", func() {
@@ -113,8 +110,6 @@ var _ = Describe("Executor", func() {
 
 			It("writes the generated source successfully", func() {
 				writer := &bytes.Buffer{}
-				reader := bytes.NewBufferString("source")
-				composer.GenerateReturns(reader, nil)
 
 				Expect(executor.Write(writer, spec)).To(Succeed())
 				Expect(writer.String()).To(Equal("source"))
@@ -150,18 +145,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the composer fails", func() {
 			BeforeEach(func() {
-				composer.GenerateReturns(nil, fmt.Errorf("Oh no!"))
-			})
-
-			It("returns the error", func() {
-				Expect(executor.Write(ioutil.Discard, spec)).To(MatchError("Oh no!"))
-			})
-		})
-
-		Context("when the copy fails", func() {
-			BeforeEach(func() {
-				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
-				composer.GenerateReturns(reader, nil)
+				composer.GenerateReturns(fmt.Errorf("Oh no!"))
 			})
 
 			It("returns the error", func() {
@@ -172,7 +156,10 @@ var _ = Describe("Executor", func() {
 
 	Describe("Create", func() {
 		BeforeEach(func() {
-			composer.GenerateReturns(bytes.NewBufferString("source"), nil)
+			composer.GenerateStub = func(ctx *sqlmodel.GeneratorContext) error {
+				ctx.Writer.Write([]byte("source"))
+				return nil
+			}
 		})
 
 		ItCreatesTheSchemaInRootPkg := func(filename, pkg string) {
@@ -295,7 +282,9 @@ var _ = Describe("Executor", func() {
 
 		Context("when the reader has empty content", func() {
 			BeforeEach(func() {
-				composer.GenerateReturns(&bytes.Buffer{}, nil)
+				composer.GenerateStub = func(ctx *sqlmodel.GeneratorContext) error {
+					return nil
+				}
 			})
 
 			It("creates a package with generated source successfully", func() {
@@ -307,7 +296,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the composer fails", func() {
 			BeforeEach(func() {
-				composer.GenerateReturns(nil, fmt.Errorf("Oh no!"))
+				composer.GenerateReturns(fmt.Errorf("Oh no!"))
 			})
 
 			It("returns the error", func() {
@@ -328,24 +317,14 @@ var _ = Describe("Executor", func() {
 				Expect(path).To(BeEmpty())
 			})
 		})
-
-		Context("when the copy fails", func() {
-			BeforeEach(func() {
-				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
-				composer.GenerateReturns(reader, nil)
-			})
-
-			It("returns the error", func() {
-				path, err := executor.Create(spec)
-				Expect(err).To(MatchError("Oh no!"))
-				Expect(path).To(BeEmpty())
-			})
-		})
 	})
 
 	Describe("CreateScript", func() {
 		BeforeEach(func() {
-			composer.GenerateReturns(bytes.NewBufferString("source"), nil)
+			composer.GenerateStub = func(ctx *sqlmodel.GeneratorContext) error {
+				ctx.Writer.Write([]byte("source"))
+				return nil
+			}
 		})
 
 		ItCreatesTheSQLScript := func(filename string) {
@@ -463,7 +442,9 @@ var _ = Describe("Executor", func() {
 
 		Context("when the reader has empty content", func() {
 			BeforeEach(func() {
-				composer.GenerateReturns(&bytes.Buffer{}, nil)
+				composer.GenerateStub = func(ctx *sqlmodel.GeneratorContext) error {
+					return nil
+				}
 			})
 
 			It("generates a script successfully", func() {
@@ -475,7 +456,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the generator fails", func() {
 			BeforeEach(func() {
-				composer.GenerateReturns(nil, fmt.Errorf("Oh no!"))
+				composer.GenerateReturns(fmt.Errorf("Oh no!"))
 			})
 
 			It("returns the error", func() {
@@ -493,19 +474,6 @@ var _ = Describe("Executor", func() {
 			It("returns the error", func() {
 				path, err := executor.CreateScript(spec)
 				Expect(err).To(MatchError("mkdir /mydir: permission denied"))
-				Expect(path).To(BeEmpty())
-			})
-		})
-
-		Context("when the copy fails", func() {
-			BeforeEach(func() {
-				reader.ReadReturns(0, fmt.Errorf("Oh no!"))
-				composer.GenerateReturns(reader, nil)
-			})
-
-			It("returns the error", func() {
-				path, err := executor.CreateScript(spec)
-				Expect(err).To(MatchError("Oh no!"))
 				Expect(path).To(BeEmpty())
 			})
 		})

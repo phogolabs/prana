@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"go/format"
-	"io/ioutil"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
@@ -82,21 +81,19 @@ var _ = Describe("ModelGenerator", func() {
 			data, err = format.Source(data)
 			Expect(err).To(BeNil())
 
+			reader := &bytes.Buffer{}
+
 			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
 				Package: "model",
 				Schema:  schemaDef,
 			}
 
-			reader, err := generator.Generate(ctx)
-			Expect(err).To(BeNil())
-
+			Expect(generator.Generate(ctx)).To(Succeed())
 			Expect(builder.BuildCallCount()).To(Equal(2))
 			Expect(builder.BuildArgsForCall(0)).To(Equal(&schemaDef.Tables[0].Columns[0]))
 			Expect(builder.BuildArgsForCall(1)).To(Equal(&schemaDef.Tables[0].Columns[1]))
-
-			generated, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-			Expect(string(generated)).To(Equal(string(data)))
+			Expect(reader.String()).To(Equal(string(data)))
 		})
 	}
 
@@ -124,17 +121,15 @@ var _ = Describe("ModelGenerator", func() {
 		})
 
 		It("generates the schema successfully", func() {
+			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
 				Package: "model",
 				Schema:  schemaDef,
 			}
 
-			reader, err := generator.Generate(ctx)
-			Expect(err).To(BeNil())
-
-			data, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-			Expect(data).To(BeEmpty())
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(BeEmpty())
 		})
 	})
 
@@ -144,20 +139,16 @@ var _ = Describe("ModelGenerator", func() {
 		})
 
 		It("generates the schema successfully", func() {
+			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
 				Package: "model",
 				Schema:  schemaDef,
 			}
 
-			reader, err := generator.Generate(ctx)
-			Expect(err).To(BeNil())
-
-			data, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-
-			source := string(data)
-			Expect(source).To(ContainSubstring("// Table1 represents a data base table 'table1'"))
-			Expect(source).To(ContainSubstring("// ID represents a database column 'id' of type 'VARCHAR(200) PRIMARY KEY NULL'"))
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(ContainSubstring("// Table1 represents a data base table 'table1'"))
+			Expect(reader.String()).To(ContainSubstring("// ID represents a database column 'id' of type 'VARCHAR(200) PRIMARY KEY NULL'"))
 		})
 	})
 
@@ -167,26 +158,26 @@ var _ = Describe("ModelGenerator", func() {
 		})
 
 		It("generates the schema successfully", func() {
+			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
 				Package: "model",
 				Schema:  schemaDef,
 			}
-			reader, err := generator.Generate(ctx)
-			Expect(err).To(BeNil())
 
-			data, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-			Expect(data).To(BeEmpty())
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(BeEmpty())
 		})
 	})
 
 	Context("when the package name is not provided", func() {
 		It("returns an error", func() {
+			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
+				Writer: reader,
 				Schema: schemaDef,
 			}
-			reader, err := generator.Generate(ctx)
-			Expect(reader).To(BeNil())
+			err := generator.Generate(ctx)
 			Expect(err).To(MatchError("model:2:1: expected 'IDENT', found 'type'"))
 		})
 	})
@@ -259,18 +250,15 @@ var _ = Describe("QueryGenerator", func() {
 			fmt.Fprintf(w, "DELETE FROM %s\n", table)
 			fmt.Fprint(w, "WHERE id = ?")
 
+			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
 				Package: "model",
 				Schema:  schemaDef,
 			}
 
-			reader, err := generator.Generate(ctx)
-			Expect(err).To(BeNil())
-
-			generated, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-
-			Expect(string(generated)).To(Equal(w.String()))
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(Equal(w.String()))
 		})
 	}
 
@@ -298,17 +286,15 @@ var _ = Describe("QueryGenerator", func() {
 		})
 
 		It("generates the commands successfully", func() {
+			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
 				Package: "model",
 				Schema:  schemaDef,
 			}
 
-			reader, err := generator.Generate(ctx)
-			Expect(err).To(BeNil())
-
-			data, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-			Expect(data).To(BeEmpty())
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(BeEmpty())
 		})
 	})
 
@@ -318,19 +304,15 @@ var _ = Describe("QueryGenerator", func() {
 		})
 
 		It("generates the schema successfully", func() {
+			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
 				Package: "model",
 				Schema:  schemaDef,
 			}
 
-			reader, err := generator.Generate(ctx)
-			Expect(err).To(BeNil())
-
-			data, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-
-			source := string(data)
-			Expect(source).To(ContainSubstring("-- Auto-generated"))
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(ContainSubstring("-- Auto-generated"))
 		})
 	})
 
@@ -340,16 +322,15 @@ var _ = Describe("QueryGenerator", func() {
 		})
 
 		It("generates the script successfully", func() {
+			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
 				Package: "model",
 				Schema:  schemaDef,
 			}
-			reader, err := generator.Generate(ctx)
-			Expect(err).To(BeNil())
 
-			data, err := ioutil.ReadAll(reader)
-			Expect(err).To(BeNil())
-			Expect(data).To(BeEmpty())
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(BeEmpty())
 		})
 	})
 })

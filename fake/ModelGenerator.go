@@ -2,27 +2,25 @@
 package fake
 
 import (
-	"io"
 	"sync"
 
 	"github.com/phogolabs/prana/sqlmodel"
 )
 
 type ModelGenerator struct {
-	GenerateStub        func(ctx *sqlmodel.GeneratorContext) (io.Reader, error)
+	GenerateStub        func(ctx *sqlmodel.GeneratorContext) error
 	generateMutex       sync.RWMutex
 	generateArgsForCall []struct {
 		ctx *sqlmodel.GeneratorContext
 	}
 	generateReturns struct {
-		result1 io.Reader
-		result2 error
+		result1 error
 	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ModelGenerator) Generate(ctx *sqlmodel.GeneratorContext) (io.Reader, error) {
+func (fake *ModelGenerator) Generate(ctx *sqlmodel.GeneratorContext) error {
 	fake.generateMutex.Lock()
 	fake.generateArgsForCall = append(fake.generateArgsForCall, struct {
 		ctx *sqlmodel.GeneratorContext
@@ -32,7 +30,7 @@ func (fake *ModelGenerator) Generate(ctx *sqlmodel.GeneratorContext) (io.Reader,
 	if fake.GenerateStub != nil {
 		return fake.GenerateStub(ctx)
 	}
-	return fake.generateReturns.result1, fake.generateReturns.result2
+	return fake.generateReturns.result1
 }
 
 func (fake *ModelGenerator) GenerateCallCount() int {
@@ -47,12 +45,11 @@ func (fake *ModelGenerator) GenerateArgsForCall(i int) *sqlmodel.GeneratorContex
 	return fake.generateArgsForCall[i].ctx
 }
 
-func (fake *ModelGenerator) GenerateReturns(result1 io.Reader, result2 error) {
+func (fake *ModelGenerator) GenerateReturns(result1 error) {
 	fake.GenerateStub = nil
 	fake.generateReturns = struct {
-		result1 io.Reader
-		result2 error
-	}{result1, result2}
+		result1 error
+	}{result1}
 }
 
 func (fake *ModelGenerator) Invocations() map[string][][]interface{} {

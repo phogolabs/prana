@@ -1,6 +1,7 @@
 package sqlmodel
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -28,38 +29,14 @@ type Executor struct {
 
 // Write writes the generated schema sqlmodels to a writer
 func (e *Executor) Write(w io.Writer, spec *Spec) error {
-	schema, err := e.schemaOf(spec)
-	if err != nil {
-		return err
-	}
-
-	ctx := &GeneratorContext{
-		Package: e.packageOf(schema, spec),
-		Schema:  schema,
-	}
-
-	r, err := e.ModelGenerator.Generate(ctx)
-	if err != nil {
-		return err
-	}
-
-	_, err = io.Copy(w, r)
+	_, err := e.writeSchema(w, spec)
 	return err
 }
 
 // Create creates a package with the generated schema sqlmodels
 func (e *Executor) Create(spec *Spec) (string, error) {
-	schema, err := e.schemaOf(spec)
-	if err != nil {
-		return "", err
-	}
-
-	ctx := &GeneratorContext{
-		Package: e.packageOf(schema, spec),
-		Schema:  schema,
-	}
-
-	reader, err := e.ModelGenerator.Generate(ctx)
+	reader := &bytes.Buffer{}
+	schema, err := e.writeSchema(reader, spec)
 	if err != nil {
 		return "", err
 	}
@@ -103,12 +80,14 @@ func (e *Executor) CreateScript(spec *Spec) (string, error) {
 		return "", err
 	}
 
+	reader := &bytes.Buffer{}
 	ctx := &GeneratorContext{
+		Writer:  reader,
 		Package: e.packageOf(schema, spec),
 		Schema:  schema,
 	}
-	reader, err := e.QueryGenerator.Generate(ctx)
-	if err != nil {
+
+	if err = e.QueryGenerator.Generate(ctx); err != nil {
 		return "", err
 	}
 
@@ -142,6 +121,25 @@ func (e *Executor) CreateScript(spec *Spec) (string, error) {
 	}
 
 	return filepath, nil
+}
+
+func (e *Executor) writeSchema(w io.Writer, spec *Spec) (*Schema, error) {
+	schema, err := e.schemaOf(spec)
+	if err != nil {
+		return nil, err
+	}
+
+	ctx := &GeneratorContext{
+		Writer:  w,
+		Package: e.packageOf(schema, spec),
+		Schema:  schema,
+	}
+
+	if err = e.ModelGenerator.Generate(ctx); err != nil {
+		return nil, err
+	}
+
+	return schema, nil
 }
 
 func (e *Executor) schemaOf(spec *Spec) (*Schema, error) {

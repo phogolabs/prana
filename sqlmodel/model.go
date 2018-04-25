@@ -106,6 +106,8 @@ type SchemaProvider interface {
 
 // GeneratorContext is the generator's context
 type GeneratorContext struct {
+	// Writer where the output will be written
+	Writer io.Writer
 	// Package name
 	Package string
 	// Schema definition
@@ -125,7 +127,7 @@ type GeneratorConfig struct {
 // Generator generates the sqlmodels
 type Generator interface {
 	// Generate generates a model or script
-	Generate(ctx *GeneratorContext) (io.Reader, error)
+	Generate(ctx *GeneratorContext) error
 }
 
 // Schema represents a database schema

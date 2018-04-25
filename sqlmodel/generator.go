@@ -25,14 +25,14 @@ type ModelGenerator struct {
 }
 
 // Generate generates the golang structs from database schema
-func (g *ModelGenerator) Generate(ctx *GeneratorContext) (io.Reader, error) {
+func (g *ModelGenerator) Generate(ctx *GeneratorContext) error {
 	pkg := ctx.Package
 	schema := ctx.Schema
 	buffer := &bytes.Buffer{}
 	tables := tables(g.Config.IgnoreTables, schema)
 
 	if len(tables) == 0 {
-		return buffer, nil
+		return nil
 	}
 
 	g.writePackage(pkg, schema.Name, buffer)
@@ -42,10 +42,11 @@ func (g *ModelGenerator) Generate(ctx *GeneratorContext) (io.Reader, error) {
 	}
 
 	if err := g.format(buffer); err != nil {
-		return nil, err
+		return err
 	}
 
-	return buffer, nil
+	_, err := io.Copy(ctx.Writer, buffer)
+	return err
 }
 
 func (g *ModelGenerator) writePackage(pkg, name string, buffer io.Writer) {
@@ -148,7 +149,7 @@ type QueryGenerator struct {
 }
 
 // Generate generates a script for given schema
-func (g *QueryGenerator) Generate(ctx *GeneratorContext) (io.Reader, error) {
+func (g *QueryGenerator) Generate(ctx *GeneratorContext) error {
 	schema := ctx.Schema
 	buffer := &bytes.Buffer{}
 	g.writeSQLComment(buffer)
@@ -163,7 +164,8 @@ func (g *QueryGenerator) Generate(ctx *GeneratorContext) (io.Reader, error) {
 		g.writeSQLQueryDelete(buffer, schema, &table)
 	}
 
-	return buffer, nil
+	_, err := io.Copy(ctx.Writer, buffer)
+	return err
 }
 
 func (g *QueryGenerator) writeSQLQuerySelectAll(w io.Writer, schema *Schema, table *Table) {
