@@ -15,8 +15,6 @@ import:
 - package: github.com/mattn/go-sqlite3
   version: v1.6.0
 - package: github.com/olekukonko/tablewriter
-- package: github.com/ulule/loukoum
-  version: v1.0.0
 - package: github.com/urfave/cli
   version: v1.20.0
 testImport:
