@@ -8,9 +8,9 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmigr"
-	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Generator", func() {
@@ -39,7 +39,7 @@ var _ = Describe("Generator", func() {
 	})
 
 	Describe("Create", func() {
-		It("creates a sqlmigr successfully", func() {
+		It("creates a migration successfully", func() {
 			err := generator.Create(item)
 			Expect(err).To(BeNil())
 

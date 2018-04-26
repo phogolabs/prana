@@ -38,12 +38,12 @@ func (m *Provider) Migrations() ([]Migration, error) {
 			return err
 		}
 
-		sqlmigr, err := Parse(path)
+		migration, err := Parse(path)
 		if err != nil {
 			return err
 		}
 
-		local = append(local, *sqlmigr)
+		local = append(local, *migration)
 		return nil
 	})
 

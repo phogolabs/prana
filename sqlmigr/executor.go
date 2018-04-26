@@ -10,28 +10,28 @@ import (
 	"github.com/apex/log"
 )
 
-// Executor provides a group of operations that works with sqlmigrs.
+// Executor provides a group of operations that works with migrations.
 type Executor struct {
 	// Logger logs each execution step
 	Logger log.Interface
-	// Provider provides all sqlmigrs for the current project.
+	// Provider provides all migrations for the current project.
 	Provider MigrationProvider
-	// Runner runs or reverts sqlmigrs for the current project.
+	// Runner runs or reverts migrations for the current project.
 	Runner MigrationRunner
-	// Generator generates a sqlmigr file.
+	// Generator generates a migration file.
 	Generator MigrationGenerator
 }
 
-// Setup setups the current project for database sqlmigrs by creating
-// sqlmigr directory and related database.
+// Setup setups the current project for database migrations by creating
+// migration directory and related database.
 func (m *Executor) Setup() error {
-	sqlmigr := &Migration{
+	migration := &Migration{
 		ID:          min.Format(format),
 		Description: "setup",
 		CreatedAt:   time.Now(),
 	}
 
-	if ok := m.Provider.Exists(sqlmigr); ok {
+	if ok := m.Provider.Exists(migration); ok {
 		return nil
 	}
 
@@ -51,64 +51,64 @@ func (m *Executor) Setup() error {
 		DownCommand: down,
 	}
 
-	if err := m.Generator.Write(sqlmigr, content); err != nil && !os.IsExist(err) {
+	if err := m.Generator.Write(migration, content); err != nil && !os.IsExist(err) {
 		return err
 	}
 
-	if err := m.Runner.Run(sqlmigr); err != nil {
+	if err := m.Runner.Run(migration); err != nil {
 		return err
 	}
 
-	return m.Provider.Insert(sqlmigr)
+	return m.Provider.Insert(migration)
 }
 
-// Create creates a sqlmigr script successfully if the project has already
+// Create creates a migration script successfully if the project has already
 // been setup, otherwise returns an error.
 func (m *Executor) Create(name string) (*Migration, error) {
 	name = strings.Replace(name, " ", "_", -1)
 
 	timestamp := time.Now()
 
-	sqlmigr := &Migration{
+	migration := &Migration{
 		ID:          timestamp.Format(format),
 		Description: name,
 		CreatedAt:   timestamp,
 	}
 
-	if err := m.Generator.Create(sqlmigr); err != nil {
+	if err := m.Generator.Create(migration); err != nil {
 		return nil, err
 	}
 
-	return sqlmigr, nil
+	return migration, nil
 }
 
-// Run runs a pending sqlmigr for given count. If the count is negative number, it
-// will execute all pending sqlmigrs.
+// Run runs a pending migration for given count. If the count is negative number, it
+// will execute all pending migrations.
 func (m *Executor) Run(step int) (int, error) {
 	run := 0
-	sqlmigrs, err := m.Migrations()
+	migrations, err := m.Migrations()
 	if err != nil {
 		return run, err
 	}
 
 	m.logf("Running migration(s)")
-	for _, sqlmigr := range sqlmigrs {
+	for _, migration := range migrations {
 		if step == 0 {
 			return run, nil
 		}
 
-		timestamp, err := time.Parse(format, sqlmigr.ID)
+		timestamp, err := time.Parse(format, migration.ID)
 		if err != nil {
 			return run, err
 		}
 
-		if !sqlmigr.CreatedAt.IsZero() || timestamp == min {
+		if !migration.CreatedAt.IsZero() || timestamp == min {
 			continue
 		}
 
-		op := sqlmigr
+		op := migration
 
-		m.logf("Running migration '%s'", sqlmigr.Filename())
+		m.logf("Running migration '%s'", migration.Filename())
 
 		if err := m.Runner.Run(&op); err != nil {
 			return run, err
@@ -122,44 +122,44 @@ func (m *Executor) Run(step int) (int, error) {
 		run = run + 1
 	}
 
-	m.logf("Run %d sqlmigr(s)", run)
+	m.logf("Run %d migration(s)", run)
 	return run, nil
 }
 
-// RunAll runs all pending sqlmigrs.
+// RunAll runs all pending migrations.
 func (m *Executor) RunAll() (int, error) {
 	return m.Run(-1)
 }
 
-// Revert reverts an applied sqlmigr for given count. If the count is
-// negative number, it will revert all applied sqlmigrs.
+// Revert reverts an applied migration for given count. If the count is
+// negative number, it will revert all applied migrations.
 func (m *Executor) Revert(step int) (int, error) {
 	reverted := 0
-	sqlmigrs, err := m.Migrations()
+	migrations, err := m.Migrations()
 	if err != nil {
 		return reverted, err
 	}
 
-	m.logf("Reverting sqlmigr(s)")
-	for i := len(sqlmigrs) - 1; i >= 0; i-- {
-		sqlmigr := sqlmigrs[i]
+	m.logf("Reverting migration(s)")
+	for i := len(migrations) - 1; i >= 0; i-- {
+		migration := migrations[i]
 
 		if step == 0 {
 			return reverted, nil
 		}
 
-		if sqlmigr.CreatedAt.IsZero() {
+		if migration.CreatedAt.IsZero() {
 			continue
 		}
 
-		timestamp, err := time.Parse(format, sqlmigr.ID)
+		timestamp, err := time.Parse(format, migration.ID)
 		if err != nil || timestamp == min {
 			return reverted, err
 		}
 
-		op := sqlmigr
+		op := migration
 
-		m.logf("Reverting sqlmigr '%s'", sqlmigr.Filename())
+		m.logf("Reverting migration '%s'", migration.Filename())
 		if err := m.Runner.Revert(&op); err != nil {
 			return reverted, err
 		}
@@ -172,16 +172,16 @@ func (m *Executor) Revert(step int) (int, error) {
 		reverted = reverted + 1
 	}
 
-	m.logf("Reverted %d sqlmigr(s)", reverted)
+	m.logf("Reverted %d migration(s)", reverted)
 	return reverted, nil
 }
 
-// RevertAll reverts all applied sqlmigrs.
+// RevertAll reverts all applied migrations.
 func (m *Executor) RevertAll() (int, error) {
 	return m.Revert(-1)
 }
 
-// Migrations returns all sqlmigrs.
+// Migrations returns all migrations.
 func (m *Executor) Migrations() ([]Migration, error) {
 	return m.Provider.Migrations()
 }

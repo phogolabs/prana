@@ -10,8 +10,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/prana/sqlmigr"
 	"github.com/phogolabs/parcello"
+	"github.com/phogolabs/prana/sqlmigr"
 )
 
 var _ = Describe("Runner", func() {
@@ -44,7 +44,7 @@ var _ = Describe("Runner", func() {
 
 	JustBeforeEach(func() {
 		query := &bytes.Buffer{}
-		fmt.Fprintln(query, "CREATE TABLE sqlmigrs (")
+		fmt.Fprintln(query, "CREATE TABLE migrations (")
 		fmt.Fprintln(query, " id          TEXT      NOT NULL PRIMARY KEY,")
 		fmt.Fprintln(query, " description TEXT      NOT NULL,")
 		fmt.Fprintln(query, " created_at  TIMESTAMP NOT NULL")
@@ -110,7 +110,7 @@ var _ = Describe("Runner", func() {
 			})
 
 			It("return an error", func() {
-				Expect(runner.Run(item)).To(MatchError("Command 'up' not found for sqlmigr '20160102150_schema.sql'"))
+				Expect(runner.Run(item)).To(MatchError("Command 'up' not found for migration '20160102150_schema.sql'"))
 			})
 		})
 
@@ -123,13 +123,13 @@ var _ = Describe("Runner", func() {
 	})
 
 	Describe("Revert", func() {
-		It("reverts the sqlmigr successfully", func() {
+		It("reverts the migration successfully", func() {
 			Expect(runner.Revert(item)).To(Succeed())
 			_, err := runner.DB.Exec("SELECT id FROM test")
 			Expect(err).To(MatchError("no such table: test"))
 		})
 
-		Context("when the sqlmigr does not exist", func() {
+		Context("when the migration does not exist", func() {
 			JustBeforeEach(func() {
 				path := filepath.Join(dir, item.Filename())
 				Expect(os.Remove(path)).To(Succeed())
@@ -163,7 +163,7 @@ var _ = Describe("Runner", func() {
 			})
 
 			It("return an error", func() {
-				Expect(runner.Revert(item)).To(MatchError("Command 'down' not found for sqlmigr '20160102150_schema.sql'"))
+				Expect(runner.Revert(item)).To(MatchError("Command 'down' not found for migration '20160102150_schema.sql'"))
 			})
 		})
 

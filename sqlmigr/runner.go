@@ -11,7 +11,7 @@ import (
 
 var _ MigrationRunner = &Runner{}
 
-// Runner runs or reverts a given sqlmigr item.
+// Runner runs or reverts a given migration  item.
 type Runner struct {
 	// FileSystem represents the project directory file system.
 	FileSystem FileSystem
@@ -19,7 +19,7 @@ type Runner struct {
 	DB *sqlx.DB
 }
 
-// Run runs a given sqlmigr item.
+// Run runs a given migration  item.
 func (r *Runner) Run(m *Migration) error {
 	if err := r.exec("up", m); err != nil {
 		return err
@@ -28,7 +28,7 @@ func (r *Runner) Run(m *Migration) error {
 	return nil
 }
 
-// Revert reverts a given sqlmigr item.
+// Revert reverts a given migration  item.
 func (r *Runner) Revert(m *Migration) error {
 	if err := r.exec("down", m); err != nil {
 		return err
@@ -69,7 +69,7 @@ func (r *Runner) command(name string, m *Migration) ([]string, error) {
 	statements, ok := queries[name]
 
 	if !ok {
-		return []string{}, fmt.Errorf("Command '%s' not found for sqlmigr '%s'", name, m.Filename())
+		return []string{}, fmt.Errorf("Command '%s' not found for migration '%s'", name, m.Filename())
 	}
 
 	commands := strings.Split(statements, ";")
