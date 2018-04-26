@@ -317,4 +317,5 @@ We are welcome to any contributions. Just fork the
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
 [software-license-url]: LICENSE
 [loukoum-url]: https://github.com/ulule/loukoum
+[oak-url]: https://github.com/phogolabs/oak
 [sqlx-url]: https://github.com/jmoiron/sqlx
