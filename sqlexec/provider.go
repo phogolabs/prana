@@ -75,12 +75,28 @@ func (p *Provider) ReadFrom(r io.Reader) (int64, error) {
 
 // Command returns a command for given name and parameters. The operation can
 // err if the command cannot be found.
-func (p *Provider) Command(name string, params ...Param) (*Cmd, error) {
+func (p *Provider) Command(name string, params ...Param) (Query, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
 	if query, ok := p.repository[name]; ok {
 		return &Cmd{
+			query:  query,
+			params: params,
+		}, nil
+	}
+
+	return nil, fmt.Errorf("Command '%s' not found", name)
+}
+
+// NamedCommand returns a command for given name and parameters. The operation can
+// err if the command cannot be found.
+func (p *Provider) NamedCommand(name string, params ...Param) (Query, error) {
+	p.mu.RLock()
+	defer p.mu.RUnlock()
+
+	if query, ok := p.repository[name]; ok {
+		return &NamedCmd{
 			query:  query,
 			params: params,
 		}, nil

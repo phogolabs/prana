@@ -160,6 +160,16 @@ var _ = Describe("Provider", func() {
 			Expect(query).To(Equal("SELECT * FROM users"))
 		})
 
+		It("returns a named command", func() {
+			stmt, err := provider.NamedCommand("up")
+			Expect(err).To(BeNil())
+			Expect(stmt).NotTo(BeNil())
+
+			query, params := stmt.Prepare()
+			Expect(params).To(BeEmpty())
+			Expect(query).To(Equal("SELECT * FROM users"))
+		})
+
 		Context("when the command has arguments", func() {
 			BeforeEach(func() {
 				buffer := bytes.NewBufferString("-- name: show-users")
@@ -182,11 +192,47 @@ var _ = Describe("Provider", func() {
 			})
 		})
 
-		Context("when not statements are found", func() {
-			It("returns a error", func() {
-				cmd, err := provider.Command("down")
-				Expect(err).To(MatchError("Command 'down' not found"))
-				Expect(cmd).To(BeNil())
+		Context("when the named command has arguments", func() {
+			BeforeEach(func() {
+				buffer := bytes.NewBufferString("-- name: show-users")
+				fmt.Fprintln(buffer)
+				fmt.Fprintln(buffer, "SELECT * FROM users WHERE id_pk = :id_pk")
+
+				n, err := provider.ReadFrom(buffer)
+				Expect(n).To(Equal(int64(1)))
+				Expect(err).To(Succeed())
+			})
+
+			It("returns a command with params", func() {
+				type param struct {
+					ID int `db:"id_pk"`
+				}
+
+				stmt, err := provider.NamedCommand("show-users", param{ID: 1})
+				Expect(err).To(BeNil())
+				Expect(stmt).NotTo(BeNil())
+
+				query, params := stmt.Prepare()
+				Expect(query).To(Equal("SELECT * FROM users WHERE id_pk = :id_pk"))
+				Expect(params).To(HaveKeyWithValue("id_pk", 1))
+			})
+		})
+
+		Context("when statements are not found", func() {
+			Describe("Cmd", func() {
+				It("returns a error", func() {
+					cmd, err := provider.Command("down")
+					Expect(err).To(MatchError("Command 'down' not found"))
+					Expect(cmd).To(BeNil())
+				})
+			})
+
+			Describe("NamedCmd", func() {
+				It("returns a error", func() {
+					cmd, err := provider.NamedCommand("down")
+					Expect(err).To(MatchError("Command 'down' not found"))
+					Expect(cmd).To(BeNil())
+				})
 			})
 		})
 	})

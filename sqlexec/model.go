@@ -20,3 +20,9 @@ type Param = interface{}
 
 // FileSystem provides with primitives to work with the underlying file system
 type FileSystem = parcello.FileSystem
+
+// Query represents an SQL Query
+type Query interface {
+	// Prepares query for execution
+	Prepare() (string, map[string]interface{})
+}
