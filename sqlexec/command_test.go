@@ -18,8 +18,9 @@ var _ = Describe("Command", func() {
 		It("returns the query", func() {
 			stmt := sqlexec.SQL("SELECT * FROM users WHERE id = ? and name = ?", 2)
 			query, params := stmt.Prepare()
-			Expect(query).To(BeEmpty())
-			Expect(params).To(BeNil())
+			Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg0 and name = :arg1"))
+			Expect(params).To(HaveLen(1))
+			Expect(params).To(HaveKeyWithValue("arg0", 2))
 		})
 	})
 })

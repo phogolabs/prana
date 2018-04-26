@@ -31,13 +31,12 @@ func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
 	var i, j int
 
 	for i = strings.Index(query, "?"); i != -1; i = strings.Index(query, "?") {
-		if j >= len(cmd.params) {
-			return "", nil
-		}
-
 		name := fmt.Sprintf("arg%d", j)
 		part := fmt.Sprintf("%s:%s", query[:i], name)
-		params[name] = cmd.params[j]
+
+		if j < len(cmd.params) {
+			params[name] = cmd.params[j]
+		}
 
 		buffer.WriteString(part)
 		query = query[i+1:]
