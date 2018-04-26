@@ -163,7 +163,7 @@ included for now.
 
 Also, it provides a way to work with embeddable SQL scripts which can be
 executed easily by [OAK][oak-url] as SQL Commands. You can see the
-[OAK example][https://github.com/phogolabs/oak/tree/master/example] to
+[OAK example](https://github.com/phogolabs/oak/tree/master/example) to
 understand more about that. First of all you have create a script that contains
 your SQL statements.
 
