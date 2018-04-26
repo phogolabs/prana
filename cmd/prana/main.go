@@ -48,7 +48,7 @@ func main() {
 	app := &cli.App{
 		Name:                 "prana",
 		HelpName:             "prana",
-		Usage:                "Golang Database Object Manager",
+		Usage:                "Golang Database Manager",
 		UsageText:            "prana [global options]",
 		Version:              "1.0",
 		BashComplete:         cli.DefaultAppComplete,

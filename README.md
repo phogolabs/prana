@@ -101,7 +101,7 @@ $ prana model sync
 By default the command will place the generated code in single `schema.go` file
 in `$PWD/database/model` package for the default database schema. Any other
 schemas will be placed in the same package but in separate files. You can
-control the behavior by passing `--keep-schema-as-package` flag which will
+control the behavior by passing `--keep-schema` flag which will
 cause each schema to be generated in own package under the
 `/$PWD/database/model` package.
 
@@ -273,7 +273,7 @@ help documentation by executing:
 $ prana -h
 
 NAME:
-   prana - Golang Database Object Manager
+   prana - Golang Database Manager
 
 USAGE:
    prana [global options]
