@@ -125,8 +125,6 @@ your final result. Supported extra tags are:
 The model representation of the users table is:
 
 ```golang
-// Package model contains an object model of database schema 'default'
-// Auto-generated at Thu Apr 19 21:36:35 CEST 2018
 package model
 
 import null "gopkg.in/volatiletech/null.v6"
@@ -158,6 +156,30 @@ The generated `db` tag is recognized by
 If you wan to generate models for [gorm](http://gorm.io), you should
 pass `--orm-tag gorm`. Note that constraints like unique or indexes are not
 included for now.
+
+```console
+$ prana model --orm-tag gorm -e json -e xml -e validate sync
+```
+
+The command above will produce the following model:
+
+```golang
+package model
+
+import null "gopkg.in/volatiletech/null.v6"
+
+// User represents a data base table 'users'
+type User struct {
+	// ID represents a database column 'id' of type 'INT PRIMARY KEY NOT NULL'
+	ID int `gorm:"column:id;type:INT;primary_key;not null" json:"id" xml:"id" validate:"required"`
+
+	// FirstName represents a database column 'first_name' of type 'TEXT NOT NULL'
+	FirstName string `gorm:"column:first_name;type:TEXT;not null" json:"first_name" xml:"first_name" validate:"required"`
+
+	// LastName represents a database column 'last_name' of type 'TEXT NULL'
+	LastName null.String `gorm:"column:last_name;type:TEXT;null" json:"last_name" xml:"last_name" validate:"-"`
+}
+```
 
 ### SQL Scripts and Commands
 
