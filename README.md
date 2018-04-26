@@ -161,8 +161,9 @@ included for now.
 
 ### SQL Scripts and Commands
 
-Also, it provides a way to work with embeddable SQL scripts by exposing them as
-SQL Commands. First of all you have create a script that contains your SQL
+Also, it provides a way to work with embeddable SQL scripts which can be
+executed easily by [OAK][oak-url] as SQL Commands. First of all you have create
+a script that contains your SQL
 statements.
 
 The easies way to generate a SQL script with correct format is by using `prana`
@@ -206,6 +207,38 @@ Running command 'show-sqlite-master' from '$PWD/database/script'
 | table | migrations                    |        2 |
 | index | sqlite_autoindex_migrations_1 |        3 |
 +-------+-------------------------------+----------+
+```
+
+You can also generate all CRUD operations for given table. The command below
+will generate a SQL script that contains SQL queries for each table in the
+default schema:
+
+```consol
+$ prana script sync
+```
+
+It will produce the following script in `$PWD/database/script`:
+
+```sql
+-- name: select-all-users
+SELECT * FROM users;
+
+-- name: select-user
+SELECT * FROM users
+WHERE id = ?;
+
+-- name: insert-user
+INSERT INTO users (id, first_name, last_name)
+VALUES (?, ?, ?);
+
+-- name: update-user
+UPDATE users
+SET first_name = ?, last_name = ?
+WHERE id = ?;
+
+-- name: delete-user
+DELETE FROM users
+WHERE id = ?;
 ```
 
 ### Command Line Interface Advance Usage
