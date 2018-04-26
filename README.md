@@ -270,7 +270,7 @@ We are welcome to any contributions. Just fork the
 
 [report-img]: https://goreportcard.com/badge/github.com/phogolabs/prana
 [report-url]: https://goreportcard.com/report/github.com/phogolabs/prana
-[logo-author-url]: https://www.freepik.com/free-photos-vectors/tree
+[logo-author-url]: https://www.freepik.com/free-vector/abstract-cross-logo-template_1185919.htm
 [logo-license]: http://creativecommons.org/licenses/by/3.0/
 [prana-url]: https://github.com/phogolabs/prana
 [prana-img]: doc/img/logo.png
