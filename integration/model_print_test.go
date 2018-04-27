@@ -13,7 +13,7 @@ import (
 	"github.com/onsi/gomega/gexec"
 )
 
-var _ = Describe("Script Sync", func() {
+var _ = Describe("Model Sync", func() {
 	var cmd *exec.Cmd
 
 	BeforeEach(func() {
@@ -40,22 +40,22 @@ var _ = Describe("Script Sync", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
 
-		cmd = exec.Command(gomPath, "--database-url", "sqlite3://gom.db", "script", "sync")
+		cmd = exec.Command(gomPath, "--database-url", "sqlite3://gom.db", "model", "sync")
 		cmd.Dir = dir
 	})
 
-	It("syncs the script command successfully", func() {
+	It("syncs the model successfully", func() {
 		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
 
-		path := filepath.Join(cmd.Dir, "/database/script/command.sql")
+		path := filepath.Join(cmd.Dir, "/database/model/schema.go")
 		Expect(path).To(BeARegularFile())
 
 		data, err := ioutil.ReadFile(path)
 		Expect(err).To(BeNil())
 
 		script := string(data)
-		Expect(script).To(ContainSubstring("-- name: select-all-users"))
+		Expect(script).To(ContainSubstring("type User struct"))
 	})
 })
