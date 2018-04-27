@@ -50,24 +50,21 @@ func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
 
 // NamedCmd is command that can use named parameters
 type NamedCmd struct {
-	query  string
-	params []Param
+	query string
+	param Param
 }
 
 // Prepare prepares the command for execution.
 func (cmd *NamedCmd) Prepare() (string, map[string]interface{}) {
 	params := make(map[string]interface{})
 
-	for _, arg := range cmd.params {
-		args, ok := arg.(map[string]interface{})
+	args, ok := cmd.param.(map[string]interface{})
+	if !ok {
+		args = cmd.bindArgs(cmd.param)
+	}
 
-		if !ok {
-			args = cmd.bindArgs(arg)
-		}
-
-		for k, v := range args {
-			params[k] = v
-		}
+	for k, v := range args {
+		params[k] = v
 	}
 
 	return cmd.query, params
@@ -100,9 +97,9 @@ func SQL(query string, params ...Param) Query {
 }
 
 // NamedSQL create a new named command from raw query
-func NamedSQL(query string, params ...Param) Query {
+func NamedSQL(query string, param Param) Query {
 	return &NamedCmd{
-		query:  query,
-		params: params,
+		query: query,
+		param: param,
 	}
 }

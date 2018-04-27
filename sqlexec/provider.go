@@ -91,14 +91,14 @@ func (p *Provider) Command(name string, params ...Param) (Query, error) {
 
 // NamedCommand returns a command for given name and parameters. The operation can
 // err if the command cannot be found.
-func (p *Provider) NamedCommand(name string, params ...Param) (Query, error) {
+func (p *Provider) NamedCommand(name string, param Param) (Query, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
 	if query, ok := p.repository[name]; ok {
 		return &NamedCmd{
-			query:  query,
-			params: params,
+			query: query,
+			param: param,
 		}, nil
 	}
 

@@ -31,7 +31,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 	})
 
 	AfterEach(func() {
-		Expect(db.Close()).To(Succeed())
+		Expect(provider.Close()).To(Succeed())
 	})
 
 	Describe("Tables", func() {
@@ -216,7 +216,7 @@ var _ = Describe("MySQLProvider", func() {
 	})
 
 	AfterEach(func() {
-		Expect(db.Close()).To(Succeed())
+		Expect(provider.Close()).To(Succeed())
 	})
 
 	Describe("Tables", func() {
@@ -390,7 +390,7 @@ var _ = Describe("SQLiteProvider", func() {
 	})
 
 	AfterEach(func() {
-		Expect(db.Close()).To(Succeed())
+		Expect(provider.Close()).To(Succeed())
 	})
 
 	Describe("Tables", func() {

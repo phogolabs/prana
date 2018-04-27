@@ -161,12 +161,12 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("returns a named command", func() {
-			stmt, err := provider.NamedCommand("up")
+			stmt, err := provider.NamedCommand("up", sqlexec.P{"id": 1})
 			Expect(err).To(BeNil())
 			Expect(stmt).NotTo(BeNil())
 
 			query, params := stmt.Prepare()
-			Expect(params).To(BeEmpty())
+			Expect(params).To(HaveKeyWithValue("id", 1))
 			Expect(query).To(Equal("SELECT * FROM users"))
 		})
 
@@ -229,7 +229,7 @@ var _ = Describe("Provider", func() {
 
 			Describe("NamedCmd", func() {
 				It("returns a error", func() {
-					cmd, err := provider.NamedCommand("down")
+					cmd, err := provider.NamedCommand("down", sqlexec.P{"id": 1})
 					Expect(err).To(MatchError("Command 'down' not found"))
 					Expect(cmd).To(BeNil())
 				})

@@ -18,6 +18,10 @@ type Rows = sqlx.Rows
 // Param is a command parameter for given query.
 type Param = interface{}
 
+// P is a shortcut to a map. It facilitates passing named params to a named
+// commands and queries
+type P = map[string]Param
+
 // FileSystem provides with primitives to work with the underlying file system
 type FileSystem = parcello.FileSystem
 
