@@ -41,11 +41,7 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", err
 	}
 
-	body, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return "", err
-	}
-
+	body, _ := ioutil.ReadAll(reader)
 	if len(body) == 0 {
 		return "", nil
 	}
