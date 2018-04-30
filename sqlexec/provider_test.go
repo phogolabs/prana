@@ -35,7 +35,7 @@ var _ = Describe("Provider", func() {
 			Expect(n).To(Equal(int64(1)))
 			Expect(err).To(Succeed())
 
-			cmd, err := provider.Command("up")
+			cmd, err := provider.Query("up")
 			Expect(err).To(BeNil())
 
 			query, _ := cmd.Prepare()
@@ -54,7 +54,7 @@ var _ = Describe("Provider", func() {
 
 				n, err = provider.ReadFrom(buffer)
 				Expect(n).To(BeZero())
-				Expect(err).To(MatchError("Command 'up' already exists"))
+				Expect(err).To(MatchError("Query 'up' already exists"))
 			})
 		})
 	})
@@ -96,9 +96,9 @@ var _ = Describe("Provider", func() {
 
 			Expect(provider.ReadDir(fileSystem)).To(Succeed())
 
-			cmd, err := provider.Command("up")
+			cmd, err := provider.Query("up")
 			Expect(cmd).To(BeNil())
-			Expect(err).To(MatchError("Command 'up' not found"))
+			Expect(err).To(MatchError("Query 'up' not found"))
 		})
 
 		Context("when the file system fails ", func() {
@@ -133,13 +133,13 @@ var _ = Describe("Provider", func() {
 					Expect(provider.ReadDir(fileSystem)).To(Succeed())
 
 					fileSystem.OpenFileReturns(parcello.NewResourceFile(node), nil)
-					Expect(provider.ReadDir(fileSystem)).To(MatchError("Command 'up' already exists"))
+					Expect(provider.ReadDir(fileSystem)).To(MatchError("Query 'up' already exists"))
 				})
 			})
 		})
 	})
 
-	Describe("Command", func() {
+	Describe("Query", func() {
 		BeforeEach(func() {
 			buffer := bytes.NewBufferString("-- name: up")
 			fmt.Fprintln(buffer)
@@ -151,7 +151,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("returns a command", func() {
-			stmt, err := provider.Command("up")
+			stmt, err := provider.Query("up")
 			Expect(err).To(BeNil())
 			Expect(stmt).NotTo(BeNil())
 
@@ -161,7 +161,7 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("returns a named command", func() {
-			stmt, err := provider.NamedCommand("up", sqlexec.P{"id": 1})
+			stmt, err := provider.NamedQuery("up", sqlexec.P{"id": 1})
 			Expect(err).To(BeNil())
 			Expect(stmt).NotTo(BeNil())
 
@@ -182,7 +182,7 @@ var _ = Describe("Provider", func() {
 			})
 
 			It("returns a command with params", func() {
-				stmt, err := provider.Command("show-users", 1)
+				stmt, err := provider.Query("show-users", 1)
 				Expect(err).To(BeNil())
 				Expect(stmt).NotTo(BeNil())
 
@@ -208,7 +208,7 @@ var _ = Describe("Provider", func() {
 					ID int `db:"id_pk"`
 				}
 
-				stmt, err := provider.NamedCommand("show-users", param{ID: 1})
+				stmt, err := provider.NamedQuery("show-users", param{ID: 1})
 				Expect(err).To(BeNil())
 				Expect(stmt).NotTo(BeNil())
 
@@ -221,16 +221,16 @@ var _ = Describe("Provider", func() {
 		Context("when statements are not found", func() {
 			Describe("Cmd", func() {
 				It("returns a error", func() {
-					cmd, err := provider.Command("down")
-					Expect(err).To(MatchError("Command 'down' not found"))
+					cmd, err := provider.Query("down")
+					Expect(err).To(MatchError("Query 'down' not found"))
 					Expect(cmd).To(BeNil())
 				})
 			})
 
 			Describe("NamedCmd", func() {
 				It("returns a error", func() {
-					cmd, err := provider.NamedCommand("down", sqlexec.P{"id": 1})
-					Expect(err).To(MatchError("Command 'down' not found"))
+					cmd, err := provider.NamedQuery("down", sqlexec.P{"id": 1})
+					Expect(err).To(MatchError("Query 'down' not found"))
 					Expect(cmd).To(BeNil())
 				})
 			})

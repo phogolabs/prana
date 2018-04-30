@@ -18,7 +18,7 @@ func (r *Runner) Run(name string, args ...Param) (*Rows, error) {
 		return nil, err
 	}
 
-	cmd, err := provider.Command(name, args...)
+	cmd, err := provider.Query(name, args...)
 	if err != nil {
 		return nil, err
 	}

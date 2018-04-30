@@ -64,7 +64,7 @@ func (p *Provider) ReadFrom(r io.Reader) (int64, error) {
 
 	for name, stmt := range stmts {
 		if _, ok := p.repository[name]; ok {
-			return 0, fmt.Errorf("Command '%s' already exists", name)
+			return 0, fmt.Errorf("Query '%s' already exists", name)
 		}
 
 		p.repository[name] = stmt
@@ -73,34 +73,34 @@ func (p *Provider) ReadFrom(r io.Reader) (int64, error) {
 	return int64(len(stmts)), nil
 }
 
-// Command returns a command for given name and parameters. The operation can
+// Query returns a query statement for given name and parameters. The operation can
 // err if the command cannot be found.
-func (p *Provider) Command(name string, params ...Param) (Query, error) {
+func (p *Provider) Query(name string, params ...Param) (Query, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
 	if query, ok := p.repository[name]; ok {
-		return &Cmd{
+		return &Stmt{
 			query:  query,
 			params: params,
 		}, nil
 	}
 
-	return nil, fmt.Errorf("Command '%s' not found", name)
+	return nil, fmt.Errorf("Query '%s' not found", name)
 }
 
-// NamedCommand returns a command for given name and parameters. The operation can
+// NamedQuery returns a query statement for given name and parameters. The operation can
 // err if the command cannot be found.
-func (p *Provider) NamedCommand(name string, param Param) (Query, error) {
+func (p *Provider) NamedQuery(name string, param Param) (Query, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
 	if query, ok := p.repository[name]; ok {
-		return &NamedCmd{
+		return &NamedStmt{
 			query: query,
 			param: param,
 		}, nil
 	}
 
-	return nil, fmt.Errorf("Command '%s' not found", name)
+	return nil, fmt.Errorf("Query '%s' not found", name)
 }

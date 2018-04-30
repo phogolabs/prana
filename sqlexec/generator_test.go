@@ -10,9 +10,9 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlexec"
-	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Generator", func() {
@@ -119,7 +119,7 @@ var _ = Describe("Generator", func() {
 				Expect(ioutil.WriteFile(path, buffer.Bytes(), 0700)).To(Succeed())
 
 				_, _, err := generator.Create("commands", "update")
-				Expect(err).To(MatchError("Command 'update' already exists"))
+				Expect(err).To(MatchError("Query 'update' already exists"))
 			})
 		})
 

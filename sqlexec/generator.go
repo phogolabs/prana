@@ -25,8 +25,8 @@ func (g *Generator) Create(path, name string) (string, string, error) {
 		return "", "", err
 	}
 
-	if _, err := provider.Command(name); err == nil {
-		return "", "", fmt.Errorf("Command '%s' already exists", name)
+	if _, err := provider.Query(name); err == nil {
+		return "", "", fmt.Errorf("Query '%s' already exists", name)
 	}
 
 	if path == "" {

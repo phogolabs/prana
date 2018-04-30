@@ -10,9 +10,9 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlexec"
-	"github.com/phogolabs/parcello"
 )
 
 var _ = Describe("Runner", func() {
@@ -104,7 +104,7 @@ var _ = Describe("Runner", func() {
 
 		It("returns an error", func() {
 			_, err := runner.Run("system-tables")
-			Expect(err).To(MatchError("Command 'system-tables' not found"))
+			Expect(err).To(MatchError("Query 'system-tables' not found"))
 		})
 	})
 

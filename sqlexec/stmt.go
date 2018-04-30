@@ -9,17 +9,17 @@ import (
 	"github.com/jmoiron/sqlx/reflectx"
 )
 
-var _ Query = &Cmd{}
-var _ Query = &NamedCmd{}
+var _ Query = &Stmt{}
+var _ Query = &NamedStmt{}
 
-// Cmd represents a single command from SQL sqlexec.
-type Cmd struct {
+// Stmt represents a single command from SQL sqlexec.
+type Stmt struct {
 	query  string
 	params []Param
 }
 
 // Prepare prepares the command for execution.
-func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
+func (cmd *Stmt) Prepare() (string, map[string]interface{}) {
 	query := cmd.query
 	params := make(map[string]interface{})
 	buffer := &bytes.Buffer{}
@@ -48,14 +48,14 @@ func (cmd *Cmd) Prepare() (string, map[string]interface{}) {
 	return query, params
 }
 
-// NamedCmd is command that can use named parameters
-type NamedCmd struct {
+// NamedStmt is command that can use named parameters
+type NamedStmt struct {
 	query string
 	param Param
 }
 
 // Prepare prepares the command for execution.
-func (cmd *NamedCmd) Prepare() (string, map[string]interface{}) {
+func (cmd *NamedStmt) Prepare() (string, map[string]interface{}) {
 	params := make(map[string]interface{})
 
 	args, ok := cmd.param.(map[string]interface{})
@@ -70,7 +70,7 @@ func (cmd *NamedCmd) Prepare() (string, map[string]interface{}) {
 	return cmd.query, params
 }
 
-func (cmd *NamedCmd) bindArgs(param Param) map[string]interface{} {
+func (cmd *NamedStmt) bindArgs(param Param) map[string]interface{} {
 	params := make(map[string]interface{})
 	mapper := reflectx.NewMapper("db")
 
@@ -90,7 +90,7 @@ func (cmd *NamedCmd) bindArgs(param Param) map[string]interface{} {
 
 // SQL create a new command from raw query
 func SQL(query string, params ...Param) Query {
-	return &Cmd{
+	return &Stmt{
 		query:  query,
 		params: params,
 	}
@@ -98,7 +98,7 @@ func SQL(query string, params ...Param) Query {
 
 // NamedSQL create a new named command from raw query
 func NamedSQL(query string, param Param) Query {
-	return &NamedCmd{
+	return &NamedStmt{
 		query: query,
 		param: param,
 	}
