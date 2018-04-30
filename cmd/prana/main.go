@@ -36,12 +36,12 @@ var flags = []cli.Flag{
 
 func main() {
 	migration := &cmd.SQLMigration{}
-	script := &cmd.SQLScript{}
+	routine := &cmd.SQLRoutine{}
 	model := &cmd.SQLModel{}
 
 	commands := []cli.Command{
 		migration.CreateCommand(),
-		script.CreateCommand(),
+		routine.CreateCommand(),
 		model.CreateCommand(),
 	}
 

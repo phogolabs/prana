@@ -13,16 +13,16 @@ import (
 	"github.com/urfave/cli"
 )
 
-// SQLScript provides a subcommands to work with SQL scripts and their
+// SQLRoutine provides a subcommands to work with SQL scripts and their
 // statements.
-type SQLScript struct {
+type SQLRoutine struct {
 	dir string
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
-func (m *SQLScript) CreateCommand() cli.Command {
+func (m *SQLRoutine) CreateCommand() cli.Command {
 	return cli.Command{
-		Name:         "script",
+		Name:         "routine",
 		Usage:        "A group of commands for generating, running, and removing SQL commands",
 		Description:  "A group of commands for generating, running, and removing SQL commands",
 		BashComplete: cli.DefaultAppComplete,
@@ -30,8 +30,8 @@ func (m *SQLScript) CreateCommand() cli.Command {
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:  "directory, dir, d",
-				Usage: "path to the directory that contain the scripts",
-				Value: "./database/script",
+				Usage: "path to the directory that contain the SQL routines",
+				Value: "./database/routine",
 			},
 		},
 		Subcommands: []cli.Command{
@@ -96,7 +96,7 @@ func (m *SQLScript) CreateCommand() cli.Command {
 	}
 }
 
-func (m *SQLScript) before(ctx *cli.Context) error {
+func (m *SQLRoutine) before(ctx *cli.Context) error {
 	var err error
 	m.dir, err = filepath.Abs(ctx.String("directory"))
 	if err != nil {
@@ -106,7 +106,7 @@ func (m *SQLScript) before(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLScript) create(ctx *cli.Context) error {
+func (m *SQLRoutine) create(ctx *cli.Context) error {
 	args := ctx.Args()
 
 	if len(args) != 1 {
@@ -126,7 +126,7 @@ func (m *SQLScript) create(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLScript) run(ctx *cli.Context) error {
+func (m *SQLRoutine) run(ctx *cli.Context) error {
 	args := ctx.Args()
 	params := params(ctx.StringSlice("param"))
 
@@ -168,7 +168,7 @@ func (m *SQLScript) run(ctx *cli.Context) error {
 	return nil
 }
 
-func (m *SQLScript) print(rows *sqlx.Rows) error {
+func (m *SQLRoutine) print(rows *sqlx.Rows) error {
 	table := tablewriter.NewWriter(os.Stdout)
 
 	columns, err := rows.Columns()
@@ -200,7 +200,7 @@ func (m *SQLScript) print(rows *sqlx.Rows) error {
 	return nil
 }
 
-func (m *SQLScript) sync(ctx *cli.Context) error {
+func (m *SQLRoutine) sync(ctx *cli.Context) error {
 	model := &SQLModel{skip: true}
 
 	if err := model.before(ctx); err != nil {

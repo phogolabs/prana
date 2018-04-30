@@ -30,8 +30,11 @@ $ go install github.com/phogolabs/prana/cmd/prana
 
 ### SQL Migrations
 
-Each migration is a SQL script that contains `-- name: up` and `-- name: down`
-comments which have statements for run and revert operations.
+Each migration is a SQL script that contains two operations for upgrade and
+rollback. They are labelled with the following comments:
+
+- `-- name: up` for upgrade
+- `-- name: down` for revert
 
 In order to prepare the project for migration, you have to set it up:
 
@@ -184,7 +187,7 @@ type User struct {
 ### SQL Scripts and Commands
 
 Also, it provides a way to work with embeddable SQL scripts which can be
-executed easily by [OAK][oak-url] as SQL Commands. You can see the
+executed easily by [OAK][oak-url] as SQL Routines. You can see the
 [OAK example](https://github.com/phogolabs/oak/tree/master/example) to
 understand more about that. First of all you have create a script that contains
 your SQL statements.
@@ -193,16 +196,16 @@ The easies way to generate a SQL script with correct format is by using `prana`
 command line interface:
 
 ```console
-$ prana script create show-sqlite-master
+$ prana routine create show-sqlite-master
 ```
 
-The command above will generate a script in your `$PWD/database/script`;
+The command above will generate a script in your `$PWD/database/routine`;
 
 ```console
 $ tree database/
 
 database/
-└── script
+└── routine
     └── 20180328184257.sql
 ```
 
@@ -237,10 +240,10 @@ will generate a SQL script that contains SQL queries for each table in the
 default schema:
 
 ```consol
-$ prana script sync
+$ prana routine sync
 ```
 
-It will produce the following script in `$PWD/database/script`:
+It will produce the following script in `$PWD/database/rotuine`:
 
 ```sql
 -- name: select-all-users
@@ -306,7 +309,7 @@ VERSION:
 COMMANDS:
      migration  A group of commands for generating, running, and reverting migrations
      model      A group of commands for generating object model from database schema
-     script     A group of commands for generating, running, and removing SQL commands
+     routine    A group of commands for generating, running, and removing SQL commands
      help, h    Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:

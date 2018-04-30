@@ -38,11 +38,11 @@ var _ = Describe("Script Run", func() {
 		fmt.Fprintln(script, "-- name: show-migrations")
 		fmt.Fprintln(script, "SELECT * FROM migrations;")
 
-		Expect(os.MkdirAll(filepath.Join(cmd.Dir, "/database/script"), 0700)).To(Succeed())
-		path := filepath.Join(cmd.Dir, "/database/script/20060102150405.sql")
+		Expect(os.MkdirAll(filepath.Join(cmd.Dir, "/database/routine"), 0700)).To(Succeed())
+		path := filepath.Join(cmd.Dir, "/database/routine/20060102150405.sql")
 		Expect(ioutil.WriteFile(path, script.Bytes(), 0700)).To(Succeed())
 
-		cmd = exec.Command(gomPath, append(args, "script", "run")...)
+		cmd = exec.Command(gomPath, append(args, "routine", "run")...)
 		cmd.Dir = dir
 
 		db, err = sql.Open("sqlite3", filepath.Join(dir, "gom.db"))

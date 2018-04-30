@@ -40,7 +40,7 @@ var _ = Describe("Script Sync", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
 
-		cmd = exec.Command(gomPath, "--database-url", "sqlite3://gom.db", "script", "sync")
+		cmd = exec.Command(gomPath, "--database-url", "sqlite3://gom.db", "routine", "sync")
 		cmd.Dir = dir
 	})
 
@@ -49,7 +49,7 @@ var _ = Describe("Script Sync", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
 
-		path := filepath.Join(cmd.Dir, "/database/script/routine.sql")
+		path := filepath.Join(cmd.Dir, "/database/routine/routine.sql")
 		Expect(path).To(BeARegularFile())
 
 		data, err := ioutil.ReadFile(path)

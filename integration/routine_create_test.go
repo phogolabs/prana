@@ -19,10 +19,10 @@ var _ = Describe("Script Create", func() {
 		dir, err := ioutil.TempDir("", "gom")
 		Expect(err).To(BeNil())
 
-		cmd = exec.Command(gomPath, "script", "create")
+		cmd = exec.Command(gomPath, "routine", "create")
 		cmd.Dir = dir
 
-		Expect(os.MkdirAll(filepath.Join(dir, "database", "script"), 0700)).To(Succeed())
+		Expect(os.MkdirAll(filepath.Join(dir, "database", "routine"), 0700)).To(Succeed())
 	})
 
 	It("generates command successfully", func() {
@@ -31,7 +31,7 @@ var _ = Describe("Script Create", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
 
-		path := filepath.Join(cmd.Dir, "/database/script/commands.sql")
+		path := filepath.Join(cmd.Dir, "/database/routine/commands.sql")
 		Expect(path).To(BeARegularFile())
 
 		data, err := ioutil.ReadFile(path)
@@ -48,7 +48,7 @@ var _ = Describe("Script Create", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
 
-			path := filepath.Join(cmd.Dir, "/database/script/commands.sql")
+			path := filepath.Join(cmd.Dir, "/database/routine/commands.sql")
 			Expect(path).To(BeARegularFile())
 
 			data, err := ioutil.ReadFile(path)
@@ -66,7 +66,7 @@ var _ = Describe("Script Create", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
 
-			path := filepath.Join(cmd.Dir, "/database/script/my_commands.sql")
+			path := filepath.Join(cmd.Dir, "/database/routine/my_commands.sql")
 			Expect(path).To(BeARegularFile())
 
 			data, err := ioutil.ReadFile(path)
