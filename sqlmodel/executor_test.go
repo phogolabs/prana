@@ -364,7 +364,7 @@ var _ = Describe("Executor", func() {
 				executor.Config.KeepSchema = false
 			})
 
-			ItCreatesTheSQLScript("command.sql")
+			ItCreatesTheSQLScript("routine.sql")
 
 			Context("when the schema is not default", func() {
 				BeforeEach(func() {

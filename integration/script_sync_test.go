@@ -49,7 +49,7 @@ var _ = Describe("Script Sync", func() {
 		Expect(err).NotTo(HaveOccurred())
 		Eventually(session).Should(gexec.Exit(0))
 
-		path := filepath.Join(cmd.Dir, "/database/script/command.sql")
+		path := filepath.Join(cmd.Dir, "/database/script/routine.sql")
 		Expect(path).To(BeARegularFile())
 
 		data, err := ioutil.ReadFile(path)
