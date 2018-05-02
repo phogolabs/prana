@@ -1,12 +1,13 @@
 package sqlmigr
 
 import (
+	"fmt"
 	"io"
 	"time"
 
 	"github.com/apex/log"
 	"github.com/fatih/color"
-	"github.com/olekukonko/tablewriter"
+	"github.com/gosuri/uitable"
 )
 
 // Flog prints the migrations as fields
@@ -33,21 +34,24 @@ func Flog(logger log.Interface, migrations []Migration) {
 
 // Ftable prints the migrations as table
 func Ftable(w io.Writer, migrations []Migration) {
-	table := tablewriter.NewWriter(w)
-	table.SetHeader([]string{"Id", "Description", "Status", "Created At"})
+	table := uitable.New()
+	table.MaxColWidth = 50
 
 	for _, m := range migrations {
 		status := color.YellowString("pending")
-		timestamp := ""
+		timestamp := "--"
 
 		if !m.CreatedAt.IsZero() {
 			status = color.GreenString("executed")
 			timestamp = m.CreatedAt.Format(time.UnixDate)
 		}
 
-		row := []string{m.ID, m.Description, status, timestamp}
-		table.Append(row)
+		table.AddRow("Id", m.ID)
+		table.AddRow("Description", m.Description)
+		table.AddRow("Status", status)
+		table.AddRow("Created At", timestamp)
+		table.AddRow("")
 	}
 
-	table.Render()
+	fmt.Fprintln(w, table)
 }
