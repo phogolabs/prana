@@ -1,5 +1,5 @@
 hash: 264de43bb8656c5955e90a98e1dcf886f8836b5986900b6c348d3bf1c9e1797d
-updated: 2018-04-30T12:30:51.451767+01:00
+updated: 2018-05-02T17:40:45.761284+01:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -19,6 +19,11 @@ imports:
   version: b1f6470ffb9c552dc105dd869f16e36ba86ba7d0
 - name: github.com/go-sql-driver/mysql
   version: a0583e0143b1624142adab07e0e97fe106d99561
+- name: github.com/gosuri/uitable
+  version: 36ee7e946282a3fb1cfecd476ddc9b35d8847e42
+  subpackages:
+  - util/strutil
+  - util/wordwrap
 - name: github.com/jmoiron/sqlx
   version: 2aeb6a910c2b94f2d5eb53d9895d80e27264ec41
   subpackages:
@@ -48,11 +53,11 @@ imports:
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: golang.org/x/sys
-  version: f67ecc163a74fbeea4cb1db0a101dcd07201464a
+  version: 78d5f264b493f125018180c204871ecf58a2dce1
   subpackages:
   - unix
 - name: golang.org/x/tools
-  version: 8e070db38e5c55da6a85c81878ab769bf5667848
+  version: 5c8013c5617234a9515f1b1379aba7e03e846479
   subpackages:
   - go/ast/astutil
   - imports
