@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/apex/log"
+	"github.com/go-openapi/inflect"
 )
 
 // Executor provides a group of operations that works with migrations.
@@ -65,7 +66,7 @@ func (m *Executor) Setup() error {
 // Create creates a migration script successfully if the project has already
 // been setup, otherwise returns an error.
 func (m *Executor) Create(name string) (*Migration, error) {
-	name = strings.Replace(name, " ", "_", -1)
+	name = inflect.Underscore(strings.ToLower(name))
 
 	timestamp := time.Now()
 

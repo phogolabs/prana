@@ -59,6 +59,7 @@ var _ = Describe("Generator", func() {
 				filename := filepath.Base(path)
 				ext := filepath.Ext(path)
 				filename = strings.Replace(filename, ext, "", -1)
+				filename = strings.Replace(filename, "-routine", "", -1)
 
 				_, err = time.Parse("20060102150405", filename)
 				Expect(err).To(Succeed())

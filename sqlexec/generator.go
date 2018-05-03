@@ -3,6 +3,7 @@ package sqlexec
 import (
 	"fmt"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/go-openapi/inflect"
@@ -16,8 +17,8 @@ type Generator struct {
 
 // Create crates a new file and command for given file name and command name.
 func (g *Generator) Create(path, name string) (string, string, error) {
-	path = inflect.Underscore(inflect.Camelize(path))
-	name = inflect.Dasherize(name)
+	path = inflect.Underscore(strings.ToLower(path))
+	name = inflect.Dasherize(strings.ToLower(name))
 
 	provider := &Provider{}
 

@@ -349,14 +349,14 @@ var _ = Describe("Executor", func() {
 			})
 		}
 
-		ItCreatesTheSQLScript("public.sql")
+		ItCreatesTheSQLScript("public-routine.sql")
 
 		Context("when the schema is not default", func() {
 			BeforeEach(func() {
 				schemaDef.IsDefault = false
 			})
 
-			ItCreatesTheSQLScript("public.sql")
+			ItCreatesTheSQLScript("public-routine.sql")
 		})
 
 		Context("when the KeepSchema is false", func() {
@@ -364,14 +364,14 @@ var _ = Describe("Executor", func() {
 				executor.Config.KeepSchema = false
 			})
 
-			ItCreatesTheSQLScript("routine.sql")
+			ItCreatesTheSQLScript("schema-routine.sql")
 
 			Context("when the schema is not default", func() {
 				BeforeEach(func() {
 					schemaDef.IsDefault = false
 				})
 
-				ItCreatesTheSQLScript("public.sql")
+				ItCreatesTheSQLScript("public-routine.sql")
 			})
 		})
 
@@ -385,8 +385,8 @@ var _ = Describe("Executor", func() {
 				Expect(err).To(Succeed())
 
 				Expect(spec.Dir).To(BeADirectory())
-				Expect(filepath.Join(spec.Dir, "public.sql")).To(BeARegularFile())
-				Expect(filepath.Join(spec.Dir, "public.sql")).To(Equal(path))
+				Expect(filepath.Join(spec.Dir, "public-routine.sql")).To(BeARegularFile())
+				Expect(filepath.Join(spec.Dir, "public-routine.sql")).To(Equal(path))
 
 				Expect(provider.TablesCallCount()).To(Equal(1))
 				Expect(provider.TablesArgsForCall(0)).To(Equal("public"))
@@ -423,8 +423,8 @@ var _ = Describe("Executor", func() {
 				path, err := executor.CreateScript(spec)
 				Expect(err).To(Succeed())
 				Expect(spec.Dir).To(BeADirectory())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, "public.sql")))
-				Expect(filepath.Join(spec.Dir, "public.sql")).To(BeARegularFile())
+				Expect(path).To(Equal(filepath.Join(spec.Dir, "public-routine.sql")))
+				Expect(filepath.Join(spec.Dir, "public-routine.sql")).To(BeARegularFile())
 			})
 		})
 
