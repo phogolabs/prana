@@ -62,7 +62,7 @@ type GORMTagBuilder struct{}
 func (builder GORMTagBuilder) Build(column *Column) string {
 	options := []string{}
 	options = append(options, fmt.Sprintf("column:%s", column.Name))
-	options = append(options, fmt.Sprintf("type:%s", column.Type.DBType()))
+	options = append(options, fmt.Sprintf("type:%s", strings.ToLower(column.Type.DBType())))
 
 	if column.Type.IsPrimaryKey {
 		options = append(options, "primary_key")

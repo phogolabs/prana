@@ -174,13 +174,13 @@ import null "gopkg.in/volatiletech/null.v6"
 // User represents a data base table 'users'
 type User struct {
 	// ID represents a database column 'id' of type 'INT PRIMARY KEY NOT NULL'
-	ID int `gorm:"column:id;type:INT;primary_key;not null" json:"id" xml:"id" validate:"required"`
+	ID int `gorm:"column:id;type:int;primary_key;not null" json:"id" xml:"id" validate:"required"`
 
 	// FirstName represents a database column 'first_name' of type 'TEXT NOT NULL'
-	FirstName string `gorm:"column:first_name;type:TEXT;not null" json:"first_name" xml:"first_name" validate:"required"`
+	FirstName string `gorm:"column:first_name;type:text;not null" json:"first_name" xml:"first_name" validate:"required"`
 
 	// LastName represents a database column 'last_name' of type 'TEXT NULL'
-	LastName null.String `gorm:"column:last_name;type:TEXT;null" json:"last_name" xml:"last_name" validate:"-"`
+	LastName null.String `gorm:"column:last_name;type:text;null" json:"last_name" xml:"last_name" validate:"-"`
 }
 ```
 
