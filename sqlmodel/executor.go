@@ -162,10 +162,10 @@ func (e *Executor) scriptFileOf(schema *Schema, spec *Spec) (string, error) {
 		return "", err
 	}
 
-	filename := "schema-routine.sql"
+	filename := "schema.sql"
 
 	if !schema.IsDefault || e.Config.KeepSchema {
-		filename = fmt.Sprintf("%s-routine.sql", schema.Name)
+		filename = fmt.Sprintf("%s.sql", schema.Name)
 	}
 
 	if err := os.MkdirAll(dir, 0700); err != nil {
