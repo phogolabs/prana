@@ -72,6 +72,9 @@ func (r *Runner) command(name string, m *Migration) ([]string, error) {
 		return []string{}, fmt.Errorf("Routine '%s' not found for migration '%s'", name, m.Filename())
 	}
 
-	commands := strings.Split(statements, ";")
+	commands := strings.FieldsFunc(statements, func(c rune) bool {
+		return c == ';'
+	})
+
 	return commands, nil
 }
