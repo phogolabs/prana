@@ -34,6 +34,8 @@ func (g *Generator) Write(m *Migration, content *Content) error {
 		if _, err := io.Copy(buffer, content.UpCommand); err != nil {
 			return err
 		}
+	} else {
+		fmt.Fprintln(buffer)
 	}
 
 	fmt.Fprintln(buffer, "-- name: down")
@@ -42,6 +44,8 @@ func (g *Generator) Write(m *Migration, content *Content) error {
 		if _, err := io.Copy(buffer, content.DownCommand); err != nil {
 			return err
 		}
+	} else {
+		fmt.Fprintln(buffer)
 	}
 
 	if err := g.write(m.Filename(), buffer.Bytes(), 0600); err != nil {
