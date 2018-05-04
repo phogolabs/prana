@@ -42,18 +42,24 @@ func (r *Runner) exec(step string, m *Migration) error {
 		return err
 	}
 
+	tx, err := r.DB.Begin()
+	if err != nil {
+		return err
+	}
+
 	for _, query := range statements {
-		if _, err := r.DB.Exec(query); err != nil {
-			err = &RunnerError{
+		if _, err := tx.Exec(query); err != nil {
+			tx.Rollback()
+
+			return &RunnerError{
 				Err:       err,
 				Migration: m.Filename(),
 				Statement: query,
 			}
-			return err
 		}
 	}
 
-	return nil
+	return tx.Commit()
 }
 
 func (r *Runner) command(name string, m *Migration) ([]string, error) {
