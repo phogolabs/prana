@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"time"
@@ -128,7 +129,7 @@ var _ = Describe("Generator", func() {
 			It("returns an error", func() {
 				generator.FileSystem = parcello.Dir("/hello")
 				_, _, err := generator.Create("commands", "update")
-				Expect(err).To(MatchError("Directory does not exist"))
+				Expect(os.IsNotExist(err)).To(BeTrue())
 			})
 		})
 	})

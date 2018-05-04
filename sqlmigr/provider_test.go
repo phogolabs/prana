@@ -11,8 +11,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/prana/sqlmigr"
 	"github.com/phogolabs/parcello"
+	"github.com/phogolabs/prana/sqlmigr"
 )
 
 var _ = Describe("Provider", func() {
@@ -193,7 +193,7 @@ var _ = Describe("Provider", func() {
 			It("returns an error", func() {
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError("Directory '.' does not exist"))
+				Expect(os.IsNotExist(err)).To(BeTrue())
 			})
 		})
 

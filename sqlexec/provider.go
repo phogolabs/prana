@@ -19,7 +19,7 @@ type Provider struct {
 func (p *Provider) ReadDir(fs FileSystem) error {
 	return fs.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info == nil {
-			return fmt.Errorf("Directory does not exist")
+			return os.ErrNotExist
 		}
 
 		if info.IsDir() {

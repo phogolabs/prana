@@ -26,7 +26,7 @@ func (m *Provider) Migrations() ([]Migration, error) {
 
 	err := m.FileSystem.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if info == nil {
-			return fmt.Errorf("Directory '%s' does not exist", path)
+			return os.ErrNotExist
 		}
 
 		if info.IsDir() {

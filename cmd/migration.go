@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -162,6 +163,7 @@ func (m *SQLMigration) run(ctx *cli.Context) error {
 
 	_, err := m.executor.Run(count)
 	if err != nil {
+		err = m.errf(err)
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
@@ -176,6 +178,7 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 
 	_, err := m.executor.Revert(count)
 	if err != nil {
+		err = m.errf(err)
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
@@ -185,11 +188,13 @@ func (m *SQLMigration) revert(ctx *cli.Context) error {
 func (m *SQLMigration) reset(ctx *cli.Context) error {
 	_, err := m.executor.RevertAll()
 	if err != nil {
+		err = m.errf(err)
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
 	_, err = m.executor.RunAll()
 	if err != nil {
+		err = m.errf(err)
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
@@ -209,4 +214,11 @@ func (m *SQLMigration) status(ctx *cli.Context) error {
 
 	sqlmigr.Ftable(os.Stdout, migrations)
 	return nil
+}
+
+func (m *SQLMigration) errf(err error) error {
+	if os.IsNotExist(err) {
+		err = fmt.Errorf("Directory '%s' does not exist", m.dir)
+	}
+	return err
 }
