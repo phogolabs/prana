@@ -69,11 +69,12 @@ func (m *Provider) Migrations() ([]Migration, error) {
 func (m *Provider) Insert(item *Migration) error {
 	item.CreatedAt = time.Now()
 
-	query := &bytes.Buffer{}
-	query.WriteString("INSERT INTO migrations(id, description, created_at) ")
-	query.WriteString("VALUES (?, ?, ?)")
+	builder := &bytes.Buffer{}
+	builder.WriteString("INSERT INTO migrations(id, description, created_at) ")
+	builder.WriteString("VALUES (?, ?, ?)")
 
-	if _, err := m.DB.Exec(query.String(), item.ID, item.Description, item.CreatedAt); err != nil {
+	query := m.DB.Rebind(builder.String())
+	if _, err := m.DB.Exec(query, item.ID, item.Description, item.CreatedAt); err != nil {
 		return err
 	}
 
@@ -82,11 +83,12 @@ func (m *Provider) Insert(item *Migration) error {
 
 // Delete deletes applied sqlmigr item from sqlmigrs table.
 func (m *Provider) Delete(item *Migration) error {
-	query := &bytes.Buffer{}
-	query.WriteString("DELETE FROM migrations ")
-	query.WriteString("WHERE id = ?")
+	builder := &bytes.Buffer{}
+	builder.WriteString("DELETE FROM migrations ")
+	builder.WriteString("WHERE id = ?")
 
-	if _, err := m.DB.Exec(query.String(), item.ID); err != nil {
+	query := m.DB.Rebind(builder.String())
+	if _, err := m.DB.Exec(query, item.ID); err != nil {
 		return err
 	}
 
