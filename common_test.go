@@ -18,7 +18,7 @@ var _ = Describe("ParseURL", func() {
 		driver, source, err := prana.ParseURL("mysql://root@/prana")
 		Expect(err).NotTo(HaveOccurred())
 		Expect(driver).To(Equal("mysql"))
-		Expect(source).To(Equal("root@/prana"))
+		Expect(source).To(Equal("root@tcp(127.0.0.1:3306)/prana?parseTime=true"))
 	})
 
 	It("parses the PostgreSQL connection string successfully", func() {
