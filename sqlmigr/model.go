@@ -94,3 +94,22 @@ func Parse(path string) (*Migration, error) {
 		Description: parts[1],
 	}, nil
 }
+
+// IsNotExist reports if the error is because of migration table not exists
+func IsNotExist(err error) bool {
+	msg := err.Error()
+
+	switch {
+	// SQLite
+	case msg == "no such table: migrations":
+		return true
+		// PostgreSQL
+	case msg == `pq: relation "migrations" does not exist`:
+		return true
+		// MySQL
+	case strings.HasSuffix(msg, "migrations' doesn't exist"):
+		return true
+	default:
+		return false
+	}
+}

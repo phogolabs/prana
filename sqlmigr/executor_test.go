@@ -63,12 +63,6 @@ var _ = Describe("Executor", func() {
 			data, err = ioutil.ReadAll(content.DownCommand)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(string(data)).To(Equal("DROP TABLE IF EXISTS migrations;\n"))
-
-			Expect(runner.RunCallCount()).To(Equal(1))
-			item = runner.RunArgsForCall(0)
-
-			Expect(item.ID).To(Equal(min.Format(format)))
-			Expect(item.Description).To(Equal("setup"))
 		})
 
 		Context("when the migration exists", func() {
@@ -82,13 +76,6 @@ var _ = Describe("Executor", func() {
 		Context("when the generator fails", func() {
 			It("returns the error", func() {
 				generator.WriteReturns(fmt.Errorf("oh no!"))
-				Expect(executor.Setup()).To(MatchError("oh no!"))
-			})
-		})
-
-		Context("when the runner fails", func() {
-			It("return the error", func() {
-				runner.RunReturns(fmt.Errorf("oh no!"))
 				Expect(executor.Setup()).To(MatchError("oh no!"))
 			})
 		})
@@ -216,23 +203,6 @@ var _ = Describe("Executor", func() {
 					item = provider.InsertArgsForCall(i)
 					Expect(*item).To(Equal(migrations[i]))
 				}
-			})
-
-			Context("when the item name is wrong", func() {
-				It("returns an error", func() {
-					migrations := []sqlmigr.Migration{
-						{
-							ID:          "timestamp",
-							Description: "First",
-							CreatedAt:   time.Now(),
-						},
-					}
-
-					provider.MigrationsReturns(migrations, nil)
-					cnt, err := executor.Run(1)
-					Expect(err).To(MatchError(`parsing time "timestamp" as "20060102150405": cannot parse "timestamp" as "2006"`))
-					Expect(cnt).To(BeZero())
-				})
 			})
 		})
 
@@ -446,23 +416,6 @@ var _ = Describe("Executor", func() {
 
 					Expect(runner.RevertCallCount()).To(Equal(1))
 				})
-			})
-		})
-
-		Context("when the item name is wrong", func() {
-			It("returns an error", func() {
-				migrations := []sqlmigr.Migration{
-					{
-						ID:          "timestamp",
-						Description: "First",
-						CreatedAt:   time.Now(),
-					},
-				}
-
-				provider.MigrationsReturns(migrations, nil)
-				cnt, err := executor.Revert(1)
-				Expect(err).To(MatchError(`parsing time "timestamp" as "20060102150405": cannot parse "timestamp" as "2006"`))
-				Expect(cnt).To(BeZero())
 			})
 		})
 

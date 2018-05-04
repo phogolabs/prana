@@ -25,14 +25,11 @@ var _ = Describe("Migration Status", func() {
 		dir, err := ioutil.TempDir("", "gom")
 		Expect(err).To(BeNil())
 
-		args := []string{"--database-url", "sqlite3://gom.db", "migration"}
+		args := []string{"--database-url", "sqlite3://gom.db"}
 
-		cmd = exec.Command(gomPath, append(args, "setup")...)
-		cmd.Dir = dir
+		Setup(args, dir)
 
-		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
-		Expect(err).NotTo(HaveOccurred())
-		Eventually(session).Should(gexec.Exit(0))
+		args = append(args, "migration")
 
 		script := &bytes.Buffer{}
 		fmt.Fprintln(script, "-- name: up")
@@ -40,7 +37,7 @@ var _ = Describe("Migration Status", func() {
 		fmt.Fprintln(script, "-- name: down")
 		fmt.Fprintln(script, "SELECT * FROM migrations;")
 
-		path := filepath.Join(cmd.Dir, "/database/migration/20060102150405_schema.sql")
+		path := filepath.Join(dir, "/database/migration/20060102150405_schema.sql")
 		Expect(ioutil.WriteFile(path, script.Bytes(), 0700)).To(Succeed())
 
 		cmd = exec.Command(gomPath, append(args, "status")...)

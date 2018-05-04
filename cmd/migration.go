@@ -127,6 +127,10 @@ func (m *SQLMigration) after(ctx *cli.Context) error {
 
 func (m *SQLMigration) setup(ctx *cli.Context) error {
 	if err := m.executor.Setup(); err != nil {
+		if os.IsExist(err) {
+			return nil
+		}
+
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 

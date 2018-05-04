@@ -3,7 +3,6 @@ package sqlmigr
 import (
 	"bytes"
 	"fmt"
-	"os"
 	"strings"
 	"time"
 
@@ -32,10 +31,6 @@ func (m *Executor) Setup() error {
 		CreatedAt:   time.Now(),
 	}
 
-	if ok := m.Provider.Exists(migration); ok {
-		return nil
-	}
-
 	up := &bytes.Buffer{}
 	fmt.Fprintln(up, "CREATE TABLE IF NOT EXISTS migrations (")
 	fmt.Fprintln(up, " id          TEXT      NOT NULL PRIMARY KEY,")
@@ -52,15 +47,7 @@ func (m *Executor) Setup() error {
 		DownCommand: down,
 	}
 
-	if err := m.Generator.Write(migration, content); err != nil && !os.IsExist(err) {
-		return err
-	}
-
-	if err := m.Runner.Run(migration); err != nil {
-		return err
-	}
-
-	return m.Provider.Insert(migration)
+	return m.Generator.Write(migration, content)
 }
 
 // Create creates a migration script successfully if the project has already
@@ -93,17 +80,13 @@ func (m *Executor) Run(step int) (int, error) {
 	}
 
 	m.logf("Running migration(s)")
+
 	for _, migration := range migrations {
 		if step == 0 {
 			return run, nil
 		}
 
-		timestamp, err := time.Parse(format, migration.ID)
-		if err != nil {
-			return run, err
-		}
-
-		if !migration.CreatedAt.IsZero() || timestamp == min {
+		if !migration.CreatedAt.IsZero() {
 			continue
 		}
 
@@ -137,11 +120,13 @@ func (m *Executor) RunAll() (int, error) {
 func (m *Executor) Revert(step int) (int, error) {
 	reverted := 0
 	migrations, err := m.Migrations()
+
 	if err != nil {
 		return reverted, err
 	}
 
 	m.logf("Reverting migration(s)")
+
 	for i := len(migrations) - 1; i >= 0; i-- {
 		migration := migrations[i]
 
@@ -153,11 +138,6 @@ func (m *Executor) Revert(step int) (int, error) {
 			continue
 		}
 
-		timestamp, err := time.Parse(format, migration.ID)
-		if err != nil || timestamp == min {
-			return reverted, err
-		}
-
 		op := migration
 
 		m.logf("Reverting migration '%s'", migration.Filename())
@@ -166,6 +146,9 @@ func (m *Executor) Revert(step int) (int, error) {
 		}
 
 		if err := m.Provider.Delete(&op); err != nil {
+			if IsNotExist(err) {
+				err = nil
+			}
 			return reverted, err
 		}
 

@@ -27,19 +27,14 @@ var _ = Describe("Script Run", func() {
 
 		args := []string{"--database-url", "sqlite3://gom.db"}
 
-		cmd = exec.Command(gomPath, append(args, "migration", "setup")...)
-		cmd.Dir = dir
-
-		session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
-		Expect(err).NotTo(HaveOccurred())
-		Eventually(session).Should(gexec.Exit(0))
+		Setup(args, dir)
 
 		script := &bytes.Buffer{}
 		fmt.Fprintln(script, "-- name: show-migrations")
 		fmt.Fprintln(script, "SELECT * FROM migrations;")
 
-		Expect(os.MkdirAll(filepath.Join(cmd.Dir, "/database/routine"), 0700)).To(Succeed())
-		path := filepath.Join(cmd.Dir, "/database/routine/20060102150405.sql")
+		Expect(os.MkdirAll(filepath.Join(dir, "/database/routine"), 0700)).To(Succeed())
+		path := filepath.Join(dir, "/database/routine/20060102150405.sql")
 		Expect(ioutil.WriteFile(path, script.Bytes(), 0700)).To(Succeed())
 
 		cmd = exec.Command(gomPath, append(args, "routine", "run")...)

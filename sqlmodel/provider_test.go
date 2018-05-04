@@ -256,10 +256,10 @@ var _ = Describe("MySQLProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				db, err := sqlx.Open("mysql", "root@/prana")
+				dbb, err := sqlx.Open("mysql", "root@/prana")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(db.Close()).To(Succeed())
-				provider.DB = db
+				Expect(dbb.Close()).To(Succeed())
+				provider.DB = dbb
 			})
 
 			It("return an error", func() {

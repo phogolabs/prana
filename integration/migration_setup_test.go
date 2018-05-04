@@ -41,11 +41,13 @@ var _ = Describe("Migration Setup", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
 
+			Expect(session.Err).Should(gbytes.Say("Setup project directory at"))
+
 			session, err = gexec.Start(setupCmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
 
-			Expect(session.Err).Should(gbytes.Say("Setup project directory at"))
+			Expect(session.Err).ShouldNot(gbytes.Say("Setup project directory at"))
 		})
 	})
 

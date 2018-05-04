@@ -58,7 +58,7 @@ func (m *Provider) Migrations() ([]Migration, error) {
 	query.WriteString("FROM migrations ")
 	query.WriteString("ORDER BY id ASC")
 
-	if err := m.DB.Select(&remote, query.String()); err != nil {
+	if err := m.DB.Select(&remote, query.String()); err != nil && !IsNotExist(err) {
 		return []Migration{}, err
 	}
 
