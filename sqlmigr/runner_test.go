@@ -95,7 +95,9 @@ var _ = Describe("Runner", func() {
 			})
 
 			It("return an error", func() {
-				Expect(runner.Run(item)).To(MatchError("sql: database is closed"))
+				err := runner.Run(item)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("sql: database is closed"))
 			})
 		})
 
@@ -148,7 +150,9 @@ var _ = Describe("Runner", func() {
 			})
 
 			It("return an error", func() {
-				Expect(runner.Revert(item)).To(MatchError("sql: database is closed"))
+				err := runner.Revert(item)
+				Expect(err).To(HaveOccurred())
+				Expect(err.Error()).To(ContainSubstring("sql: database is closed"))
 			})
 		})
 

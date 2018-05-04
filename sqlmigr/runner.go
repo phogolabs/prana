@@ -44,6 +44,11 @@ func (r *Runner) exec(step string, m *Migration) error {
 
 	for _, query := range statements {
 		if _, err := r.DB.Exec(query); err != nil {
+			err = &RunnerError{
+				Err:       err,
+				Migration: m.Filename(),
+				Statement: query,
+			}
 			return err
 		}
 	}
@@ -75,6 +80,10 @@ func (r *Runner) command(name string, m *Migration) ([]string, error) {
 	commands := strings.FieldsFunc(statements, func(c rune) bool {
 		return c == ';'
 	})
+
+	for index, cmd := range commands {
+		commands[index] = strings.TrimSpace(cmd)
+	}
 
 	return commands, nil
 }

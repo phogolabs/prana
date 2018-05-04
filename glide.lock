@@ -1,5 +1,5 @@
 hash: 264de43bb8656c5955e90a98e1dcf886f8836b5986900b6c348d3bf1c9e1797d
-updated: 2018-05-03T12:30:50.402522+01:00
+updated: 2018-05-04T14:12:34.485661+01:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -57,7 +57,7 @@ imports:
   subpackages:
   - unix
 - name: golang.org/x/tools
-  version: f4ce24f1d8feacab63a0476fc8bee0de7f9dc291
+  version: ae8027637c91c400af8a3e006c35c7011b3ca1fe
   subpackages:
   - go/ast/astutil
   - imports

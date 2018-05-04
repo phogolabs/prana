@@ -9,6 +9,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/gosuri/uitable"
 	"github.com/phogolabs/parcello"
 )
 
@@ -58,6 +59,25 @@ type Content struct {
 	UpCommand io.Reader
 	// DownCommand is the content for rollback operation.
 	DownCommand io.Reader
+}
+
+// RunnerError represents a runner error
+type RunnerError struct {
+	// Migration name
+	Migration string
+	// Statement that cause the issue
+	Statement string
+	// Err the actual error
+	Err error
+}
+
+// Error returns the error as string
+func (e *RunnerError) Error() string {
+	table := uitable.New()
+	table.AddRow("error", e.Err.Error())
+	table.AddRow("migration", e.Migration)
+	table.AddRow("statement", e.Statement)
+	return table.String()
 }
 
 // Migration represents a single migration record.
