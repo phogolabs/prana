@@ -29,9 +29,10 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 		Before:       m.before,
 		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name:  "directory, dir, d",
-				Usage: "path to the directory that contain the SQL routines",
-				Value: "./database/routine",
+				Name:   "directory, dir, d",
+				Usage:  "path to the directory that contain the SQL routines",
+				EnvVar: "PRANA_ROUTINE_DIR",
+				Value:  "./database/routine",
 			},
 		},
 		Subcommands: []cli.Command{
