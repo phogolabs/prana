@@ -1,15 +1,20 @@
 package sqlexec
 
 import (
+	"database/sql"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 )
 
 // Provider loads SQL sqlexecs and provides all SQL statements as commands.
 type Provider struct {
+	// Driver is the current SQL driver
+	Driver string
+	// private fields
 	mu         sync.RWMutex
 	repository map[string]string
 }
@@ -26,28 +31,32 @@ func (p *Provider) ReadDir(fs FileSystem) error {
 			return nil
 		}
 
-		matched, err := filepath.Match("*.sql", info.Name())
-		if err != nil || !matched {
-			return err
-		}
-
-		file, err := fs.OpenFile(path, os.O_RDONLY, 0)
-		if err != nil {
-			return err
-		}
-
-		defer func() {
-			if ioErr := file.Close(); err == nil {
-				err = ioErr
-			}
-		}()
-
-		if _, err = p.ReadFrom(file); err != nil {
-			return err
-		}
-
-		return err
+		return p.ReadFile(path, fs)
 	})
+}
+
+// ReadFile reads a given file
+func (p *Provider) ReadFile(path string, fs FileSystem) error {
+	if !p.filter(path) {
+		return nil
+	}
+
+	file, err := fs.OpenFile(path, os.O_RDONLY, 0)
+	if err != nil {
+		return err
+	}
+
+	defer func() {
+		if ioErr := file.Close(); err == nil {
+			err = ioErr
+		}
+	}()
+
+	if _, err = p.ReadFrom(file); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // ReadFrom reads the sqlexec from a reader
@@ -64,7 +73,7 @@ func (p *Provider) ReadFrom(r io.Reader) (int64, error) {
 
 	for name, stmt := range stmts {
 		if _, ok := p.repository[name]; ok {
-			return 0, fmt.Errorf("Query '%s' already exists", name)
+			return 0, fmt.Errorf("query '%s' already exists", name)
 		}
 
 		p.repository[name] = stmt
@@ -86,7 +95,7 @@ func (p *Provider) Query(name string, params ...Param) (Query, error) {
 		}, nil
 	}
 
-	return nil, fmt.Errorf("Query '%s' not found", name)
+	return nil, nonExistQueryErr(name)
 }
 
 // NamedQuery returns a query statement for given name and parameters. The operation can
@@ -102,5 +111,35 @@ func (p *Provider) NamedQuery(name string, param Param) (Query, error) {
 		}, nil
 	}
 
-	return nil, fmt.Errorf("Query '%s' not found", name)
+	return nil, nonExistQueryErr(name)
+}
+
+// Filter returns true if the file can be processed for the current driver
+func (p *Provider) filter(path string) bool {
+	ext := filepath.Ext(path)
+
+	if ext != ".sql" {
+		return false
+	}
+
+	if p.Driver == "" {
+		return true
+	}
+
+	_, path = filepath.Split(path)
+	path = strings.Replace(path, ext, "", -1)
+	parts := strings.Split(path, "_")
+	driver := strings.ToLower(parts[len(parts)-1])
+
+	for _, name := range sql.Drivers() {
+		if driver == name {
+			return driver == p.Driver
+		}
+	}
+
+	return true
+}
+
+func nonExistQueryErr(name string) error {
+	return fmt.Errorf("query '%s' not found", name)
 }

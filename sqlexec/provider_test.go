@@ -54,7 +54,7 @@ var _ = Describe("Provider", func() {
 
 				n, err = provider.ReadFrom(buffer)
 				Expect(n).To(BeZero())
-				Expect(err).To(MatchError("Query 'up' already exists"))
+				Expect(err).To(MatchError("query 'up' already exists"))
 			})
 		})
 	})
@@ -81,6 +81,58 @@ var _ = Describe("Provider", func() {
 			Expect(dir).To(Equal("/"))
 		})
 
+		Context("when the driver is provided", func() {
+			var node *parcello.Node
+			BeforeEach(func() {
+				provider.Driver = "sqlite3"
+
+				data := buffer.Bytes()
+				node = &parcello.Node{
+					Name:    "file_sqlite3.sql",
+					Content: &data,
+					Mutex:   &sync.RWMutex{},
+				}
+
+				fileSystem.OpenFileReturns(parcello.NewResourceFile(node), nil)
+				fileSystem.WalkStub = func(dir string, fn filepath.WalkFunc) error {
+					return fn(node.Name, &parcello.ResourceFileInfo{Node: node}, nil)
+				}
+			})
+
+			It("loads the file successfully", func() {
+				Expect(provider.ReadDir(fileSystem)).To(Succeed())
+				cmd, err := provider.Query("up")
+				Expect(cmd).NotTo(BeNil())
+				Expect(err).To(BeNil())
+			})
+
+			Context("when the file has another suffix", func() {
+				BeforeEach(func() {
+					node.Name = "file_dummy.sql"
+				})
+
+				It("loads the file successfully", func() {
+					Expect(provider.ReadDir(fileSystem)).To(Succeed())
+					cmd, err := provider.Query("up")
+					Expect(cmd).NotTo(BeNil())
+					Expect(err).To(BeNil())
+				})
+			})
+
+			Context("when the driver is not supported by the provider", func() {
+				BeforeEach(func() {
+					provider.Driver = "dummy"
+				})
+
+				It("does not load the driver", func() {
+					Expect(provider.ReadDir(fileSystem)).To(Succeed())
+					cmd, err := provider.Query("up")
+					Expect(cmd).To(BeNil())
+					Expect(err).To(MatchError("query 'up' not found"))
+				})
+			})
+		})
+
 		It("skips non sql files", func() {
 			data := []byte{}
 			node := &parcello.Node{
@@ -98,13 +150,13 @@ var _ = Describe("Provider", func() {
 
 			cmd, err := provider.Query("up")
 			Expect(cmd).To(BeNil())
-			Expect(err).To(MatchError("Query 'up' not found"))
+			Expect(err).To(MatchError("query 'up' not found"))
 		})
 
 		Context("when the file system fails ", func() {
 			BeforeEach(func() {
 				fileSystem.WalkStub = func(dir string, fn filepath.WalkFunc) error {
-					return fn(dir, &parcello.ResourceFileInfo{Node: &parcello.Node{Name: "file.sql"}}, nil)
+					return fn("file.sql", &parcello.ResourceFileInfo{Node: &parcello.Node{Name: "file.sql"}}, nil)
 				}
 			})
 
@@ -133,7 +185,7 @@ var _ = Describe("Provider", func() {
 					Expect(provider.ReadDir(fileSystem)).To(Succeed())
 
 					fileSystem.OpenFileReturns(parcello.NewResourceFile(node), nil)
-					Expect(provider.ReadDir(fileSystem)).To(MatchError("Query 'up' already exists"))
+					Expect(provider.ReadDir(fileSystem)).To(MatchError("query 'up' already exists"))
 				})
 			})
 		})
@@ -222,7 +274,7 @@ var _ = Describe("Provider", func() {
 			Describe("Cmd", func() {
 				It("returns a error", func() {
 					cmd, err := provider.Query("down")
-					Expect(err).To(MatchError("Query 'down' not found"))
+					Expect(err).To(MatchError("query 'down' not found"))
 					Expect(cmd).To(BeNil())
 				})
 			})
@@ -230,7 +282,7 @@ var _ = Describe("Provider", func() {
 			Describe("NamedCmd", func() {
 				It("returns a error", func() {
 					cmd, err := provider.NamedQuery("down", sqlexec.P{"id": 1})
-					Expect(err).To(MatchError("Query 'down' not found"))
+					Expect(err).To(MatchError("query 'down' not found"))
 					Expect(cmd).To(BeNil())
 				})
 			})

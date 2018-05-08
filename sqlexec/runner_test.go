@@ -104,7 +104,7 @@ var _ = Describe("Runner", func() {
 
 		It("returns an error", func() {
 			_, err := runner.Run("system-tables")
-			Expect(err).To(MatchError("Query 'system-tables' not found"))
+			Expect(err).To(MatchError("query 'system-tables' not found"))
 		})
 	})
 
