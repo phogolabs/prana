@@ -53,7 +53,6 @@ func (r *Runner) exec(step string, m *Migration) error {
 
 			return &RunnerError{
 				Err:       err,
-				Migration: m.Filename(),
 				Statement: query,
 			}
 		}

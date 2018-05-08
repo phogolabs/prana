@@ -3,6 +3,7 @@
 package sqlmigr
 
 import (
+	"bytes"
 	"fmt"
 	"io"
 	"path/filepath"
@@ -63,17 +64,18 @@ type Content struct {
 
 // RunnerError represents a runner error
 type RunnerError struct {
-	// Migration name
-	Migration string
-	// Statement that cause the issue
-	Statement string
 	// Err the actual error
 	Err error
+	// Statement that cause the issue
+	Statement string
 }
 
 // Error returns the error as string
 func (e *RunnerError) Error() string {
-	return e.Err.Error()
+	buffer := &bytes.Buffer{}
+	fmt.Fprintf(buffer, "error: %s\n", e.Err.Error())
+	fmt.Fprintf(buffer, "statement: \n%s", e.Statement)
+	return buffer.String()
 }
 
 // Migration represents a single migration record.

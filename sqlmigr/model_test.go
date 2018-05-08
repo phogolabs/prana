@@ -74,11 +74,10 @@ var _ = Describe("RunnerErr", func() {
 	It("returns the error message", func() {
 		err := &sqlmigr.RunnerError{
 			Err:       fmt.Errorf("oh no!"),
-			Migration: "migration",
 			Statement: "statement",
 		}
 
-		Expect(err).To(MatchError("oh no!"))
+		Expect(err).To(MatchError("error: oh no!\nstatement: \nstatement"))
 	})
 })
 

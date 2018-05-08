@@ -114,7 +114,7 @@ func (m *Executor) Run(step int) (int, error) {
 		run = run + 1
 	}
 
-	m.logf("Run %d migration(s)", run)
+	m.logf("Ran %d migration(s)", run)
 	return run, nil
 }
 
