@@ -69,8 +69,7 @@ var _ = Describe("Migration Revert", func() {
 		row := db.QueryRow("SELECT COUNT(*) FROM migrations")
 
 		count := 0
-		Expect(row.Scan(&count)).To(Succeed())
-		Expect(count).To(Equal(2))
+		Expect(row.Scan(&count)).To(MatchError("no such table: migrations"))
 	})
 
 	Context("when the count argument is provided", func() {
@@ -86,17 +85,6 @@ var _ = Describe("Migration Revert", func() {
 			count := 0
 			Expect(row.Scan(&count)).To(Succeed())
 			Expect(count).To(Equal(1))
-		})
-
-		Context("when the count is negative number", func() {
-			It("returns an error", func() {
-				cmd.Args = append(cmd.Args, "--count", "-1")
-
-				session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(session).Should(gexec.Exit(103))
-				Expect(session.Err).To(gbytes.Say("The count argument cannot be negative number"))
-			})
 		})
 	})
 

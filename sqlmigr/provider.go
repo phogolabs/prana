@@ -146,6 +146,7 @@ func (m *Provider) merge(remote, local []Migration) ([]Migration, error) {
 
 		// Merge creation time
 		l.CreatedAt = r.CreatedAt
+		result[index] = l
 	}
 
 	return result, nil

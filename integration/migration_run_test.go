@@ -11,7 +11,6 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gbytes"
 	"github.com/onsi/gomega/gexec"
 )
 
@@ -63,7 +62,7 @@ var _ = Describe("Migration Run", func() {
 
 		count := 0
 		Expect(row.Scan(&count)).To(Succeed())
-		Expect(count).To(Equal(2))
+		Expect(count).To(Equal(3))
 	})
 
 	Context("when the count argument is provided", func() {
@@ -80,17 +79,6 @@ var _ = Describe("Migration Run", func() {
 			Expect(row.Scan(&count)).To(Succeed())
 			Expect(count).To(Equal(3))
 		})
-
-		Context("when the count is negative number", func() {
-			It("returns an error", func() {
-				cmd.Args = append(cmd.Args, "--count", "-1")
-
-				session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
-				Expect(err).NotTo(HaveOccurred())
-				Eventually(session).Should(gexec.Exit(103))
-				Expect(session.Err).To(gbytes.Say("The count argument cannot be negative number"))
-			})
-		})
 	})
 
 	Context("when the database is not available", func() {
@@ -100,17 +88,6 @@ var _ = Describe("Migration Run", func() {
 			session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(0))
-		})
-	})
-
-	Context("when the count argument is wrong", func() {
-		It("returns an error", func() {
-			cmd.Args = append(cmd.Args, "--count", "wrong")
-
-			session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
-			Expect(err).NotTo(HaveOccurred())
-			Eventually(session).Should(gexec.Exit(-1))
-			Expect(session.Out).To(gbytes.Say(`Incorrect Usage: invalid value "wrong" for flag -count: strconv.ParseInt: parsing "wrong": invalid syntax`))
 		})
 	})
 })

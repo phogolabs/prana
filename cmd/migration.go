@@ -57,12 +57,8 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "count, c",
-						Usage: "Number of migrations to be executed",
-						Value: 1,
-					},
-					cli.BoolFlag{
-						Name:  "all, a",
-						Usage: "Run all migrations",
+						Usage: "Number of migrations to be executed. Negative number will run all",
+						Value: -1,
 					},
 				},
 			},
@@ -73,12 +69,8 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 				Flags: []cli.Flag{
 					cli.IntFlag{
 						Name:  "count, c",
-						Usage: "Number of migrations to be reverted",
-						Value: 1,
-					},
-					cli.BoolFlag{
-						Name:  "all, a",
-						Usage: "Revert all migrations",
+						Usage: "Number of migrations to be reverted. Negative number will revert all",
+						Value: -1,
 					},
 				},
 			},
@@ -165,13 +157,6 @@ func (m *SQLMigration) create(ctx *cli.Context) error {
 
 func (m *SQLMigration) run(ctx *cli.Context) error {
 	count := ctx.Int("count")
-	if count <= 0 {
-		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
-	}
-
-	if ctx.Bool("all") {
-		count = -1
-	}
 
 	_, err := m.executor.Run(count)
 	if err != nil {
@@ -184,13 +169,6 @@ func (m *SQLMigration) run(ctx *cli.Context) error {
 
 func (m *SQLMigration) revert(ctx *cli.Context) error {
 	count := ctx.Int("count")
-	if count <= 0 {
-		return cli.NewExitError("The count argument cannot be negative number", ErrCodeMigration)
-	}
-
-	if ctx.Bool("all") {
-		count = -1
-	}
 
 	_, err := m.executor.Revert(count)
 	if err != nil {
