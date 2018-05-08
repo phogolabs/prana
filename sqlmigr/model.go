@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/phogolabs/parcello"
+	"github.com/phogolabs/prana/sqlexec"
 )
 
 //go:generate counterfeiter -fake-name MigrationRunner -o ../fake/MigrationRunner.go . MigrationRunner
@@ -83,6 +84,8 @@ type Migration struct {
 	Description string `db:"description"`
 	// CreatedAt returns the time of sqlmigr execution.
 	CreatedAt time.Time `db:"created_at"`
+	// Driver name
+	Driver string `db:"-"`
 }
 
 // Filename returns the item filename
@@ -104,9 +107,19 @@ func Parse(path string) (*Migration, error) {
 		return nil, parseErr
 	}
 
+	id := parts[0]
+	description := parts[1]
+	driver := sqlexec.PathDriver(path)
+
+	if driver != "" {
+		pattern := fmt.Sprintf("_%s", driver)
+		description = strings.Replace(description, pattern, "", -1)
+	}
+
 	return &Migration{
-		ID:          parts[0],
-		Description: parts[1],
+		ID:          id,
+		Description: description,
+		Driver:      driver,
 	}, nil
 }
 

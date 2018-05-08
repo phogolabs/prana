@@ -25,22 +25,21 @@ func (m *Provider) Migrations() ([]Migration, error) {
 	local := []Migration{}
 
 	err := m.FileSystem.Walk("/", func(path string, info os.FileInfo, err error) error {
-		if info == nil {
-			return os.ErrNotExist
-		}
+		if ferr := m.filter(info); ferr != nil {
+			if ferr.Error() == "skip" {
+				ferr = nil
+			}
 
-		if info.IsDir() {
-			return nil
-		}
-
-		matched, err := filepath.Match("*.sql", info.Name())
-		if err != nil || !matched {
-			return err
+			return ferr
 		}
 
 		migration, err := Parse(path)
 		if err != nil {
 			return err
+		}
+
+		if !m.supported(migration) {
+			return nil
 		}
 
 		local = append(local, *migration)
@@ -63,6 +62,31 @@ func (m *Provider) Migrations() ([]Migration, error) {
 	}
 
 	return m.merge(remote, local)
+}
+
+func (m *Provider) supported(migration *Migration) bool {
+	driver := migration.Driver
+	return driver == "" || driver == m.DB.DriverName()
+}
+
+func (m *Provider) filter(info os.FileInfo) error {
+	skip := fmt.Errorf("skip")
+
+	if info == nil {
+		return os.ErrNotExist
+	}
+
+	if info.IsDir() {
+		return skip
+	}
+
+	matched, _ := filepath.Match("*.sql", info.Name())
+
+	if !matched {
+		return skip
+	}
+
+	return nil
 }
 
 // Insert inserts executed sqlmigr item in the sqlmigrs table.
@@ -113,14 +137,15 @@ func (m *Provider) merge(remote, local []Migration) ([]Migration, error) {
 		l := local[index]
 
 		if r.ID != l.ID {
-			return []Migration{}, fmt.Errorf("Mismatched migration id. Expected: '%s' but has '%s'", r.ID, l.ID)
+			return []Migration{}, fmt.Errorf("mismatched migration id. Expected: '%s' but has '%s'", r.ID, l.ID)
 		}
 
 		if r.Description != l.Description {
-			return []Migration{}, fmt.Errorf("Mismatched migration description. Expected: '%s' but has '%s'", r.Description, l.Description)
+			return []Migration{}, fmt.Errorf("mismatched migration description. Expected: '%s' but has '%s'", r.Description, l.Description)
 		}
 
-		result[index] = r
+		// Merge creation time
+		l.CreatedAt = r.CreatedAt
 	}
 
 	return result, nil

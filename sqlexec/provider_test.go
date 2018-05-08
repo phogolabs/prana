@@ -83,6 +83,7 @@ var _ = Describe("Provider", func() {
 
 		Context("when the driver is provided", func() {
 			var node *parcello.Node
+
 			BeforeEach(func() {
 				provider.Driver = "sqlite3"
 
@@ -108,7 +109,7 @@ var _ = Describe("Provider", func() {
 
 			Context("when the file has another suffix", func() {
 				BeforeEach(func() {
-					node.Name = "file_dummy.sql"
+					node.Name = "file_sqlite3.sql"
 				})
 
 				It("loads the file successfully", func() {

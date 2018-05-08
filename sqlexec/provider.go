@@ -1,7 +1,6 @@
 package sqlexec
 
 import (
-	"database/sql"
 	"fmt"
 	"io"
 	"os"
@@ -122,22 +121,24 @@ func (p *Provider) filter(path string) bool {
 		return false
 	}
 
-	if p.Driver == "" {
-		return true
-	}
+	driver := PathDriver(path)
+	return driver == p.Driver
+}
 
+// PathDriver returns the driver name from a given path
+func PathDriver(path string) string {
+	ext := filepath.Ext(path)
 	_, path = filepath.Split(path)
 	path = strings.Replace(path, ext, "", -1)
 	parts := strings.Split(path, "_")
 	driver := strings.ToLower(parts[len(parts)-1])
 
-	for _, name := range sql.Drivers() {
-		if driver == name {
-			return driver == p.Driver
-		}
+	switch driver {
+	case "sqlite3", "postgres", "mysql":
+		return driver
+	default:
+		return ""
 	}
-
-	return true
 }
 
 func nonExistQueryErr(name string) error {

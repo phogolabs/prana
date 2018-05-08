@@ -27,13 +27,25 @@ var _ = Describe("Migration Model", func() {
 			Expect(item.Description).To(Equal("schema"))
 		})
 
-		Context("when the filename is hes longer description", func() {
+		Context("when the filename is has longer description", func() {
 			It("parses the item successfully", func() {
 				filename := "20060102150405_my_schema_for_this_db.sql"
 				item, err := sqlmigr.Parse(filename)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(item.ID).To(Equal("20060102150405"))
 				Expect(item.Description).To(Equal("my_schema_for_this_db"))
+				Expect(item.Driver).To(BeEmpty())
+			})
+
+			Context("when the filename has driver name as suffix", func() {
+				It("parses the item successfully", func() {
+					filename := "20060102150405_my_schema_for_this_db_sqlite3.sql"
+					item, err := sqlmigr.Parse(filename)
+					Expect(err).NotTo(HaveOccurred())
+					Expect(item.ID).To(Equal("20060102150405"))
+					Expect(item.Description).To(Equal("my_schema_for_this_db"))
+					Expect(item.Driver).To(Equal("sqlite3"))
+				})
 			})
 		})
 
