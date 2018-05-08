@@ -38,7 +38,7 @@ var _ = Describe("Provider", func() {
 			cmd, err := provider.Query("up")
 			Expect(err).To(BeNil())
 
-			query, _ := cmd.Prepare()
+			query, _ := cmd.NamedQuery()
 			Expect(query).To(Equal("SELECT * FROM users;"))
 		})
 
@@ -208,7 +208,7 @@ var _ = Describe("Provider", func() {
 			Expect(err).To(BeNil())
 			Expect(stmt).NotTo(BeNil())
 
-			query, params := stmt.Prepare()
+			query, params := stmt.NamedQuery()
 			Expect(params).To(BeEmpty())
 			Expect(query).To(Equal("SELECT * FROM users"))
 		})
@@ -218,7 +218,7 @@ var _ = Describe("Provider", func() {
 			Expect(err).To(BeNil())
 			Expect(stmt).NotTo(BeNil())
 
-			query, params := stmt.Prepare()
+			query, params := stmt.NamedQuery()
 			Expect(params).To(HaveKeyWithValue("id", 1))
 			Expect(query).To(Equal("SELECT * FROM users"))
 		})
@@ -239,7 +239,7 @@ var _ = Describe("Provider", func() {
 				Expect(err).To(BeNil())
 				Expect(stmt).NotTo(BeNil())
 
-				query, params := stmt.Prepare()
+				query, params := stmt.NamedQuery()
 				Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg0"))
 				Expect(params).To(HaveKeyWithValue("arg0", 1))
 			})
@@ -265,7 +265,7 @@ var _ = Describe("Provider", func() {
 				Expect(err).To(BeNil())
 				Expect(stmt).NotTo(BeNil())
 
-				query, params := stmt.Prepare()
+				query, params := stmt.NamedQuery()
 				Expect(query).To(Equal("SELECT * FROM users WHERE id_pk = :id_pk"))
 				Expect(params).To(HaveKeyWithValue("id_pk", 1))
 			})

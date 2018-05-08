@@ -23,7 +23,7 @@ func (r *Runner) Run(name string, args ...Param) (*Rows, error) {
 		return nil, err
 	}
 
-	query, params := cmd.Prepare()
+	query, params := cmd.NamedQuery()
 
 	stmt, err := r.DB.PrepareNamed(query)
 	if err != nil {

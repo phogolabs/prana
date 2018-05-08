@@ -1,5 +1,5 @@
 hash: 264de43bb8656c5955e90a98e1dcf886f8836b5986900b6c348d3bf1c9e1797d
-updated: 2018-05-08T22:58:18.509256+03:00
+updated: 2018-05-09T02:06:29.599025+03:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -43,9 +43,9 @@ imports:
 - name: github.com/mattn/go-sqlite3
   version: 6c771bb9887719704b210e87e934f08be014bdb1
 - name: github.com/olekukonko/tablewriter
-  version: d5dd8a50526aadb3d5f2c9b5233277bc2db90e88
+  version: d4647c9c7a84d847478d890b816b7d8b62b0b279
 - name: github.com/phogolabs/parcello
-  version: bd573b2ad411d66e6028d8cb84ee461f468846ff
+  version: 3b48cfcb61c1a98ac0512babf63de0c164be7698
   subpackages:
   - fake
 - name: github.com/pkg/errors
@@ -53,7 +53,7 @@ imports:
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: golang.org/x/sys
-  version: 78d5f264b493f125018180c204871ecf58a2dce1
+  version: 7db1c3b1a98089d0071c84f646ff5c96aad43682
   subpackages:
   - unix
 - name: golang.org/x/tools
@@ -100,7 +100,7 @@ testImports:
   - matchers/support/goraph/util
   - types
 - name: golang.org/x/net
-  version: 640f4622ab692b87c2f3a94265e6f579fe38263d
+  version: 3a7846fea0afe8cc88deb31d8cfb1fa15a3615ef
   subpackages:
   - html
   - html/atom

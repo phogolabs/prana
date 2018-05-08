@@ -27,6 +27,6 @@ type FileSystem = parcello.FileSystem
 
 // Query represents an SQL Query
 type Query interface {
-	// Prepares query for execution
-	Prepare() (string, map[string]interface{})
+	// NamedQuery prepares query for execution
+	NamedQuery() (string, map[string]interface{})
 }

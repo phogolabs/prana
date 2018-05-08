@@ -18,8 +18,8 @@ type Stmt struct {
 	params []Param
 }
 
-// Prepare prepares the command for execution.
-func (cmd *Stmt) Prepare() (string, map[string]interface{}) {
+// NamedQuery prepares prepares the command for execution.
+func (cmd *Stmt) NamedQuery() (string, map[string]interface{}) {
 	query := cmd.query
 	params := make(map[string]interface{})
 	buffer := &bytes.Buffer{}
@@ -54,8 +54,8 @@ type NamedStmt struct {
 	param Param
 }
 
-// Prepare prepares the command for execution.
-func (cmd *NamedStmt) Prepare() (string, map[string]interface{}) {
+// NamedQuery prepares the command for execution.
+func (cmd *NamedStmt) NamedQuery() (string, map[string]interface{}) {
 	params := make(map[string]interface{})
 
 	args, ok := cmd.param.(map[string]interface{})
