@@ -11,8 +11,8 @@ import (
 
 // Provider loads SQL sqlexecs and provides all SQL statements as commands.
 type Provider struct {
-	// Driver is the current SQL driver
-	Driver string
+	// DriverName is the current SQL driver
+	DriverName string
 	// private fields
 	mu         sync.RWMutex
 	repository map[string]string
@@ -122,7 +122,7 @@ func (p *Provider) filter(path string) bool {
 	}
 
 	driver := PathDriver(path)
-	return driver == p.Driver
+	return driver == p.DriverName
 }
 
 // PathDriver returns the driver name from a given path

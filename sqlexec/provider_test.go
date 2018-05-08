@@ -85,7 +85,7 @@ var _ = Describe("Provider", func() {
 			var node *parcello.Node
 
 			BeforeEach(func() {
-				provider.Driver = "sqlite3"
+				provider.DriverName = "sqlite3"
 
 				data := buffer.Bytes()
 				node = &parcello.Node{
@@ -122,7 +122,7 @@ var _ = Describe("Provider", func() {
 
 			Context("when the driver is not supported by the provider", func() {
 				BeforeEach(func() {
-					provider.Driver = "dummy"
+					provider.DriverName = "dummy"
 				})
 
 				It("does not load the driver", func() {
