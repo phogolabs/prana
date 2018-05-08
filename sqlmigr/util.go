@@ -18,10 +18,6 @@ func RunAll(db *sqlx.DB, fileSystem FileSystem) error {
 		},
 	}
 
-	if err := executor.Setup(); err != nil {
-		return err
-	}
-
 	_, err := executor.RunAll()
 	return err
 }

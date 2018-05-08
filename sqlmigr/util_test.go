@@ -2,14 +2,15 @@ package sqlmigr_test
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/phogolabs/prana/sqlmigr"
 	"github.com/phogolabs/parcello"
+	"github.com/phogolabs/prana/sqlmigr"
 )
 
 var _ = Describe("Util", func() {
@@ -40,11 +41,11 @@ var _ = Describe("Util", func() {
 
 		Context("when the file system fails", func() {
 			BeforeEach(func() {
-				fs = parcello.Dir("/")
+				fs = parcello.Dir("/file")
 			})
 
 			It("returns an error", func() {
-				Expect(sqlmigr.RunAll(db, fs)).To(MatchError("open /00060524000000_setup.sql: permission denied"))
+				Expect(sqlmigr.RunAll(db, fs)).To(MatchError(os.ErrNotExist))
 			})
 		})
 	})
