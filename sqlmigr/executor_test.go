@@ -221,6 +221,11 @@ var _ = Describe("Executor", func() {
 						Description: "Second",
 					},
 					{
+						ID:          "20070102150405",
+						Description: "Second",
+						Driver:      "sqlite3",
+					},
+					{
 						ID:          "20080102150405",
 						Description: "Third",
 					},
@@ -235,8 +240,8 @@ var _ = Describe("Executor", func() {
 				Expect(cnt).To(Equal(2))
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
-				Expect(runner.RunCallCount()).To(Equal(2))
-				Expect(logger.InfofCallCount()).To(Equal(4))
+				Expect(runner.RunCallCount()).To(Equal(3))
+				Expect(logger.InfofCallCount()).To(Equal(5))
 
 				for i := 0; i < runner.RunCallCount(); i++ {
 					item := runner.RunArgsForCall(i)
@@ -305,6 +310,12 @@ var _ = Describe("Executor", func() {
 					CreatedAt:   time.Now(),
 				},
 				{
+					ID:          "20070102150405",
+					Description: "Second",
+					Driver:      "sqlite3",
+					CreatedAt:   time.Now(),
+				},
+				{
 					ID:          "20080102150405",
 					Description: "Third",
 					CreatedAt:   time.Now(),
@@ -317,18 +328,26 @@ var _ = Describe("Executor", func() {
 			Expect(cnt).To(Equal(3))
 
 			Expect(provider.MigrationsCallCount()).To(Equal(1))
-			Expect(runner.RevertCallCount()).To(Equal(3))
+			Expect(runner.RevertCallCount()).To(Equal(4))
 			Expect(provider.DeleteCallCount()).To(Equal(3))
 
-			for i, j := 0, 2; i < 3; i++ {
-				item := runner.RevertArgsForCall(i)
-				Expect(*item).To(Equal(migrations[j]))
+			item := runner.RevertArgsForCall(0)
+			Expect(*item).To(Equal(migrations[3]))
+			item = provider.DeleteArgsForCall(0)
+			Expect(*item).To(Equal(migrations[3]))
 
-				item = provider.DeleteArgsForCall(i)
-				Expect(*item).To(Equal(migrations[j]))
+			item = runner.RevertArgsForCall(1)
+			Expect(*item).To(Equal(migrations[2]))
 
-				j = j - 1
-			}
+			item = runner.RevertArgsForCall(2)
+			Expect(*item).To(Equal(migrations[1]))
+			item = provider.DeleteArgsForCall(1)
+			Expect(*item).To(Equal(migrations[1]))
+
+			item = runner.RevertArgsForCall(3)
+			Expect(*item).To(Equal(migrations[0]))
+			item = provider.DeleteArgsForCall(2)
+			Expect(*item).To(Equal(migrations[0]))
 		})
 
 		Context("when there are pending migrations", func() {

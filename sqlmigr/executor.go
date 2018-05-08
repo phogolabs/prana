@@ -81,7 +81,7 @@ func (m *Executor) Run(step int) (int, error) {
 
 	m.logf("Running migration(s)")
 
-	for _, migration := range migrations {
+	for index, migration := range migrations {
 		if step == 0 {
 			return run, nil
 		}
@@ -96,6 +96,14 @@ func (m *Executor) Run(step int) (int, error) {
 
 		if err := m.Runner.Run(&op); err != nil {
 			return run, err
+		}
+
+		if index < len(migrations)-1 {
+			prev := migrations[index+1]
+
+			if prev.ID == migration.ID {
+				continue
+			}
 		}
 
 		if err := m.Provider.Insert(&op); err != nil {
@@ -127,8 +135,8 @@ func (m *Executor) Revert(step int) (int, error) {
 
 	m.logf("Reverting migration(s)")
 
-	for i := len(migrations) - 1; i >= 0; i-- {
-		migration := migrations[i]
+	for index := len(migrations) - 1; index >= 0; index-- {
+		migration := migrations[index]
 
 		if step == 0 {
 			return reverted, nil
@@ -143,6 +151,14 @@ func (m *Executor) Revert(step int) (int, error) {
 		m.logf("Reverting migration '%s'", migration.Filename())
 		if err := m.Runner.Revert(&op); err != nil {
 			return reverted, err
+		}
+
+		if index > 0 {
+			next := migrations[index-1]
+
+			if next.ID == migration.ID {
+				continue
+			}
 		}
 
 		if err := m.Provider.Delete(&op); err != nil {
