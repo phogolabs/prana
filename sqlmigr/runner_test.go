@@ -12,6 +12,7 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmigr"
+	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 var _ = Describe("Runner", func() {
@@ -101,6 +102,26 @@ var _ = Describe("Runner", func() {
 			})
 		})
 
+		Context("when the command execution fails", func() {
+			var mock sqlmock.Sqlmock
+
+			JustBeforeEach(func() {
+				db, m, err := sqlmock.New()
+				Expect(err).NotTo(HaveOccurred())
+				runner.DB = sqlx.NewDb(db, "dummy")
+
+				mock = m
+				mock.ExpectBegin()
+				mock.ExpectExec("CREATE TABLE test(id TEXT)").
+					WillReturnError(fmt.Errorf("oh no!"))
+				mock.ExpectRollback()
+			})
+
+			It("returns the error", func() {
+				Expect(runner.Run(item)).To(HaveOccurred())
+			})
+		})
+
 		Context("when the sqlmigr step does not exist", func() {
 			JustBeforeEach(func() {
 				sqlmigr := &bytes.Buffer{}
@@ -112,7 +133,7 @@ var _ = Describe("Runner", func() {
 			})
 
 			It("return an error", func() {
-				Expect(runner.Run(item)).To(MatchError("Routine 'up' not found for migration '20160102150_schema.sql'"))
+				Expect(runner.Run(item)).To(HaveOccurred())
 			})
 		})
 

@@ -9,7 +9,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gosuri/uitable"
 	"github.com/phogolabs/parcello"
 )
 
@@ -73,11 +72,7 @@ type RunnerError struct {
 
 // Error returns the error as string
 func (e *RunnerError) Error() string {
-	table := uitable.New()
-	table.AddRow("error", e.Err.Error())
-	table.AddRow("migration", e.Migration)
-	table.AddRow("statement", e.Statement)
-	return table.String()
+	return e.Err.Error()
 }
 
 // Migration represents a single migration record.
@@ -99,7 +94,7 @@ func (m Migration) Filename() string {
 func Parse(path string) (*Migration, error) {
 	name := strings.TrimSuffix(filepath.Base(path), filepath.Ext(path))
 	parts := strings.SplitN(name, "_", 2)
-	parseErr := fmt.Errorf("Migration '%s' has an invalid file name", path)
+	parseErr := fmt.Errorf("migration '%s' has an invalid file name", path)
 
 	if len(parts) != 2 {
 		return nil, parseErr

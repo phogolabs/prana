@@ -23,7 +23,7 @@ func ParseURL(conn string) (string, string, error) {
 	case "mysql":
 		source, err := parseMySQL(driver, conn)
 		if err != nil {
-			return "", "", nil
+			return "", "", err
 		}
 		return driver, source, nil
 	case "sqlite3":

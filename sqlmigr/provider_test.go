@@ -207,7 +207,7 @@ var _ = Describe("Provider", func() {
 			It("returns an error", func() {
 				items, err := provider.Migrations()
 				Expect(items).To(BeEmpty())
-				Expect(err).To(MatchError("Migration 'id_schema.sql' has an invalid file name"))
+				Expect(err).To(MatchError("migration 'id_schema.sql' has an invalid file name"))
 			})
 		})
 

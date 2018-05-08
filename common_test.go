@@ -14,11 +14,22 @@ var _ = Describe("ParseURL", func() {
 		Expect(source).To(Equal("./prana.db"))
 	})
 
-	It("parses the MySQL connection string successfully", func() {
-		driver, source, err := prana.ParseURL("mysql://root@/prana")
-		Expect(err).NotTo(HaveOccurred())
-		Expect(driver).To(Equal("mysql"))
-		Expect(source).To(Equal("root@tcp(127.0.0.1:3306)/prana?parseTime=true"))
+	Describe("MySQL", func() {
+		It("parses the MySQL connection string successfully", func() {
+			driver, source, err := prana.ParseURL("mysql://root@/prana")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(driver).To(Equal("mysql"))
+			Expect(source).To(Equal("root@tcp(127.0.0.1:3306)/prana?parseTime=true"))
+		})
+
+		Context("when the DSN is invalid", func() {
+			It("returns the error", func() {
+				driver, source, err := prana.ParseURL("mysql://@net(addr/")
+				Expect(err).To(MatchError("invalid DSN: network address not terminated (missing closing brace)"))
+				Expect(driver).To(BeEmpty())
+				Expect(source).To(BeEmpty())
+			})
+		})
 	})
 
 	It("parses the PostgreSQL connection string successfully", func() {

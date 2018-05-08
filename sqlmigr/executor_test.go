@@ -429,8 +429,10 @@ var _ = Describe("Executor", func() {
 			})
 
 			Context("when the delete fails", func() {
-				It("returns the error", func() {
-					migrations := []sqlmigr.Migration{
+				var migrations []sqlmigr.Migration
+
+				BeforeEach(func() {
+					migrations = []sqlmigr.Migration{
 						{
 							ID:          "20060102150405",
 							Description: "First",
@@ -445,7 +447,20 @@ var _ = Describe("Executor", func() {
 							Description: "Third",
 						},
 					}
+				})
 
+				Context("when the error is not exist", func() {
+					It("does not return the error", func() {
+						provider.MigrationsReturns(migrations, nil)
+						provider.DeleteReturns(fmt.Errorf("no such table: migrations"))
+
+						cnt, err := executor.Revert(1)
+						Expect(err).To(BeNil())
+						Expect(cnt).To(Equal(0))
+					})
+				})
+
+				It("returns the error", func() {
 					provider.MigrationsReturns(migrations, nil)
 					provider.DeleteReturns(fmt.Errorf("Oh no!"))
 
