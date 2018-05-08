@@ -241,7 +241,7 @@ var _ = Describe("Executor", func() {
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(Equal(3))
-				Expect(logger.InfofCallCount()).To(Equal(5))
+				Expect(logger.InfofCallCount()).To(Equal(3))
 
 				for i := 0; i < runner.RunCallCount(); i++ {
 					item := runner.RunArgsForCall(i)
