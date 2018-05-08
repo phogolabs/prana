@@ -94,7 +94,7 @@ var _ = Describe("Generator", func() {
 					DownCommand: bytes.NewBufferString("rollback"),
 				}
 
-				writer := &fake.Buffer{}
+				writer := &fake.File{}
 				writer.WriteReturns(1, nil)
 
 				fileSystem := &fake.FileSystem{}
@@ -119,7 +119,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when the up step cannot be created", func() {
 			It("returns an error", func() {
-				reader := &fake.Buffer{}
+				reader := &fake.File{}
 				content := &sqlmigr.Content{
 					UpCommand:   reader,
 					DownCommand: bytes.NewBufferString("rollback"),
@@ -131,7 +131,7 @@ var _ = Describe("Generator", func() {
 
 		Context("when the up step cannot be created", func() {
 			It("returns an error", func() {
-				reader := &fake.Buffer{}
+				reader := &fake.File{}
 				content := &sqlmigr.Content{
 					UpCommand:   bytes.NewBufferString("upgrade"),
 					DownCommand: reader,

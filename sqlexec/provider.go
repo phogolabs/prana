@@ -122,7 +122,7 @@ func (p *Provider) filter(path string) bool {
 	}
 
 	driver := PathDriver(path)
-	return driver == p.DriverName
+	return driver == "" || driver == p.DriverName
 }
 
 // PathDriver returns the driver name from a given path
