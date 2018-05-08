@@ -90,7 +90,13 @@ type Migration struct {
 
 // Filename returns the item filename
 func (m Migration) Filename() string {
-	return fmt.Sprintf("%s_%s.sql", m.ID, m.Description)
+	parts := []string{m.ID, m.Description}
+
+	if m.Driver != "" {
+		parts = append(parts, m.Driver)
+	}
+
+	return fmt.Sprintf("%s.sql", strings.Join(parts, "_"))
 }
 
 // Parse parses a given file path to a sqlmigr item.

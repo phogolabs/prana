@@ -13,9 +13,10 @@ var _ = Describe("Migration Model", func() {
 		item := &sqlmigr.Migration{
 			ID:          "id",
 			Description: "schema",
+			Driver:      "sqlite3",
 		}
 
-		Expect(item.Filename()).To(Equal("id_schema.sql"))
+		Expect(item.Filename()).To(Equal("id_schema_sqlite3.sql"))
 	})
 
 	Describe("Parse", func() {
