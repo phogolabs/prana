@@ -21,19 +21,12 @@ type Runner struct {
 
 // Run runs a given migration  item.
 func (r *Runner) Run(m *Migration) error {
-	if err := r.exec("up", m); err != nil {
-		return err
-	}
-
-	return nil
+	return r.exec("up", m)
 }
 
 // Revert reverts a given migration  item.
 func (r *Runner) Revert(m *Migration) error {
-	if err := r.exec("down", m); err != nil {
-		return err
-	}
-	return nil
+	return r.exec("down", m)
 }
 
 func (r *Runner) exec(step string, m *Migration) error {

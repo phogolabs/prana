@@ -11,7 +11,7 @@ import (
 
 // ExecutorConfig defines the Executor's configuration
 type ExecutorConfig struct {
-	// KeepSchema controlls whether the database schema to be kept as package
+	// KeepSchema controls whether the database schema to be kept as package
 	KeepSchema bool
 }
 
