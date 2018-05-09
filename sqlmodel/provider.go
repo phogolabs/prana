@@ -52,10 +52,7 @@ func (m *PostgreSQLProvider) Tables(schema string) ([]string, error) {
 	for rows.Next() {
 		table := ""
 
-		if err := rows.Scan(&table); err != nil {
-			return []string{}, err
-		}
-
+		_ = rows.Scan(&table)
 		tables = append(tables, table)
 	}
 
@@ -104,9 +101,7 @@ func (m *PostgreSQLProvider) Schema(schema string, names ...string) (*Schema, er
 				&column.Type.CharMaxLength,
 			}
 
-			if err := rows.Scan(fields...); err != nil {
-				return nil, err
-			}
+			_ = rows.Scan(fields...)
 
 			indx := sort.SearchStrings(primaryKey, column.Name)
 			column.Type.IsPrimaryKey = indx >= 0 && indx < len(primaryKey)
@@ -150,7 +145,7 @@ func (m *PostgreSQLProvider) translate(columnType *ColumnType) string {
 
 func (m *PostgreSQLProvider) userDefType(columnType *ColumnType) string {
 	nullable := columnType.IsNullable
-	name := sanitize(columnType.Name)
+	name := sanitize(columnType.Underlying)
 
 	switch name {
 	case "hstore":
@@ -188,10 +183,7 @@ func (m *SQLiteProvider) Tables(schema string) ([]string, error) {
 	for rows.Next() {
 		table := ""
 
-		if err := rows.Scan(&table); err != nil {
-			return []string{}, err
-		}
-
+		_ = rows.Scan(&table)
 		tables = append(tables, table)
 	}
 
@@ -226,13 +218,7 @@ func (m *SQLiteProvider) Schema(schema string, names ...string) (*Schema, error)
 				&info.PK,
 			}
 
-			if err := rows.Scan(fields...); err != nil {
-				return nil, err
-			}
-
-			if info.Type == "" {
-				return nil, fmt.Errorf("SQLite does not provide any information for column '%s' in table '%s'", column.Name, name)
-			}
+			_ = rows.Scan(fields...)
 
 			column.Type = m.create(&info)
 			column.ScanType = translate(&column.Type)
@@ -332,10 +318,7 @@ func (m *MySQLProvider) Tables(schema string) ([]string, error) {
 	for rows.Next() {
 		table := ""
 
-		if err := rows.Scan(&table); err != nil {
-			return []string{}, err
-		}
-
+		_ = rows.Scan(&table)
 		tables = append(tables, table)
 	}
 
@@ -397,9 +380,7 @@ func (m *MySQLProvider) Schema(schema string, names ...string) (*Schema, error) 
 				&column.Type.CharMaxLength,
 			}
 
-			if err := rows.Scan(fields...); err != nil {
-				return nil, err
-			}
+			_ = rows.Scan(fields...)
 
 			indx := sort.SearchStrings(primaryKey, column.Name)
 			column.Type.IsPrimaryKey = indx >= 0 && indx < len(primaryKey)
@@ -430,6 +411,7 @@ func (m *MySQLProvider) database() (string, error) {
 	if err := row.Scan(&schema); err != nil {
 		return "", err
 	}
+
 	return schema, nil
 }
 
@@ -451,10 +433,8 @@ func primaryKeyFromInformationSchema(db *sqlx.DB, schema, table string) ([]strin
 
 	for rows.Next() {
 		column := ""
-		if err := rows.Scan(&column); err != nil {
-			return []string{}, err
-		}
 
+		_ = rows.Scan(&column)
 		columns = append(columns, column)
 	}
 

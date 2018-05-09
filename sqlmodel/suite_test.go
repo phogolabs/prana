@@ -691,7 +691,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("hstore.Hstore"))
 
 	column = columns[62]
 	Expect(column.Name).To(Equal("hstore_field_not_null"))
@@ -701,7 +701,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("string"))
+	Expect(column.ScanType).To(Equal("hstore.Hstore"))
 }
 
 func ExpectColumnsForMySQL(columns []sqlmodel.Column) {

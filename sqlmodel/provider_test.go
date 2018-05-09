@@ -267,6 +267,14 @@ var _ = Describe("MySQLProvider", func() {
 				Expect(tables).To(BeEmpty())
 				Expect(err).To(MatchError("sql: database is closed"))
 			})
+
+			Context("when the schema is empty", func() {
+				It("return an error", func() {
+					tables, err := provider.Tables("")
+					Expect(tables).To(BeEmpty())
+					Expect(err).To(MatchError("sql: database is closed"))
+				})
+			})
 		})
 	})
 
