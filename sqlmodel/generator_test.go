@@ -59,7 +59,6 @@ var _ = Describe("ModelGenerator", func() {
 		generator = &sqlmodel.ModelGenerator{
 			TagBuilder: builder,
 			Config: &sqlmodel.ModelGeneratorConfig{
-				KeepSchema: true,
 				InlcudeDoc: false,
 			},
 		}
@@ -93,26 +92,19 @@ var _ = Describe("ModelGenerator", func() {
 			Expect(builder.BuildCallCount()).To(Equal(2))
 			Expect(builder.BuildArgsForCall(0)).To(Equal(&schemaDef.Tables[0].Columns[0]))
 			Expect(builder.BuildArgsForCall(1)).To(Equal(&schemaDef.Tables[0].Columns[1]))
+
 			Expect(reader.String()).To(Equal(string(data)))
 		})
 	}
 
 	ItGeneratesTheModelSuccessfully("Table1")
 
-	Context("when KeepSchema is disabled", func() {
+	Context("when the schema is not default", func() {
 		BeforeEach(func() {
-			generator.Config.KeepSchema = false
+			schemaDef.IsDefault = false
 		})
 
 		ItGeneratesTheModelSuccessfully("Table1")
-
-		Context("when the schema is not default", func() {
-			BeforeEach(func() {
-				schemaDef.IsDefault = false
-			})
-
-			ItGeneratesTheModelSuccessfully("ModelTable1")
-		})
 	})
 
 	Context("when the table is ignored", func() {

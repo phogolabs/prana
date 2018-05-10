@@ -107,12 +107,6 @@ func (g *ModelGenerator) writeTable(pkg string, isDefaultSchema bool, table *Tab
 func (g *ModelGenerator) typeName(pkg string, isDefaultSchema bool, table *Table) string {
 	name := inflect.Camelize(table.Name)
 	name = inflect.Singularize(name)
-
-	if !g.Config.KeepSchema && !isDefaultSchema {
-		pkg = inflect.Camelize(pkg)
-		name = fmt.Sprintf("%s%s", pkg, name)
-	}
-
 	return name
 }
 

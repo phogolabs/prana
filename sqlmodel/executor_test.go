@@ -53,9 +53,6 @@ var _ = Describe("Executor", func() {
 
 		composer = &fake.ModelGenerator{}
 		executor = &sqlmodel.Executor{
-			Config: &sqlmodel.ExecutorConfig{
-				KeepSchema: true,
-			},
 			Provider:       provider,
 			ModelGenerator: composer,
 			QueryGenerator: composer,
@@ -99,7 +96,8 @@ var _ = Describe("Executor", func() {
 				Expect(composer.GenerateCallCount()).To(Equal(1))
 				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(ctx.Package).To(Equal(schemaDef.Name))
+				Expect(ctx.Package).To(Equal("entity"))
+				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 		})
 
@@ -193,14 +191,10 @@ var _ = Describe("Executor", func() {
 				schemaDef.IsDefault = false
 			})
 
-			ItCreatesTheSchemaInRootPkg("public/schema.go", "public")
+			ItCreatesTheSchemaInRootPkg("public.go", "entity")
 		})
 
 		Context("when the KeepSchema is false", func() {
-			BeforeEach(func() {
-				executor.Config.KeepSchema = false
-			})
-
 			ItCreatesTheSchemaInRootPkg("schema.go", "entity")
 
 			Context("when the schema is not default", func() {
@@ -263,8 +257,8 @@ var _ = Describe("Executor", func() {
 				Expect(err).To(Succeed())
 				Expect(spec.Dir).To(BeADirectory())
 
-				Expect(filepath.Join(spec.Dir, "public", "schema.go")).To(BeARegularFile())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, "public", "schema.go")))
+				Expect(path).To(Equal(filepath.Join(spec.Dir, "public.go")))
+				Expect(path).To(BeARegularFile())
 			})
 		})
 
@@ -349,7 +343,7 @@ var _ = Describe("Executor", func() {
 			})
 		}
 
-		ItCreatesTheSQLScript("public.sql")
+		ItCreatesTheSQLScript("routine.sql")
 
 		Context("when the schema is not default", func() {
 			BeforeEach(func() {
@@ -357,22 +351,6 @@ var _ = Describe("Executor", func() {
 			})
 
 			ItCreatesTheSQLScript("public.sql")
-		})
-
-		Context("when the KeepSchema is false", func() {
-			BeforeEach(func() {
-				executor.Config.KeepSchema = false
-			})
-
-			ItCreatesTheSQLScript("schema.sql")
-
-			Context("when the schema is not default", func() {
-				BeforeEach(func() {
-					schemaDef.IsDefault = false
-				})
-
-				ItCreatesTheSQLScript("public.sql")
-			})
 		})
 
 		Context("when the tables are not provided", func() {
@@ -385,8 +363,8 @@ var _ = Describe("Executor", func() {
 				Expect(err).To(Succeed())
 
 				Expect(spec.Dir).To(BeADirectory())
-				Expect(filepath.Join(spec.Dir, "public.sql")).To(BeARegularFile())
-				Expect(filepath.Join(spec.Dir, "public.sql")).To(Equal(path))
+				Expect(path).To(Equal(filepath.Join(spec.Dir, "routine.sql")))
+				Expect(path).To(BeARegularFile())
 
 				Expect(provider.TablesCallCount()).To(Equal(1))
 				Expect(provider.TablesArgsForCall(0)).To(Equal("public"))

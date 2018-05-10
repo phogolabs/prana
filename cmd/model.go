@@ -45,10 +45,6 @@ func (m *SQLModel) CreateCommand() cli.Command {
 				Usage: "path to the package, where the source code will be generated",
 				Value: "./database/model",
 			},
-			cli.BoolFlag{
-				Name:  "keep-schema, k",
-				Usage: "keep the schema as package (except default schema)",
-			},
 			cli.StringFlag{
 				Name:  "orm-tag, m",
 				Usage: "tag tag that is wellknow for some ORM packages. supported: (sqlx, gorm)",
@@ -97,9 +93,6 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 	}
 
 	m.executor = &sqlmodel.Executor{
-		Config: &sqlmodel.ExecutorConfig{
-			KeepSchema: ctx.Bool("keep-schema"),
-		},
 		Provider: provider,
 		QueryGenerator: &sqlmodel.QueryGenerator{
 			Config: &sqlmodel.QueryGeneratorConfig{
@@ -111,7 +104,6 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 		ModelGenerator: &sqlmodel.ModelGenerator{
 			TagBuilder: builder,
 			Config: &sqlmodel.ModelGeneratorConfig{
-				KeepSchema:   ctx.Bool("keep-schema"),
 				InlcudeDoc:   ctx.BoolT("include-docs"),
 				IgnoreTables: ctx.StringSlice("ignore-table-name"),
 			},

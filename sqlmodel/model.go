@@ -116,8 +116,6 @@ type GeneratorContext struct {
 
 // ModelGeneratorConfig controls how the code generation happens
 type ModelGeneratorConfig struct {
-	// KeepSchema controls whether the database schema to be kept as package
-	KeepSchema bool
 	// InlcudeDoc determines whether to include documentation
 	InlcudeDoc bool
 	// IgnoreTables ecludes the those tables from generation

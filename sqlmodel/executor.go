@@ -9,16 +9,8 @@ import (
 	"path/filepath"
 )
 
-// ExecutorConfig defines the Executor's configuration
-type ExecutorConfig struct {
-	// KeepSchema controls whether the database schema to be kept as package
-	KeepSchema bool
-}
-
 // Executor executes the schema generation
 type Executor struct {
-	// Config of the executor
-	Config *ExecutorConfig
 	// ModelGenerator is the SQL model generator
 	ModelGenerator Generator
 	// QueryGenerator is the SQL script generator
@@ -46,7 +38,7 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", nil
 	}
 
-	filepath, err := e.modelFileOf(schema, spec)
+	filepath, err := e.fileOf(e.nameOf(schema), spec.Dir, "schema.go")
 	if err != nil {
 		return "", err
 	}
@@ -69,7 +61,7 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 	return filepath, nil
 }
 
-// CreateScript creates a package with the generated schema sqlmodels
+// CreateScript creates a model SQL routines
 func (e *Executor) CreateScript(spec *Spec) (string, error) {
 	schema, err := e.schemaOf(spec)
 	if err != nil {
@@ -79,7 +71,7 @@ func (e *Executor) CreateScript(spec *Spec) (string, error) {
 	reader := &bytes.Buffer{}
 	ctx := &GeneratorContext{
 		Writer:  reader,
-		Package: e.packageOf(schema, spec),
+		Package: e.packageOf(spec),
 		Schema:  schema,
 	}
 
@@ -96,7 +88,7 @@ func (e *Executor) CreateScript(spec *Spec) (string, error) {
 		return "", nil
 	}
 
-	filepath, err := e.scriptFileOf(schema, spec)
+	filepath, err := e.fileOf(e.nameOf(schema), spec.Dir, "routine.sql")
 	if err != nil {
 		return "", err
 	}
@@ -127,7 +119,7 @@ func (e *Executor) writeSchema(w io.Writer, spec *Spec) (*Schema, error) {
 
 	ctx := &GeneratorContext{
 		Writer:  w,
-		Package: e.packageOf(schema, spec),
+		Package: e.packageOf(spec),
 		Schema:  schema,
 	}
 
@@ -156,16 +148,14 @@ func (e *Executor) schemaOf(spec *Spec) (*Schema, error) {
 	return schema, nil
 }
 
-func (e *Executor) scriptFileOf(schema *Schema, spec *Spec) (string, error) {
-	dir, err := filepath.Abs(spec.Dir)
+func (e *Executor) fileOf(schema, dir, filename string) (string, error) {
+	dir, err := filepath.Abs(dir)
 	if err != nil {
 		return "", err
 	}
 
-	filename := "schema.sql"
-
-	if !schema.IsDefault || e.Config.KeepSchema {
-		filename = fmt.Sprintf("%s.sql", schema.Name)
+	if schema != "" {
+		filename = fmt.Sprintf("%s%s", schema, filepath.Ext(filename))
 	}
 
 	if err := os.MkdirAll(dir, 0700); err != nil {
@@ -175,33 +165,13 @@ func (e *Executor) scriptFileOf(schema *Schema, spec *Spec) (string, error) {
 	return filepath.Join(dir, filename), nil
 }
 
-func (e *Executor) modelFileOf(schema *Schema, spec *Spec) (string, error) {
-	dir, err := filepath.Abs(spec.Dir)
-	if err != nil {
-		return "", err
-	}
-
-	filename := "schema.go"
-
+func (e *Executor) nameOf(schema *Schema) string {
 	if !schema.IsDefault {
-		if e.Config.KeepSchema {
-			dir = filepath.Join(dir, schema.Name)
-		} else {
-			filename = fmt.Sprintf("%s.go", schema.Name)
-		}
+		return schema.Name
 	}
-
-	if err := os.MkdirAll(dir, 0700); err != nil {
-		return "", err
-	}
-
-	return filepath.Join(dir, filename), nil
+	return ""
 }
 
-func (e *Executor) packageOf(schema *Schema, spec *Spec) string {
-	if schema.IsDefault || !e.Config.KeepSchema {
-		return filepath.Base(spec.Dir)
-	}
-
-	return schema.Name
+func (e *Executor) packageOf(spec *Spec) string {
+	return filepath.Base(spec.Dir)
 }
