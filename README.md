@@ -88,6 +88,29 @@ If you want to rollback the migration you have to revert it:
 $ prana migration revert
 ```
 
+If you have an SQL script that is compatible with particular database, you can
+append the database's driver name suffix. For instance if you want to run part
+of a particular migration for MySQL, you should have the following directory
+tree:
+
+```
+$ tree database
+
+database/
+└── migration
+    ├── 00060524000000_setup.sql
+    ├── 20180406190015_users.sql
+    ├── 20180406190015_users_mysql.sql
+    ├── 20180406190015_users_postgres.sql
+    └── 20180406190015_users_sqlite3.sql
+```
+
+Prana will execute the following migrations with `users` suffix, when MySQL
+driver is used:
+
+- `20180406190015_users.sql`
+- `20180406190015_users_mysql.sql`
+
 ## SQL Schema and Code Generation
 
 Let's assume that we want to generate a mode for the `users` table.
