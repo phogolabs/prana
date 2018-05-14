@@ -58,8 +58,8 @@ var _ = Describe("Runner", func() {
 
 		sqlmigr := &bytes.Buffer{}
 		fmt.Fprintln(sqlmigr, "-- name: up")
-		fmt.Fprintln(sqlmigr, "CREATE TABLE test(id TEXT);")
-		fmt.Fprintln(sqlmigr, "CREATE TABLE test2(id TEXT);")
+		fmt.Fprintln(sqlmigr, "CREATE TABLE IF NOT EXISTS test(id TEXT);")
+		fmt.Fprintln(sqlmigr, "CREATE TABLE IF NOT EXISTS test2(id TEXT);")
 		fmt.Fprintln(sqlmigr, "-- name: down")
 		fmt.Fprintln(sqlmigr, "DROP TABLE IF EXISTS test;")
 		fmt.Fprintln(sqlmigr, "DROP TABLE IF EXISTS test2;")
@@ -156,6 +156,18 @@ var _ = Describe("Runner", func() {
 			Expect(runner.Revert(item)).To(Succeed())
 			_, err := runner.DB.Exec("SELECT id FROM test")
 			Expect(err).To(MatchError("no such table: test"))
+		})
+
+		Context("when the migration has multiple files", func() {
+			BeforeEach(func() {
+				item.Drivers = []string{"sqlite3", "sql"}
+			})
+
+			It("reverts the migration successfully", func() {
+				Expect(runner.Revert(item)).To(Succeed())
+				_, err := runner.DB.Exec("SELECT id FROM test")
+				Expect(err).To(MatchError("no such table: test"))
+			})
 		})
 
 		Context("when the migration does not exist", func() {
