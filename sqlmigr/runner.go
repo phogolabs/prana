@@ -55,8 +55,13 @@ func (r *Runner) exec(step string, m *Migration) error {
 
 func (r *Runner) routine(name string, m *Migration) ([]string, error) {
 	statements := make(map[string][]string, 2)
+	filenames := m.Filenames()
 
-	for _, file := range m.Filenames() {
+	if name == "down" {
+		reverse(filenames)
+	}
+
+	for _, file := range filenames {
 		routines, err := r.scan(file)
 		if err != nil {
 			return []string{}, err
@@ -89,4 +94,10 @@ func (r *Runner) scan(filename string) (map[string]string, error) {
 
 	scanner := &sqlexec.Scanner{}
 	return scanner.Scan(file), nil
+}
+
+func reverse(s []string) {
+	for i, j := 0, len(s)-1; i < j; i, j = i+1, j-1 {
+		s[i], s[j] = s[j], s[i]
+	}
 }
