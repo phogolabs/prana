@@ -341,7 +341,7 @@ var _ = Describe("QueryGenerator", func() {
 			schemaDef.Tables = []sqlmodel.Table{}
 		})
 
-		It("generates the script successfully", func() {
+		It("generates the schema successfully", func() {
 			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
 				Writer:  reader,
@@ -351,6 +351,51 @@ var _ = Describe("QueryGenerator", func() {
 
 			Expect(generator.Generate(ctx)).To(Succeed())
 			Expect(reader.String()).To(BeEmpty())
+		})
+	})
+
+	Context("when more than one table are provided", func() {
+		BeforeEach(func() {
+			schemaDef.Tables = append(schemaDef.Tables,
+				sqlmodel.Table{
+					Name: "table2",
+					Columns: []sqlmodel.Column{
+						{
+							Name:     "id",
+							ScanType: "string",
+							Type: sqlmodel.ColumnType{
+								Name:          "varchar",
+								IsPrimaryKey:  true,
+								IsNullable:    true,
+								CharMaxLength: 200,
+							},
+						},
+						{
+							Name:     "name",
+							ScanType: "string",
+							Type: sqlmodel.ColumnType{
+								Name:          "varchar",
+								IsPrimaryKey:  false,
+								IsNullable:    false,
+								CharMaxLength: 200,
+							},
+						},
+					},
+				},
+			)
+		})
+
+		It("generates the script successfully", func() {
+			reader := &bytes.Buffer{}
+			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
+				Package: "model",
+				Schema:  schemaDef,
+			}
+
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(ContainSubstring("table1"))
+			Expect(reader.String()).To(ContainSubstring("table2"))
 		})
 	})
 })

@@ -145,7 +145,11 @@ func (g *QueryGenerator) Generate(ctx *GeneratorContext) error {
 
 	tables := tables(g.Config.IgnoreTables, schema)
 
-	for _, table := range tables {
+	for index, table := range tables {
+		if index > 0 {
+			fmt.Fprintln(buffer)
+		}
+
 		g.writeSQLQuerySelectAll(buffer, schema, &table)
 		g.writeSQLQuerySelect(buffer, schema, &table)
 		g.writeSQLQueryInsert(buffer, schema, &table)
