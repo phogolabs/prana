@@ -21,8 +21,22 @@ type Provider struct {
 }
 
 // Migrations returns the project migrations.
-func (m *Provider) Migrations() ([]Migration, error) {
-	local := []Migration{}
+func (m *Provider) Migrations() ([]*Migration, error) {
+	local, err := m.files()
+	if err != nil {
+		return local, err
+	}
+
+	remote, err := m.query()
+	if err != nil {
+		return remote, err
+	}
+
+	return m.merge(remote, local)
+}
+
+func (m *Provider) files() ([]*Migration, error) {
+	local := []*Migration{}
 
 	err := m.FileSystem.Walk("/", func(path string, info os.FileInfo, err error) error {
 		if ferr := m.filter(info); ferr != nil {
@@ -38,35 +52,27 @@ func (m *Provider) Migrations() ([]Migration, error) {
 			return err
 		}
 
-		if !m.supported(migration) {
+		if !m.supported(migration.Drivers) {
 			return nil
 		}
 
-		local = append(local, *migration)
+		if index := len(local) - 1; index >= 0 {
+			if prev := local[index]; migration.Equal(prev) {
+				prev.Drivers = append(prev.Drivers, migration.Drivers...)
+				local[index] = prev
+				return nil
+			}
+		}
+
+		local = append(local, migration)
 		return nil
 	})
 
 	if err != nil {
-		return []Migration{}, err
+		return []*Migration{}, err
 	}
 
-	remote := []Migration{}
-
-	query := &bytes.Buffer{}
-	query.WriteString("SELECT id, description, created_at ")
-	query.WriteString("FROM migrations ")
-	query.WriteString("ORDER BY id ASC")
-
-	if err := m.DB.Select(&remote, query.String()); err != nil && !IsNotExist(err) {
-		return []Migration{}, err
-	}
-
-	return m.merge(remote, local)
-}
-
-func (m *Provider) supported(migration *Migration) bool {
-	driver := migration.Driver
-	return driver == "" || driver == m.DB.DriverName()
+	return local, nil
 }
 
 func (m *Provider) filter(info os.FileInfo) error {
@@ -87,6 +93,31 @@ func (m *Provider) filter(info os.FileInfo) error {
 	}
 
 	return nil
+}
+
+func (m *Provider) supported(drivers []string) bool {
+	for _, driver := range drivers {
+		if driver == every || driver == m.DB.DriverName() {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (m *Provider) query() ([]*Migration, error) {
+	query := &bytes.Buffer{}
+	query.WriteString("SELECT id, description, created_at ")
+	query.WriteString("FROM migrations ")
+	query.WriteString("ORDER BY id ASC")
+
+	remote := []*Migration{}
+
+	if err := m.DB.Select(&remote, query.String()); err != nil && !IsNotExist(err) {
+		return []*Migration{}, err
+	}
+
+	return remote, nil
 }
 
 // Insert inserts executed sqlmigr item in the sqlmigrs table.
@@ -130,18 +161,18 @@ func (m *Provider) Exists(item *Migration) bool {
 	return count == 1
 }
 
-func (m *Provider) merge(remote, local []Migration) ([]Migration, error) {
+func (m *Provider) merge(remote, local []*Migration) ([]*Migration, error) {
 	result := local
 
 	for index, r := range remote {
 		l := local[index]
 
 		if r.ID != l.ID {
-			return []Migration{}, fmt.Errorf("mismatched migration id. Expected: '%s' but has '%s'", r.ID, l.ID)
+			return []*Migration{}, fmt.Errorf("mismatched migration id. Expected: '%s' but has '%s'", r.ID, l.ID)
 		}
 
 		if r.Description != l.Description {
-			return []Migration{}, fmt.Errorf("mismatched migration description. Expected: '%s' but has '%s'", r.Description, l.Description)
+			return []*Migration{}, fmt.Errorf("mismatched migration description. Expected: '%s' but has '%s'", r.Description, l.Description)
 		}
 
 		// Merge creation time

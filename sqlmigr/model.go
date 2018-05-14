@@ -21,6 +21,7 @@ import (
 var (
 	format = "20060102150405"
 	min    = time.Date(1, time.January, 1970, 0, 0, 0, 0, time.UTC)
+	every  = "sql"
 )
 
 // FileSystem provides with primitives to work with the underlying file system
@@ -37,7 +38,7 @@ type MigrationRunner interface {
 // MigrationProvider provides all items.
 type MigrationProvider interface {
 	// Migrations returns all sqlmigr items.
-	Migrations() ([]Migration, error)
+	Migrations() ([]*Migration, error)
 	// Insert inserts executed sqlmigr item in the sqlmigrs table.
 	Insert(item *Migration) error
 	// Delete deletes applied sqlmigr item from sqlmigrs table.
@@ -86,19 +87,39 @@ type Migration struct {
 	Description string `db:"description"`
 	// CreatedAt returns the time of sqlmigr execution.
 	CreatedAt time.Time `db:"created_at"`
-	// Driver name
-	Driver string `db:"-"`
+	// Drivers return all supported drivers
+	Drivers []string `db:"-"`
 }
 
-// Filename returns the item filename
-func (m Migration) Filename() string {
-	parts := []string{m.ID, m.Description}
+// Filenames return the migration filenames
+func (m *Migration) Filenames() []string {
+	var (
+		files []string
+		parts []string
+	)
 
-	if m.Driver != "" {
-		parts = append(parts, m.Driver)
+	for _, driver := range m.Drivers {
+		switch driver {
+		case every:
+			parts = []string{m.ID, m.Description}
+		default:
+			parts = []string{m.ID, m.Description, driver}
+		}
+
+		files = append(files, fmt.Sprintf("%s.sql", strings.Join(parts, "_")))
 	}
 
-	return fmt.Sprintf("%s.sql", strings.Join(parts, "_"))
+	return files
+}
+
+// String returns the migration as string
+func (m *Migration) String() string {
+	return strings.Join(m.Filenames(), ", ")
+}
+
+// Equal returns true if the migrations are equal
+func (m *Migration) Equal(migration *Migration) bool {
+	return m.ID == migration.ID && m.Description == migration.Description
 }
 
 // Parse parses a given file path to a sqlmigr item.
@@ -119,7 +140,7 @@ func Parse(path string) (*Migration, error) {
 	description := parts[1]
 	driver := sqlexec.PathDriver(path)
 
-	if driver != "" {
+	if driver != every {
 		pattern := fmt.Sprintf("_%s", driver)
 		description = strings.Replace(description, pattern, "", -1)
 	}
@@ -127,7 +148,7 @@ func Parse(path string) (*Migration, error) {
 	return &Migration{
 		ID:          id,
 		Description: description,
-		Driver:      driver,
+		Drivers:     []string{driver},
 	}, nil
 }
 

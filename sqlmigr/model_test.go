@@ -8,17 +8,7 @@ import (
 	"github.com/phogolabs/prana/sqlmigr"
 )
 
-var _ = Describe("Migration Model", func() {
-	It("returns the filename correctly", func() {
-		item := &sqlmigr.Migration{
-			ID:          "id",
-			Description: "schema",
-			Driver:      "sqlite3",
-		}
-
-		Expect(item.Filename()).To(Equal("id_schema_sqlite3.sql"))
-	})
-
+var _ = Describe("Migration", func() {
 	Describe("Parse", func() {
 		It("parses the item successfully", func() {
 			filename := "20060102150405_schema.sql"
@@ -26,6 +16,7 @@ var _ = Describe("Migration Model", func() {
 			Expect(err).NotTo(HaveOccurred())
 			Expect(item.ID).To(Equal("20060102150405"))
 			Expect(item.Description).To(Equal("schema"))
+			Expect(item.Filenames()).To(ContainElement(filename))
 		})
 
 		Context("when the filename is has longer description", func() {
@@ -35,7 +26,8 @@ var _ = Describe("Migration Model", func() {
 				Expect(err).NotTo(HaveOccurred())
 				Expect(item.ID).To(Equal("20060102150405"))
 				Expect(item.Description).To(Equal("my_schema_for_this_db"))
-				Expect(item.Driver).To(BeEmpty())
+				Expect(item.Drivers).To(ContainElement("sql"))
+				Expect(item.Filenames()).To(ContainElement(filename))
 			})
 
 			Context("when the filename has driver name as suffix", func() {
@@ -45,7 +37,8 @@ var _ = Describe("Migration Model", func() {
 					Expect(err).NotTo(HaveOccurred())
 					Expect(item.ID).To(Equal("20060102150405"))
 					Expect(item.Description).To(Equal("my_schema_for_this_db"))
-					Expect(item.Driver).To(Equal("sqlite3"))
+					Expect(item.Drivers).To(ContainElement("sqlite3"))
+					Expect(item.Filenames()).To(ContainElement(filename))
 				})
 			})
 		})

@@ -152,7 +152,7 @@ func (m *SQLMigration) create(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeMigration)
 	}
 
-	log.Infof("Created migration at: '%s'", filepath.Join(m.dir, item.Filename()))
+	log.Infof("Created migration at: '%s'", filepath.Join(m.dir, item.Filenames()[0]))
 	return nil
 }
 

@@ -30,7 +30,7 @@ func (r *Runner) Revert(m *Migration) error {
 }
 
 func (r *Runner) exec(step string, m *Migration) error {
-	statements, err := r.command(step, m)
+	statements, err := r.routine(step, m)
 	if err != nil {
 		return err
 	}
@@ -54,8 +54,38 @@ func (r *Runner) exec(step string, m *Migration) error {
 	return tx.Commit()
 }
 
-func (r *Runner) command(name string, m *Migration) ([]string, error) {
-	file, err := r.FileSystem.OpenFile(m.Filename(), os.O_RDONLY, 0)
+func (r *Runner) routine(name string, m *Migration) ([]string, error) {
+	statements := make(map[string]string, 2)
+
+	for _, file := range m.Filenames() {
+		routines, err := r.scan(file)
+		if err != nil {
+			return []string{}, err
+		}
+
+		for key, value := range routines {
+			statements[key] = value
+		}
+	}
+
+	routine, ok := statements[name]
+	if !ok {
+		return []string{}, fmt.Errorf("routine '%s' not found for migration '%v'", name, m)
+	}
+
+	commands := strings.FieldsFunc(routine, func(c rune) bool {
+		return c == ';'
+	})
+
+	for index, cmd := range commands {
+		commands[index] = strings.TrimSpace(cmd)
+	}
+
+	return commands, nil
+}
+
+func (r *Runner) scan(filename string) (map[string]string, error) {
+	file, err := r.FileSystem.OpenFile(filename, os.O_RDONLY, 0)
 	if err != nil {
 		return nil, err
 	}
@@ -67,21 +97,5 @@ func (r *Runner) command(name string, m *Migration) ([]string, error) {
 	}()
 
 	scanner := &sqlexec.Scanner{}
-
-	queries := scanner.Scan(file)
-	statements, ok := queries[name]
-
-	if !ok {
-		return []string{}, fmt.Errorf("Routine '%s' not found for migration '%s'", name, m.Filename())
-	}
-
-	commands := strings.FieldsFunc(statements, func(c rune) bool {
-		return c == ';'
-	})
-
-	for index, cmd := range commands {
-		commands[index] = strings.TrimSpace(cmd)
-	}
-
-	return commands, nil
+	return scanner.Scan(file), nil
 }

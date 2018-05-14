@@ -28,6 +28,7 @@ func (m *Executor) Setup() error {
 	migration := &Migration{
 		ID:          min.Format(format),
 		Description: "setup",
+		Drivers:     []string{every},
 		CreatedAt:   time.Now(),
 	}
 
@@ -53,16 +54,11 @@ func (m *Executor) Setup() error {
 // Create creates a migration script successfully if the project has already
 // been setup, otherwise returns an error.
 func (m *Executor) Create(name string) (*Migration, error) {
+	id := time.Now().Format(format)
 	name = inflect.Underscore(strings.ToLower(name))
+	name = fmt.Sprintf("%s_%s.sql", id, name)
 
-	timestamp := time.Now()
-
-	migration := &Migration{
-		ID:          timestamp.Format(format),
-		Description: name,
-		CreatedAt:   timestamp,
-	}
-
+	migration, _ := Parse(name)
 	if err := m.Generator.Create(migration); err != nil {
 		return nil, err
 	}
@@ -88,21 +84,13 @@ func (m *Executor) Run(step int) (int, error) {
 			continue
 		}
 
-		m.logf("Running migration '%s'", migration.Filename())
+		m.logf("Running migration '%v'", migration)
 
-		if err := m.Runner.Run(&migrations[index]); err != nil {
+		if err := m.Runner.Run(migrations[index]); err != nil {
 			return run, err
 		}
 
-		if index < len(migrations)-1 {
-			prev := migrations[index+1]
-
-			if prev.ID == migration.ID {
-				continue
-			}
-		}
-
-		if err := m.Provider.Insert(&migrations[index]); err != nil {
+		if err := m.Provider.Insert(migrations[index]); err != nil {
 			return run, err
 		}
 
@@ -139,20 +127,13 @@ func (m *Executor) Revert(step int) (int, error) {
 			continue
 		}
 
-		m.logf("Reverting migration '%s'", migration.Filename())
-		if err := m.Runner.Revert(&migrations[index]); err != nil {
+		m.logf("Reverting migration '%v'", migration)
+
+		if err := m.Runner.Revert(migrations[index]); err != nil {
 			return reverted, err
 		}
 
-		if index > 0 {
-			next := migrations[index-1]
-
-			if next.ID == migration.ID {
-				continue
-			}
-		}
-
-		if err := m.Provider.Delete(&migrations[index]); err != nil {
+		if err := m.Provider.Delete(migrations[index]); err != nil {
 			if IsNotExist(err) {
 				err = nil
 			}
@@ -172,7 +153,7 @@ func (m *Executor) RevertAll() (int, error) {
 }
 
 // Migrations returns all migrations.
-func (m *Executor) Migrations() ([]Migration, error) {
+func (m *Executor) Migrations() ([]*Migration, error) {
 	return m.Provider.Migrations()
 }
 

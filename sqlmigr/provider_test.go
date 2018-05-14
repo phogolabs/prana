@@ -172,16 +172,22 @@ var _ = Describe("Provider", func() {
 			path := filepath.Join(dir, "20070102150405_setup.sql")
 			Expect(ioutil.WriteFile(path, []byte{}, 0700)).To(Succeed())
 
+			path = filepath.Join(dir, "20070102150405_setup_sqlite3.sql")
+			Expect(ioutil.WriteFile(path, []byte{}, 0700)).To(Succeed())
+
 			items, err := provider.Migrations()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(items).To(HaveLen(2))
 
 			Expect(items[0].ID).To(Equal("20060102150405"))
 			Expect(items[0].Description).To(Equal("schema"))
+			Expect(items[0].Drivers).To(ContainElement("sql"))
 
 			Expect(items[1].ID).To(Equal("20070102150405"))
 			Expect(items[1].Description).To(Equal("setup"))
 			Expect(items[1].CreatedAt.IsZero()).To(BeTrue())
+			Expect(items[1].Drivers).To(ContainElement("sql"))
+			Expect(items[1].Drivers).To(ContainElement("sqlite3"))
 		})
 
 		Context("when the directory does not exist", func() {
@@ -225,11 +231,11 @@ var _ = Describe("Provider", func() {
 
 		Context("when the migration has database suffix which is not matched", func() {
 			It("skips the migration", func() {
-				path := filepath.Join(dir, "20070102150405_setup_mysql.sql")
-				Expect(ioutil.WriteFile(path, []byte{}, 0700)).To(Succeed())
+				path1 := filepath.Join(dir, "20070102150405_setup_mysql.sql")
+				Expect(ioutil.WriteFile(path1, []byte{}, 0700)).To(Succeed())
 
-				path = filepath.Join(dir, "20070102150405_setup_sqlite3.sql")
-				Expect(ioutil.WriteFile(path, []byte{}, 0700)).To(Succeed())
+				path2 := filepath.Join(dir, "20070102150405_setup_sqlite3.sql")
+				Expect(ioutil.WriteFile(path2, []byte{}, 0700)).To(Succeed())
 
 				items, err := provider.Migrations()
 				Expect(err).NotTo(HaveOccurred())
@@ -237,12 +243,13 @@ var _ = Describe("Provider", func() {
 
 				Expect(items[0].ID).To(Equal("20060102150405"))
 				Expect(items[0].Description).To(Equal("schema"))
-				Expect(items[0].Driver).To(BeEmpty())
+				Expect(items[0].Drivers).To(HaveLen(1))
+				Expect(items[0].Drivers).To(ContainElement("sql"))
 
 				Expect(items[1].ID).To(Equal("20070102150405"))
 				Expect(items[1].Description).To(Equal("setup"))
-				Expect(items[1].Driver).To(Equal("sqlite3"))
-				Expect(items[1].CreatedAt.IsZero()).To(BeTrue())
+				Expect(items[1].Drivers).To(HaveLen(1))
+				Expect(items[1].Drivers).To(ContainElement("sqlite3"))
 			})
 		})
 

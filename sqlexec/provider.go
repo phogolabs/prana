@@ -9,6 +9,8 @@ import (
 	"sync"
 )
 
+const every = "sql"
+
 // Provider loads SQL sqlexecs and provides all SQL statements as commands.
 type Provider struct {
 	// DriverName is the current SQL driver
@@ -122,7 +124,7 @@ func (p *Provider) filter(path string) bool {
 	}
 
 	driver := PathDriver(path)
-	return driver == "" || driver == p.DriverName
+	return driver == every || driver == p.DriverName
 }
 
 // PathDriver returns the driver name from a given path
@@ -137,7 +139,7 @@ func PathDriver(path string) string {
 	case "sqlite3", "postgres", "mysql":
 		return driver
 	default:
-		return ""
+		return every
 	}
 }
 

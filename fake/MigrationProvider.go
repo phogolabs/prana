@@ -8,11 +8,11 @@ import (
 )
 
 type MigrationProvider struct {
-	MigrationsStub        func() ([]sqlmigr.Migration, error)
+	MigrationsStub        func() ([]*sqlmigr.Migration, error)
 	migrationsMutex       sync.RWMutex
 	migrationsArgsForCall []struct{}
 	migrationsReturns     struct {
-		result1 []sqlmigr.Migration
+		result1 []*sqlmigr.Migration
 		result2 error
 	}
 	InsertStub        func(item *sqlmigr.Migration) error
@@ -43,7 +43,7 @@ type MigrationProvider struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *MigrationProvider) Migrations() ([]sqlmigr.Migration, error) {
+func (fake *MigrationProvider) Migrations() ([]*sqlmigr.Migration, error) {
 	fake.migrationsMutex.Lock()
 	fake.migrationsArgsForCall = append(fake.migrationsArgsForCall, struct{}{})
 	fake.recordInvocation("Migrations", []interface{}{})
@@ -60,10 +60,10 @@ func (fake *MigrationProvider) MigrationsCallCount() int {
 	return len(fake.migrationsArgsForCall)
 }
 
-func (fake *MigrationProvider) MigrationsReturns(result1 []sqlmigr.Migration, result2 error) {
+func (fake *MigrationProvider) MigrationsReturns(result1 []*sqlmigr.Migration, result2 error) {
 	fake.MigrationsStub = nil
 	fake.migrationsReturns = struct {
-		result1 []sqlmigr.Migration
+		result1 []*sqlmigr.Migration
 		result2 error
 	}{result1, result2}
 }

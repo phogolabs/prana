@@ -3,6 +3,7 @@ package sqlmigr
 import (
 	"fmt"
 	"io"
+	"strings"
 	"time"
 
 	"github.com/apex/log"
@@ -11,7 +12,7 @@ import (
 )
 
 // Flog prints the migrations as fields
-func Flog(logger log.Interface, migrations []Migration) {
+func Flog(logger log.Interface, migrations []*Migration) {
 	for _, m := range migrations {
 		status := "pending"
 		timestamp := ""
@@ -25,6 +26,7 @@ func Flog(logger log.Interface, migrations []Migration) {
 			"Id":          m.ID,
 			"Description": m.Description,
 			"Status":      status,
+			"Drivers":     strings.Join(m.Filenames(), ", "),
 			"CreatedAt":   timestamp,
 		}
 
@@ -33,7 +35,7 @@ func Flog(logger log.Interface, migrations []Migration) {
 }
 
 // Ftable prints the migrations as table
-func Ftable(w io.Writer, migrations []Migration) {
+func Ftable(w io.Writer, migrations []*Migration) {
 	table := uitable.New()
 	table.MaxColWidth = 50
 
@@ -49,6 +51,7 @@ func Ftable(w io.Writer, migrations []Migration) {
 		table.AddRow("Id", m.ID)
 		table.AddRow("Description", m.Description)
 		table.AddRow("Status", status)
+		table.AddRow("Drivers", strings.Join(m.Filenames(), ", "))
 		table.AddRow("Created At", timestamp)
 		table.AddRow("")
 	}

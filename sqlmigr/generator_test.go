@@ -35,6 +35,7 @@ var _ = Describe("Generator", func() {
 		item = &sqlmigr.Migration{
 			ID:          "20160102150",
 			Description: "schema",
+			Drivers:     []string{"sql"},
 		}
 	})
 
@@ -43,7 +44,7 @@ var _ = Describe("Generator", func() {
 			err := generator.Create(item)
 			Expect(err).To(BeNil())
 
-			path := filepath.Join(dir, item.Filename())
+			path := filepath.Join(dir, item.Filenames()[0])
 			Expect(path).To(BeARegularFile())
 			Expect(dir).To(BeADirectory())
 
@@ -74,7 +75,7 @@ var _ = Describe("Generator", func() {
 			Expect(generator.Write(item, content)).To(Succeed())
 			Expect(dir).To(BeADirectory())
 
-			path := filepath.Join(dir, item.Filename())
+			path := filepath.Join(dir, item.Filenames()[0])
 			Expect(path).To(BeARegularFile())
 
 			data, err := ioutil.ReadFile(path)

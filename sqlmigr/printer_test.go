@@ -12,10 +12,10 @@ import (
 )
 
 var _ = Describe("Printer", func() {
-	var migrations []sqlmigr.Migration
+	var migrations []*sqlmigr.Migration
 
 	BeforeEach(func() {
-		migrations = []sqlmigr.Migration{
+		migrations = []*sqlmigr.Migration{
 			{
 				ID:          "20060102150405",
 				Description: "First",

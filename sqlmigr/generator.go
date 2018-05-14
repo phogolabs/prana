@@ -48,8 +48,10 @@ func (g *Generator) Write(m *Migration, content *Content) error {
 		fmt.Fprintln(buffer)
 	}
 
-	if err := g.write(m.Filename(), buffer.Bytes(), 0600); err != nil {
-		return err
+	for _, filename := range m.Filenames() {
+		if err := g.write(filename, buffer.Bytes(), 0600); err != nil {
+			return err
+		}
 	}
 
 	return nil

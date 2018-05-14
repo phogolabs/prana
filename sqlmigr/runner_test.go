@@ -11,6 +11,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	"github.com/phogolabs/parcello"
+	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmigr"
 	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
@@ -40,6 +41,7 @@ var _ = Describe("Runner", func() {
 		item = &sqlmigr.Migration{
 			ID:          "20160102150",
 			Description: "schema",
+			Drivers:     []string{"sql"},
 		}
 	})
 
@@ -62,8 +64,10 @@ var _ = Describe("Runner", func() {
 		fmt.Fprintln(sqlmigr, "DROP TABLE IF EXISTS test;")
 		fmt.Fprintln(sqlmigr, "DROP TABLE IF EXISTS test2;")
 
-		path := filepath.Join(dir, item.Filename())
-		Expect(ioutil.WriteFile(path, sqlmigr.Bytes(), 0700)).To(Succeed())
+		for _, filename := range item.Filenames() {
+			path := filepath.Join(dir, filename)
+			Expect(ioutil.WriteFile(path, sqlmigr.Bytes(), 0700)).To(Succeed())
+		}
 	})
 
 	AfterEach(func() {
@@ -79,12 +83,14 @@ var _ = Describe("Runner", func() {
 
 		Context("when the sqlmigr does not exist", func() {
 			JustBeforeEach(func() {
-				path := filepath.Join(dir, item.Filename())
-				Expect(os.Remove(path)).To(Succeed())
+				for _, filename := range item.Filenames() {
+					path := filepath.Join(dir, filename)
+					Expect(os.Remove(path)).To(Succeed())
+				}
 			})
 
 			It("returns an error", func() {
-				path := filepath.Join(dir, item.Filename())
+				path := filepath.Join(dir, item.Filenames()[0])
 				msg := fmt.Sprintf("open %s: no such file or directory", path)
 				Expect(runner.Run(item)).To(MatchError(msg))
 			})
@@ -128,7 +134,7 @@ var _ = Describe("Runner", func() {
 				fmt.Fprintln(sqlmigr, "-- name: down")
 				fmt.Fprintln(sqlmigr, "DROP TABLE IF EXISTS test")
 
-				path := filepath.Join(dir, item.Filename())
+				path := filepath.Join(dir, item.Filenames()[0])
 				Expect(ioutil.WriteFile(path, sqlmigr.Bytes(), 0700)).To(Succeed())
 			})
 
@@ -154,12 +160,12 @@ var _ = Describe("Runner", func() {
 
 		Context("when the migration does not exist", func() {
 			JustBeforeEach(func() {
-				path := filepath.Join(dir, item.Filename())
+				path := filepath.Join(dir, item.Filenames()[0])
 				Expect(os.Remove(path)).To(Succeed())
 			})
 
 			It("returns an error", func() {
-				path := filepath.Join(dir, item.Filename())
+				path := filepath.Join(dir, item.Filenames()[0])
 				msg := fmt.Sprintf("open %s: no such file or directory", path)
 				Expect(runner.Revert(item)).To(MatchError(msg))
 			})
@@ -183,19 +189,24 @@ var _ = Describe("Runner", func() {
 				fmt.Fprintln(sqlmigr, "-- name: up")
 				fmt.Fprintln(sqlmigr, "CREATE TABLE test(id TEXT)")
 
-				path := filepath.Join(dir, item.Filename())
+				path := filepath.Join(dir, item.Filenames()[0])
 				Expect(ioutil.WriteFile(path, sqlmigr.Bytes(), 0700)).To(Succeed())
 			})
 
 			It("return an error", func() {
-				Expect(runner.Revert(item)).To(MatchError("Routine 'down' not found for migration '20160102150_schema.sql'"))
+				Expect(runner.Revert(item)).To(MatchError("routine 'down' not found for migration '20160102150_schema.sql'"))
 			})
 		})
 
 		Context("when the dir is not valid", func() {
+			JustBeforeEach(func() {
+				fs := &fake.FileSystem{}
+				fs.OpenFileReturns(nil, fmt.Errorf("oh no!"))
+				runner.FileSystem = fs
+			})
+
 			It("returns an error", func() {
-				runner.FileSystem = parcello.Dir("/")
-				Expect(runner.Revert(item)).To(MatchError("open /20160102150_schema.sql: no such file or directory"))
+				Expect(runner.Revert(item)).To(MatchError("oh no!"))
 			})
 		})
 	})

@@ -83,15 +83,13 @@ var _ = Describe("Executor", func() {
 
 	Describe("Create", func() {
 		It("creates migration successfully", func() {
-			format := "20060102150405"
-
 			migration, err := executor.Create("schema")
 			Expect(err).NotTo(HaveOccurred())
 			Expect(generator.CreateCallCount()).To(Equal(1))
 
 			item := generator.CreateArgsForCall(0)
-			Expect(item.ID).To(Equal(item.CreatedAt.Format(format)))
 			Expect(item.Description).To(Equal("schema"))
+			Expect(item.Drivers).To(ContainElement("sql"))
 			Expect(item).To(Equal(migration))
 		})
 
@@ -107,7 +105,7 @@ var _ = Describe("Executor", func() {
 
 	Describe("Migrations", func() {
 		It("returns the migrations successfully", func() {
-			provider.MigrationsReturns([]sqlmigr.Migration{{ID: "id-123"}}, nil)
+			provider.MigrationsReturns([]*sqlmigr.Migration{{ID: "id-123"}}, nil)
 			migrations, err := executor.Migrations()
 			Expect(err).To(BeNil())
 			Expect(migrations).To(HaveLen(1))
@@ -117,7 +115,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]sqlmigr.Migration{}, fmt.Errorf("oh no!"))
+				provider.MigrationsReturns([]*sqlmigr.Migration{}, fmt.Errorf("oh no!"))
 				migrations, err := executor.Migrations()
 				Expect(err).To(MatchError("oh no!"))
 				Expect(migrations).To(BeEmpty())
@@ -139,7 +137,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when there are applied migrations", func() {
 			It("does not run any of the applied migrations", func() {
-				migrations := []sqlmigr.Migration{
+				migrations := []*sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -164,15 +162,15 @@ var _ = Describe("Executor", func() {
 				Expect(runner.RunCallCount()).To(Equal(1))
 
 				item := runner.RunArgsForCall(0)
-				Expect(*item).To(Equal(migrations[1]))
+				Expect(item).To(Equal(migrations[1]))
 
 				Expect(provider.InsertCallCount()).To(Equal(1))
 				item = provider.InsertArgsForCall(0)
-				Expect(*item).To(Equal(migrations[1]))
+				Expect(item).To(Equal(migrations[1]))
 			})
 
 			It("runs all migrations", func() {
-				migrations := []sqlmigr.Migration{
+				migrations := []*sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -198,35 +196,38 @@ var _ = Describe("Executor", func() {
 
 				for i := 0; i < 3; i++ {
 					item := runner.RunArgsForCall(i)
-					Expect(*item).To(Equal(migrations[i]))
+					Expect(item).To(Equal(migrations[i]))
 
 					item = provider.InsertArgsForCall(i)
-					Expect(*item).To(Equal(migrations[i]))
+					Expect(item).To(Equal(migrations[i]))
 				}
 			})
 		})
 
 		Context("when the step is negative number", func() {
-			var migrations []sqlmigr.Migration
+			var migrations []*sqlmigr.Migration
 
 			BeforeEach(func() {
-				migrations = []sqlmigr.Migration{
+				migrations = []*sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
+						Drivers:     []string{"sql"},
 						CreatedAt:   time.Now(),
 					},
 					{
 						ID:          "20070102150405",
 						Description: "Second",
+						Drivers:     []string{"sql"},
 					},
 					{
 						ID:          "20070102150405",
 						Description: "Second",
-						Driver:      "sqlite3",
+						Drivers:     []string{"sql", "sqlite3"},
 					},
 					{
 						ID:          "20080102150405",
+						Drivers:     []string{"sql"},
 						Description: "Third",
 					},
 				}
@@ -237,7 +238,7 @@ var _ = Describe("Executor", func() {
 			It("runs all pending migrations", func() {
 				cnt, err := executor.Run(-1)
 				Expect(err).To(Succeed())
-				Expect(cnt).To(Equal(2))
+				Expect(cnt).To(Equal(3))
 
 				Expect(provider.MigrationsCallCount()).To(Equal(1))
 				Expect(runner.RunCallCount()).To(Equal(3))
@@ -245,7 +246,7 @@ var _ = Describe("Executor", func() {
 
 				for i := 0; i < runner.RunCallCount(); i++ {
 					item := runner.RunArgsForCall(i)
-					Expect(*item).To(Equal(migrations[i+1]))
+					Expect(item).To(Equal(migrations[i+1]))
 				}
 			})
 
@@ -276,7 +277,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]sqlmigr.Migration{}, fmt.Errorf("Oh no!"))
+				provider.MigrationsReturns([]*sqlmigr.Migration{}, fmt.Errorf("Oh no!"))
 
 				cnt, err := executor.Run(1)
 				Expect(err).To(MatchError("Oh no!"))
@@ -298,26 +299,23 @@ var _ = Describe("Executor", func() {
 		})
 
 		It("revert all migrations", func() {
-			migrations := []sqlmigr.Migration{
+			migrations := []*sqlmigr.Migration{
 				{
 					ID:          "20060102150405",
 					Description: "First",
+					Drivers:     []string{"sql"},
 					CreatedAt:   time.Now(),
 				},
 				{
 					ID:          "20070102150405",
 					Description: "Second",
-					CreatedAt:   time.Now(),
-				},
-				{
-					ID:          "20070102150405",
-					Description: "Second",
-					Driver:      "sqlite3",
+					Drivers:     []string{"sql", "sqlite3"},
 					CreatedAt:   time.Now(),
 				},
 				{
 					ID:          "20080102150405",
 					Description: "Third",
+					Drivers:     []string{"sql"},
 					CreatedAt:   time.Now(),
 				},
 			}
@@ -328,31 +326,31 @@ var _ = Describe("Executor", func() {
 			Expect(cnt).To(Equal(3))
 
 			Expect(provider.MigrationsCallCount()).To(Equal(1))
-			Expect(runner.RevertCallCount()).To(Equal(4))
+			Expect(runner.RevertCallCount()).To(Equal(3))
 			Expect(provider.DeleteCallCount()).To(Equal(3))
 
 			item := runner.RevertArgsForCall(0)
-			Expect(*item).To(Equal(migrations[3]))
+			Expect(item).To(Equal(migrations[2]))
+
 			item = provider.DeleteArgsForCall(0)
-			Expect(*item).To(Equal(migrations[3]))
+			Expect(item).To(Equal(migrations[2]))
 
 			item = runner.RevertArgsForCall(1)
-			Expect(*item).To(Equal(migrations[2]))
+			Expect(item).To(Equal(migrations[1]))
+
+			item = provider.DeleteArgsForCall(1)
+			Expect(item).To(Equal(migrations[1]))
 
 			item = runner.RevertArgsForCall(2)
-			Expect(*item).To(Equal(migrations[1]))
-			item = provider.DeleteArgsForCall(1)
-			Expect(*item).To(Equal(migrations[1]))
+			Expect(item).To(Equal(migrations[0]))
 
-			item = runner.RevertArgsForCall(3)
-			Expect(*item).To(Equal(migrations[0]))
 			item = provider.DeleteArgsForCall(2)
-			Expect(*item).To(Equal(migrations[0]))
+			Expect(item).To(Equal(migrations[0]))
 		})
 
 		Context("when there are pending migrations", func() {
 			It("does not revert any of the pending migrations", func() {
-				migrations := []sqlmigr.Migration{
+				migrations := []*sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -379,19 +377,19 @@ var _ = Describe("Executor", func() {
 				Expect(runner.RevertCallCount()).To(Equal(1))
 
 				item := runner.RevertArgsForCall(0)
-				Expect(*item).To(Equal(migrations[1]))
+				Expect(item).To(Equal(migrations[1]))
 
 				Expect(provider.DeleteCallCount()).To(Equal(1))
 				item = provider.DeleteArgsForCall(0)
-				Expect(*item).To(Equal(migrations[1]))
+				Expect(item).To(Equal(migrations[1]))
 			})
 		})
 
 		Context("when the step is negative number", func() {
-			var migrations []sqlmigr.Migration
+			var migrations []*sqlmigr.Migration
 
 			BeforeEach(func() {
-				migrations = []sqlmigr.Migration{
+				migrations = []*sqlmigr.Migration{
 					{
 						ID:          "20060102150405",
 						Description: "First",
@@ -440,7 +438,7 @@ var _ = Describe("Executor", func() {
 
 		Context("when the provider fails", func() {
 			It("returns the error", func() {
-				provider.MigrationsReturns([]sqlmigr.Migration{}, fmt.Errorf("Oh no!"))
+				provider.MigrationsReturns([]*sqlmigr.Migration{}, fmt.Errorf("Oh no!"))
 
 				cnt, err := executor.Revert(1)
 				Expect(err).To(MatchError("Oh no!"))
@@ -448,10 +446,10 @@ var _ = Describe("Executor", func() {
 			})
 
 			Context("when the delete fails", func() {
-				var migrations []sqlmigr.Migration
+				var migrations []*sqlmigr.Migration
 
 				BeforeEach(func() {
-					migrations = []sqlmigr.Migration{
+					migrations = []*sqlmigr.Migration{
 						{
 							ID:          "20060102150405",
 							Description: "First",
