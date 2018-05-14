@@ -19,7 +19,7 @@ import (
 
 var (
 	format = "20060102150405"
-	min    = time.Date(1, time.January, 1970, 0, 0, 0, 0, time.UTC)
+	min    = time.Date(1, time.January, 1970, 0, 0, 0, 0, time.UTC).UTC()
 	every  = "sql"
 )
 
