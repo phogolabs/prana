@@ -114,7 +114,7 @@ func (m *Migration) Filenames() []string {
 
 // String returns the migration as string
 func (m *Migration) String() string {
-	return strings.Join(m.Filenames(), ", ")
+	return fmt.Sprintf("%s_%s", m.ID, m.Description)
 }
 
 // Equal returns true if the migrations are equal

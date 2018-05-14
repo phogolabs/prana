@@ -194,7 +194,7 @@ var _ = Describe("Runner", func() {
 			})
 
 			It("return an error", func() {
-				Expect(runner.Revert(item)).To(MatchError("routine 'down' not found for migration '20160102150_schema.sql'"))
+				Expect(runner.Revert(item)).To(MatchError("routine 'down' not found for migration '20160102150_schema'"))
 			})
 		})
 
