@@ -73,15 +73,7 @@ func (r *Runner) routine(name string, m *Migration) ([]string, error) {
 		return []string{}, fmt.Errorf("routine '%s' not found for migration '%v'", name, m)
 	}
 
-	commands := strings.FieldsFunc(routine, func(c rune) bool {
-		return c == ';'
-	})
-
-	for index, cmd := range commands {
-		commands[index] = strings.TrimSpace(cmd)
-	}
-
-	return commands, nil
+	return strings.Split(routine, "\n\n"), nil
 }
 
 func (r *Runner) scan(filename string) (map[string]string, error) {
