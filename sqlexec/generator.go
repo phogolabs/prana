@@ -30,8 +30,10 @@ func (g *Generator) Create(path, name string) (string, string, error) {
 		return "", "", fmt.Errorf("Query '%s' already exists", name)
 	}
 
+	now := time.Now().UTC()
+
 	if path == "" {
-		path = time.Now().Format(format)
+		path = now.Format(format)
 	}
 
 	path = fmt.Sprintf("%s.sql", path)
@@ -42,7 +44,7 @@ func (g *Generator) Create(path, name string) (string, string, error) {
 
 	defer file.Close()
 
-	fmt.Fprintln(file, "-- Auto-generated at", time.Now().Format(time.UnixDate))
+	fmt.Fprintln(file, "-- Auto-generated at", now.Format(time.RFC1123))
 	fmt.Fprintf(file, "-- name: %s", name)
 	fmt.Fprintln(file)
 	fmt.Fprintln(file)

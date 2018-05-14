@@ -25,7 +25,7 @@ func (g *Generator) Create(m *Migration) error {
 func (g *Generator) Write(m *Migration, content *Content) error {
 	buffer := &bytes.Buffer{}
 
-	fmt.Fprintln(buffer, "-- Auto-generated at", m.CreatedAt.Format(time.UnixDate))
+	fmt.Fprintln(buffer, "-- Auto-generated at", m.CreatedAt.Format(time.RFC1123))
 	fmt.Fprintln(buffer, "-- Please do not change the name attributes")
 	fmt.Fprintln(buffer)
 	fmt.Fprintln(buffer, "-- name: up")

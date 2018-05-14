@@ -54,7 +54,7 @@ func (m *Executor) Setup() error {
 // Create creates a migration script successfully if the project has already
 // been setup, otherwise returns an error.
 func (m *Executor) Create(name string) (*Migration, error) {
-	now := time.Now()
+	now := time.Now().UTC()
 	id := now.Format(format)
 	name = inflect.Underscore(strings.ToLower(name))
 	name = fmt.Sprintf("%s_%s.sql", id, name)
