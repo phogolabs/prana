@@ -26,7 +26,7 @@ func Flog(logger log.Interface, migrations []*Migration) {
 			"Id":          m.ID,
 			"Description": m.Description,
 			"Status":      status,
-			"Drivers":     strings.Join(m.Filenames(), ", "),
+			"Drivers":     strings.Join(m.Drivers(), ", "),
 			"CreatedAt":   timestamp,
 		}
 
@@ -51,7 +51,7 @@ func Ftable(w io.Writer, migrations []*Migration) {
 		table.AddRow("Id", m.ID)
 		table.AddRow("Description", m.Description)
 		table.AddRow("Status", status)
-		table.AddRow("Drivers", strings.Join(m.Filenames(), ", "))
+		table.AddRow("Drivers", strings.Join(m.Drivers(), ", "))
 		table.AddRow("Created At", timestamp)
 		table.AddRow("")
 	}
