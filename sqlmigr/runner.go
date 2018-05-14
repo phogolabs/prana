@@ -3,7 +3,6 @@ package sqlmigr
 import (
 	"fmt"
 	"os"
-	"strings"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/prana/sqlexec"
@@ -55,7 +54,7 @@ func (r *Runner) exec(step string, m *Migration) error {
 }
 
 func (r *Runner) routine(name string, m *Migration) ([]string, error) {
-	statements := make(map[string]string, 2)
+	statements := make(map[string][]string, 2)
 
 	for _, file := range m.Filenames() {
 		routines, err := r.scan(file)
@@ -64,7 +63,7 @@ func (r *Runner) routine(name string, m *Migration) ([]string, error) {
 		}
 
 		for key, value := range routines {
-			statements[key] = value
+			statements[key] = append(statements[key], value)
 		}
 	}
 
@@ -73,7 +72,7 @@ func (r *Runner) routine(name string, m *Migration) ([]string, error) {
 		return []string{}, fmt.Errorf("routine '%s' not found for migration '%v'", name, m)
 	}
 
-	return strings.Split(routine, "\n\n"), nil
+	return routine, nil
 }
 
 func (r *Runner) scan(filename string) (map[string]string, error) {
