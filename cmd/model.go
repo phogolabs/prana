@@ -3,10 +3,12 @@ package cmd
 import (
 	"fmt"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmodel"
 	"github.com/urfave/cli"
 )
@@ -173,9 +175,10 @@ func (m *SQLModel) after(ctx *cli.Context) error {
 
 func (m *SQLModel) print(ctx *cli.Context) error {
 	spec := &sqlmodel.Spec{
-		Dir:    ctx.GlobalString("package-dir"),
-		Schema: ctx.GlobalString("schema-name"),
-		Tables: ctx.GlobalStringSlice("table-name"),
+		Name:       filepath.Base(ctx.GlobalString("package-dir")),
+		FileSystem: parcello.Dir(ctx.GlobalString("package-dir")),
+		Schema:     ctx.GlobalString("schema-name"),
+		Tables:     ctx.GlobalStringSlice("table-name"),
 	}
 
 	if err := m.executor.Write(os.Stdout, spec); err != nil {
@@ -187,9 +190,10 @@ func (m *SQLModel) print(ctx *cli.Context) error {
 
 func (m *SQLModel) sync(ctx *cli.Context) error {
 	spec := &sqlmodel.Spec{
-		Dir:    ctx.GlobalString("package-dir"),
-		Schema: ctx.GlobalString("schema-name"),
-		Tables: ctx.GlobalStringSlice("table-name"),
+		Name:       filepath.Base(ctx.GlobalString("package-dir")),
+		FileSystem: parcello.Dir(ctx.GlobalString("package-dir")),
+		Schema:     ctx.GlobalString("schema-name"),
+		Tables:     ctx.GlobalStringSlice("table-name"),
 	}
 
 	path, err := m.executor.Create(spec)
@@ -206,9 +210,10 @@ func (m *SQLModel) sync(ctx *cli.Context) error {
 
 func (m *SQLModel) script(ctx *cli.Context) error {
 	spec := &sqlmodel.Spec{
-		Dir:    ctx.GlobalString("directory"),
-		Schema: ctx.GlobalString("schema-name"),
-		Tables: ctx.GlobalStringSlice("table-name"),
+		Name:       filepath.Base(ctx.GlobalString("routine-directory")),
+		FileSystem: parcello.Dir(ctx.GlobalString("routine-directory")),
+		Schema:     ctx.GlobalString("schema-name"),
+		Tables:     ctx.GlobalStringSlice("table-name"),
 	}
 
 	path, err := m.executor.CreateScript(spec)

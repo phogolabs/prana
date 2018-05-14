@@ -38,12 +38,8 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", nil
 	}
 
-	filepath, err := e.fileOf(e.nameOf(schema), spec.Dir, "schema.go")
-	if err != nil {
-		return "", err
-	}
-
-	file, err := os.Create(filepath)
+	filepath := e.fileOf(e.nameOf(schema), "schema.go")
+	file, err := spec.FileSystem.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return "", err
 	}
@@ -71,7 +67,7 @@ func (e *Executor) CreateScript(spec *Spec) (string, error) {
 	reader := &bytes.Buffer{}
 	ctx := &GeneratorContext{
 		Writer:  reader,
-		Package: e.packageOf(spec),
+		Package: spec.Name,
 		Schema:  schema,
 	}
 
@@ -79,21 +75,13 @@ func (e *Executor) CreateScript(spec *Spec) (string, error) {
 		return "", err
 	}
 
-	body, err := ioutil.ReadAll(reader)
-	if err != nil {
-		return "", err
-	}
-
+	body, _ := ioutil.ReadAll(reader)
 	if len(body) == 0 {
 		return "", nil
 	}
 
-	filepath, err := e.fileOf(e.nameOf(schema), spec.Dir, "routine.sql")
-	if err != nil {
-		return "", err
-	}
-
-	file, err := os.Create(filepath)
+	filepath := e.fileOf(e.nameOf(schema), "routine.sql")
+	file, err := spec.FileSystem.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return "", err
 	}
@@ -119,7 +107,7 @@ func (e *Executor) writeSchema(w io.Writer, spec *Spec) (*Schema, error) {
 
 	ctx := &GeneratorContext{
 		Writer:  w,
-		Package: e.packageOf(spec),
+		Package: spec.Name,
 		Schema:  schema,
 	}
 
@@ -148,21 +136,12 @@ func (e *Executor) schemaOf(spec *Spec) (*Schema, error) {
 	return schema, nil
 }
 
-func (e *Executor) fileOf(schema, dir, filename string) (string, error) {
-	dir, err := filepath.Abs(dir)
-	if err != nil {
-		return "", err
-	}
-
+func (e *Executor) fileOf(schema, filename string) string {
 	if schema != "" {
 		filename = fmt.Sprintf("%s%s", schema, filepath.Ext(filename))
 	}
 
-	if err := os.MkdirAll(dir, 0700); err != nil {
-		return "", err
-	}
-
-	return filepath.Join(dir, filename), nil
+	return filename
 }
 
 func (e *Executor) nameOf(schema *Schema) string {
@@ -170,8 +149,4 @@ func (e *Executor) nameOf(schema *Schema) string {
 		return schema.Name
 	}
 	return ""
-}
-
-func (e *Executor) packageOf(spec *Spec) string {
-	return filepath.Base(spec.Dir)
 }

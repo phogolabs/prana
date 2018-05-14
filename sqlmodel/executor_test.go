@@ -8,6 +8,7 @@ import (
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmodel"
 )
@@ -42,9 +43,10 @@ var _ = Describe("Executor", func() {
 		Expect(err).To(BeNil())
 
 		spec = &sqlmodel.Spec{
-			Schema: "public",
-			Tables: []string{"table1"},
-			Dir:    filepath.Join(dir, "entity"),
+			Schema:     "public",
+			Tables:     []string{"table1"},
+			Name:       "entity",
+			FileSystem: parcello.Dir(dir),
 		}
 
 		provider = &fake.SchemaProvider{}
@@ -164,10 +166,11 @@ var _ = Describe("Executor", func() {
 			It("creates a package with generated source successfully", func() {
 				path, err := executor.Create(spec)
 				Expect(err).To(Succeed())
+				Expect(path).To(Equal(filename))
 
-				Expect(spec.Dir).To(BeADirectory())
-				Expect(filepath.Join(spec.Dir, filename)).To(BeARegularFile())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, filename)))
+				dir := fmt.Sprintf("%v", spec.FileSystem)
+				Expect(dir).To(BeADirectory())
+				Expect(filepath.Join(dir, path)).To(BeARegularFile())
 
 				Expect(provider.TablesCallCount()).To(BeZero())
 				Expect(provider.SchemaCallCount()).To(Equal(1))
@@ -214,10 +217,7 @@ var _ = Describe("Executor", func() {
 			It("creates a package with generated source successfully", func() {
 				path, err := executor.Create(spec)
 				Expect(err).To(Succeed())
-
-				Expect(spec.Dir).To(BeADirectory())
-				Expect(filepath.Join(spec.Dir, "schema.go")).To(BeARegularFile())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, "schema.go")))
+				Expect(path).To(Equal("schema.go"))
 
 				Expect(provider.TablesCallCount()).To(Equal(1))
 				Expect(provider.TablesArgsForCall(0)).To(Equal("public"))
@@ -255,10 +255,7 @@ var _ = Describe("Executor", func() {
 			It("creates a package with generated source successfully", func() {
 				path, err := executor.Create(spec)
 				Expect(err).To(Succeed())
-				Expect(spec.Dir).To(BeADirectory())
-
-				Expect(path).To(Equal(filepath.Join(spec.Dir, "public.go")))
-				Expect(path).To(BeARegularFile())
+				Expect(path).To(Equal("public.go"))
 			})
 		})
 
@@ -300,9 +297,26 @@ var _ = Describe("Executor", func() {
 			})
 		})
 
+		Context("when writing the file fails", func() {
+			BeforeEach(func() {
+				file := &fake.File{}
+				file.WriteReturns(0, fmt.Errorf("oh no!"))
+
+				fs := &fake.FileSystem{}
+				fs.OpenFileReturns(file, nil)
+				spec.FileSystem = fs
+			})
+
+			It("returns the error", func() {
+				path, err := executor.Create(spec)
+				Expect(err).To(MatchError("oh no!"))
+				Expect(path).To(BeEmpty())
+			})
+		})
+
 		Context("when creating the dir fails", func() {
 			BeforeEach(func() {
-				spec.Dir = "/mydir"
+				spec.FileSystem = parcello.Dir("/mydir")
 			})
 
 			It("returns the error", func() {
@@ -326,9 +340,9 @@ var _ = Describe("Executor", func() {
 				path, err := executor.CreateScript(spec)
 				Expect(err).To(Succeed())
 
-				Expect(spec.Dir).To(BeADirectory())
-				Expect(filepath.Join(spec.Dir, filename)).To(BeARegularFile())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, filename)))
+				dir := fmt.Sprintf("%v", spec.FileSystem)
+				Expect(dir).To(BeADirectory())
+				Expect(filepath.Join(dir, path)).To(BeARegularFile())
 
 				Expect(provider.TablesCallCount()).To(BeZero())
 				Expect(provider.SchemaCallCount()).To(Equal(1))
@@ -361,10 +375,11 @@ var _ = Describe("Executor", func() {
 			It("generates the SQL script scuessfully", func() {
 				path, err := executor.CreateScript(spec)
 				Expect(err).To(Succeed())
+				Expect(path).To(Equal("routine.sql"))
 
-				Expect(spec.Dir).To(BeADirectory())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, "routine.sql")))
-				Expect(path).To(BeARegularFile())
+				dir := fmt.Sprintf("%v", spec.FileSystem)
+				Expect(dir).To(BeADirectory())
+				Expect(filepath.Join(dir, path)).To(BeARegularFile())
 
 				Expect(provider.TablesCallCount()).To(Equal(1))
 				Expect(provider.TablesArgsForCall(0)).To(Equal("public"))
@@ -400,9 +415,11 @@ var _ = Describe("Executor", func() {
 			It("creates a package with generated source successfully", func() {
 				path, err := executor.CreateScript(spec)
 				Expect(err).To(Succeed())
-				Expect(spec.Dir).To(BeADirectory())
-				Expect(path).To(Equal(filepath.Join(spec.Dir, "public.sql")))
-				Expect(filepath.Join(spec.Dir, "public.sql")).To(BeARegularFile())
+				Expect(path).To(Equal("public.sql"))
+
+				dir := fmt.Sprintf("%v", spec.FileSystem)
+				Expect(dir).To(BeADirectory())
+				Expect(filepath.Join(dir, path)).To(BeARegularFile())
 			})
 		})
 
@@ -444,9 +461,26 @@ var _ = Describe("Executor", func() {
 			})
 		})
 
+		Context("when writing the file fails", func() {
+			BeforeEach(func() {
+				file := &fake.File{}
+				file.WriteReturns(0, fmt.Errorf("oh no!"))
+
+				fs := &fake.FileSystem{}
+				fs.OpenFileReturns(file, nil)
+				spec.FileSystem = fs
+			})
+
+			It("returns the error", func() {
+				path, err := executor.CreateScript(spec)
+				Expect(err).To(MatchError("oh no!"))
+				Expect(path).To(BeEmpty())
+			})
+		})
+
 		Context("when creating the dir fails", func() {
 			BeforeEach(func() {
-				spec.Dir = "/mydir"
+				spec.FileSystem = parcello.Dir("/mydir")
 			})
 
 			It("returns the error", func() {

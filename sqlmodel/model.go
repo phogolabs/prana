@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io"
 	"strings"
+
+	"github.com/phogolabs/parcello"
 )
 
 var (
@@ -232,6 +234,9 @@ func (t ColumnType) String() string {
 	return strings.ToUpper(name)
 }
 
+// FileSystem provides with primitives to work with the underlying file system
+type FileSystem = parcello.FileSystem
+
 // TypeDef represents a type definition
 type TypeDef struct {
 	// Type name
@@ -250,12 +255,14 @@ func (t *TypeDef) As(nullable bool) string {
 
 // Spec specifies the generation options
 type Spec struct {
+	// FileSystem is the underlying file system
+	FileSystem FileSystem
 	// Schema is the database schema name
 	Schema string
+	// Name of the spec
+	Name string
 	// Tables is the list of the desired tables from the database schema
 	Tables []string
-	// Dir is a path to root sqlmodel package directory
-	Dir string
 }
 
 // TagBuilder builds tags from column type
