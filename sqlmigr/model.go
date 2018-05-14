@@ -72,7 +72,7 @@ type RunnerError struct {
 
 // Error returns the error as string
 func (e *RunnerError) Error() string {
-	lines := strings.SplitN(e.Statement, "\n", 1)
+	lines := strings.Split(e.Statement, "\n")
 	return fmt.Sprintf("%s: %s", e.Err.Error(), lines[0])
 }
 

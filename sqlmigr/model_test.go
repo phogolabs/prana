@@ -72,6 +72,17 @@ var _ = Describe("RunnerErr", func() {
 
 		Expect(err).To(MatchError("oh no!: statement"))
 	})
+
+	Context("when it has a new line", func() {
+		It("returns the error message", func() {
+			err := &sqlmigr.RunnerError{
+				Err:       fmt.Errorf("oh no!"),
+				Statement: "statement\nhello",
+			}
+
+			Expect(err).To(MatchError("oh no!: statement"))
+		})
+	})
 })
 
 var _ = Describe("IsNotExist", func() {
