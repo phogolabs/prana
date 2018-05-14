@@ -70,7 +70,7 @@ var _ = Describe("RunnerErr", func() {
 			Statement: "statement",
 		}
 
-		Expect(err).To(MatchError("error: oh no!\nstatement: \nstatement"))
+		Expect(err).To(MatchError("oh no!: statement"))
 	})
 })
 
