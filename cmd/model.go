@@ -212,8 +212,8 @@ func (m *SQLModel) script(ctx *cli.Context) error {
 	spec := &sqlmodel.Spec{
 		Name:       filepath.Base(ctx.GlobalString("routine-directory")),
 		FileSystem: parcello.Dir(ctx.GlobalString("routine-directory")),
-		Schema:     ctx.GlobalString("schema-name"),
-		Tables:     ctx.GlobalStringSlice("table-name"),
+		Schema:     ctx.String("schema-name"),
+		Tables:     ctx.StringSlice("table-name"),
 	}
 
 	path, err := m.executor.CreateScript(spec)
