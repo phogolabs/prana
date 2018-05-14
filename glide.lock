@@ -1,5 +1,5 @@
 hash: 264de43bb8656c5955e90a98e1dcf886f8836b5986900b6c348d3bf1c9e1797d
-updated: 2018-05-09T02:06:29.599025+03:00
+updated: 2018-05-14T20:26:06.916094+03:00
 imports:
 - name: github.com/apex/log
   version: 0296d6eb16bb28f8a0c55668affcf4876dc269be
@@ -45,7 +45,7 @@ imports:
 - name: github.com/olekukonko/tablewriter
   version: d4647c9c7a84d847478d890b816b7d8b62b0b279
 - name: github.com/phogolabs/parcello
-  version: 3b48cfcb61c1a98ac0512babf63de0c164be7698
+  version: 48e6cbb8c0d4488dd6a17deca3adf14330cfd381
   subpackages:
   - fake
 - name: github.com/pkg/errors
@@ -53,7 +53,7 @@ imports:
 - name: github.com/urfave/cli
   version: cfb38830724cc34fedffe9a2a29fb54fa9169cd1
 - name: golang.org/x/sys
-  version: 7db1c3b1a98089d0071c84f646ff5c96aad43682
+  version: 7c87d13f8e835d2fb3a70a2912c811ed0c1d241b
   subpackages:
   - unix
 - name: golang.org/x/tools
@@ -100,13 +100,13 @@ testImports:
   - matchers/support/goraph/util
   - types
 - name: golang.org/x/net
-  version: 3a7846fea0afe8cc88deb31d8cfb1fa15a3615ef
+  version: 2491c5de3490fced2f6cff376127c667efeed857
   subpackages:
   - html
   - html/atom
   - html/charset
 - name: golang.org/x/text
-  version: 7922cc490dd5a7dbaa7fd5d6196b49db59ac042f
+  version: 5c1cf69b5978e5a34c5f9ba09a83e56acc4b7877
   subpackages:
   - encoding
   - encoding/charmap
