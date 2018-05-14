@@ -207,6 +207,7 @@ func (g *QueryGenerator) writeSQLComment(w io.Writer) {
 
 func (g *QueryGenerator) commandName(name string, singularize bool) string {
 	name = strings.Replace(name, ".", "-", -1)
+	name = strings.Replace(name, "_", "-", -1)
 	if singularize {
 		name = inflect.Singularize(name)
 	}
