@@ -702,6 +702,26 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("hstore.Hstore"))
+
+	column = columns[63]
+	Expect(column.Name).To(Equal("mood_field_null"))
+	Expect(column.Type.Name).To(Equal("USER-DEFINED"))
+	Expect(column.Type.Underlying).To(Equal("mood"))
+	Expect(column.Type.IsNullable).To(Equal(true))
+	Expect(column.Type.CharMaxLength).To(Equal(0))
+	Expect(column.Type.Precision).To(Equal(0))
+	Expect(column.Type.PrecisionScale).To(Equal(0))
+	Expect(column.ScanType).To(Equal("null.String"))
+
+	column = columns[64]
+	Expect(column.Name).To(Equal("mood_field_not_null"))
+	Expect(column.Type.Name).To(Equal("USER-DEFINED"))
+	Expect(column.Type.Underlying).To(Equal("mood"))
+	Expect(column.Type.IsNullable).To(Equal(false))
+	Expect(column.Type.CharMaxLength).To(Equal(0))
+	Expect(column.Type.Precision).To(Equal(0))
+	Expect(column.Type.PrecisionScale).To(Equal(0))
+	Expect(column.ScanType).To(Equal("string"))
 }
 
 func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
@@ -1306,8 +1326,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("char"))
 	Expect(column.Type.Underlying).To(Equal("char"))
 	Expect(column.Type.IsNullable).To(Equal(true))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("null.Byte"))
 
@@ -1316,8 +1336,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("char"))
 	Expect(column.Type.Underlying).To(Equal("char"))
 	Expect(column.Type.IsNullable).To(Equal(false))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("byte"))
 
@@ -1326,8 +1346,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("character"))
 	Expect(column.Type.Underlying).To(Equal("character"))
 	Expect(column.Type.IsNullable).To(Equal(true))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("null.String"))
 
@@ -1336,8 +1356,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("character"))
 	Expect(column.Type.Underlying).To(Equal("character"))
 	Expect(column.Type.IsNullable).To(Equal(false))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("string"))
 
@@ -1346,8 +1366,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("varchar"))
 	Expect(column.Type.Underlying).To(Equal("varchar"))
 	Expect(column.Type.IsNullable).To(Equal(true))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("null.String"))
 
@@ -1356,8 +1376,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("varchar"))
 	Expect(column.Type.Underlying).To(Equal("varchar"))
 	Expect(column.Type.IsNullable).To(Equal(false))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("string"))
 
@@ -1366,8 +1386,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("character varying"))
 	Expect(column.Type.Underlying).To(Equal("character varying"))
 	Expect(column.Type.IsNullable).To(Equal(true))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("null.String"))
 
@@ -1376,8 +1396,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("character varying"))
 	Expect(column.Type.Underlying).To(Equal("character varying"))
 	Expect(column.Type.IsNullable).To(Equal(false))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("string"))
 
@@ -1666,8 +1686,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("varbit"))
 	Expect(column.Type.Underlying).To(Equal("varbit"))
 	Expect(column.Type.IsNullable).To(Equal(true))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("null.String"))
 
@@ -1676,8 +1696,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("varbit"))
 	Expect(column.Type.Underlying).To(Equal("varbit"))
 	Expect(column.Type.IsNullable).To(Equal(false))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("string"))
 
@@ -1686,8 +1706,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("bit varying"))
 	Expect(column.Type.Underlying).To(Equal("bit varying"))
 	Expect(column.Type.IsNullable).To(Equal(true))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("null.String"))
 
@@ -1696,8 +1716,8 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.Name).To(Equal("bit varying"))
 	Expect(column.Type.Underlying).To(Equal("bit varying"))
 	Expect(column.Type.IsNullable).To(Equal(false))
-	Expect(column.Type.CharMaxLength).To(Equal(0))
-	Expect(column.Type.Precision).To(Equal(20))
+	Expect(column.Type.CharMaxLength).To(Equal(20))
+	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("string"))
 

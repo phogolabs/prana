@@ -2,14 +2,17 @@ package sqlmodel_test
 
 import (
 	"bytes"
+	"database/sql"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 
 	"github.com/jmoiron/sqlx"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
+	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmodel"
 )
 
@@ -87,6 +90,9 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 	Describe("Schema", func() {
 		BeforeEach(func() {
+			_, ferr := db.Exec("CREATE TYPE mood AS ENUM ('sad', 'ok', 'happy');")
+			Expect(ferr).NotTo(HaveOccurred())
+
 			query := &bytes.Buffer{}
 
 			fmt.Fprintln(query, " varbit_field_null                    varbit(20) NULL,")
@@ -115,7 +121,9 @@ var _ = Describe("PostgreSQLProvider", func() {
 			fmt.Fprintln(query, " uuid_field_null                      uuid NULL,")
 			fmt.Fprintln(query, " uuid_field_not_null                  uuid NOT NULL,")
 			fmt.Fprintln(query, " hstore_field_null                    hstore NULL,")
-			fmt.Fprintln(query, " hstore_field_not_null                hstore NOT NULL")
+			fmt.Fprintln(query, " hstore_field_not_null                hstore NOT NULL,")
+			fmt.Fprintln(query, " mood_field_null                      mood NULL,")
+			fmt.Fprintln(query, " mood_field_not_null                  mood NOT NULL")
 
 			_, err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 			Expect(err).NotTo(HaveOccurred())
@@ -128,7 +136,11 @@ var _ = Describe("PostgreSQLProvider", func() {
 		})
 
 		AfterEach(func() {
+
 			_, err := db.Exec("DROP TABLE IF EXISTS test")
+			Expect(err).NotTo(HaveOccurred())
+
+			_, err = db.Exec("DROP TYPE mood")
 			Expect(err).NotTo(HaveOccurred())
 		})
 
@@ -141,7 +153,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 			table := schema.Tables[0]
 			Expect(table.Name).To(Equal("test"))
-			Expect(table.Columns).To(HaveLen(63))
+			Expect(table.Columns).To(HaveLen(65))
 			ExpectColumnsForPostgreSQL(table.Columns)
 		})
 
@@ -193,6 +205,29 @@ var _ = Describe("PostgreSQLProvider", func() {
 				schema, err := provider.Schema("public", "test")
 				Expect(schema).To(BeNil())
 				Expect(err).To(MatchError("sql: database is closed"))
+			})
+		})
+
+		Context("when the table information cannot be fetched", func() {
+			BeforeEach(func() {
+				querier := &fake.Querier{}
+				querier.CloseStub = db.Close
+				querier.QueryRowStub = db.QueryRow
+				querier.RebindStub = db.Rebind
+				querier.QueryStub = func(txt string, args ...interface{}) (*sql.Rows, error) {
+					if strings.Contains(txt, "information_schema.columns") {
+						return nil, fmt.Errorf("oh no!")
+					}
+					return db.Query(txt, args...)
+				}
+
+				provider.DB = querier
+			})
+
+			It("return an error", func() {
+				schema, err := provider.Schema("public", "test")
+				Expect(schema).To(BeNil())
+				Expect(err).To(MatchError("oh no!"))
 			})
 		})
 	})
@@ -371,6 +406,52 @@ var _ = Describe("MySQLProvider", func() {
 				schema, err := provider.Schema("", "test")
 				Expect(schema).To(BeNil())
 				Expect(err).To(MatchError("sql: database is closed"))
+			})
+		})
+
+		Context("when the table primary key information cannot be fetched", func() {
+			BeforeEach(func() {
+				querier := &fake.Querier{}
+				querier.CloseStub = db.Close
+				querier.QueryRowStub = db.QueryRow
+				querier.RebindStub = db.Rebind
+				querier.QueryStub = func(txt string, args ...interface{}) (*sql.Rows, error) {
+					if strings.Contains(txt, "information_schema.table_constraints") {
+						return nil, fmt.Errorf("oh no!")
+					}
+					return db.Query(txt, args...)
+				}
+
+				provider.DB = querier
+			})
+
+			It("return an error", func() {
+				schema, err := provider.Schema("public", "test")
+				Expect(schema).To(BeNil())
+				Expect(err).To(MatchError("oh no!"))
+			})
+		})
+
+		Context("when the table information cannot be fetched", func() {
+			BeforeEach(func() {
+				querier := &fake.Querier{}
+				querier.CloseStub = db.Close
+				querier.QueryRowStub = db.QueryRow
+				querier.RebindStub = db.Rebind
+				querier.QueryStub = func(txt string, args ...interface{}) (*sql.Rows, error) {
+					if strings.Contains(txt, "information_schema.columns") {
+						return nil, fmt.Errorf("oh no!")
+					}
+					return db.Query(txt, args...)
+				}
+
+				provider.DB = querier
+			})
+
+			It("return an error", func() {
+				schema, err := provider.Schema("public", "test")
+				Expect(schema).To(BeNil())
+				Expect(err).To(MatchError("oh no!"))
 			})
 		})
 	})

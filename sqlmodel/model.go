@@ -2,6 +2,7 @@
 package sqlmodel
 
 import (
+	"database/sql"
 	"fmt"
 	"io"
 	"strings"
@@ -93,6 +94,19 @@ var (
 //go:generate counterfeiter -fake-name SchemaProvider -o ../fake/SchemaProvider.go . SchemaProvider
 //go:generate counterfeiter -fake-name ModelGenerator -o ../fake/ModelGenerator.go . Generator
 //go:generate counterfeiter -fake-name TagBuilder -o ../fake/TagBuilder.go . TagBuilder
+//go:generate counterfeiter -fake-name Querier -o ../fake/Querier.go . Querier
+
+// Querier executes queries
+type Querier interface {
+	// Query performs a query and returns a set of rows
+	Query(query string, args ...interface{}) (*sql.Rows, error)
+	// QueryRow performs a query and returns a row
+	QueryRow(query string, args ...interface{}) *sql.Row
+	// Rebind rebinds the query
+	Rebind(query string) string
+	// Close closes the connection
+	Close() error
+}
 
 // SchemaProvider provides a metadata for database schema
 type SchemaProvider interface {

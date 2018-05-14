@@ -109,7 +109,7 @@ var _ = Describe("ModelGenerator", func() {
 
 	Context("when the table is ignored", func() {
 		BeforeEach(func() {
-			generator.Config.IgnoreTables = []string{"table1"}
+			generator.Config.IgnoreTables = []string{"table2", "table1"}
 		})
 
 		It("generates the schema successfully", func() {

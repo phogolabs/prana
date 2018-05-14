@@ -3,7 +3,6 @@ package sqlmodel
 import (
 	"bytes"
 	"fmt"
-	"go/format"
 	"io"
 	"sort"
 	"strings"
@@ -122,11 +121,6 @@ func (g *ModelGenerator) fieldType(column *Column) string {
 
 func (g *ModelGenerator) format(buffer *bytes.Buffer) error {
 	data, err := imports.Process("model", buffer.Bytes(), nil)
-	if err != nil {
-		return err
-	}
-
-	data, err = format.Source(data)
 	if err != nil {
 		return err
 	}
