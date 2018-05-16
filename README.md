@@ -37,7 +37,8 @@ $ brew install prana
 
 ## Introduction
 
-Note that we may introduce breaking changes until we reach v1.0.
+Note that Prana is in BETA. We may introduce breaking changes until we reach
+v1.0.
 
 ### SQL Migrations
 
