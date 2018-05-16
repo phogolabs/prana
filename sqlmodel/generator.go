@@ -141,9 +141,13 @@ type QueryGenerator struct {
 func (g *QueryGenerator) Generate(ctx *GeneratorContext) error {
 	schema := ctx.Schema
 	buffer := &bytes.Buffer{}
-	g.writeSQLComment(buffer)
-
 	tables := tables(g.Config.IgnoreTables, schema)
+
+	if len(tables) == 0 {
+		return nil
+	}
+
+	g.writeSQLComment(buffer)
 
 	for index, table := range tables {
 		if index > 0 {
