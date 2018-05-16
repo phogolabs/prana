@@ -105,7 +105,7 @@ append the database's driver name suffix. For instance if you want to run part
 of a particular migration for MySQL, you should have the following directory
 tree:
 
-```
+```console
 $ tree database
 
 database/
@@ -277,7 +277,7 @@ You can also generate all CRUD operations for given table. The command below
 will generate a SQL script that contains SQL queries for each table in the
 default schema:
 
-```consol
+```console
 $ prana routine sync
 ```
 
