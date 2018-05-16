@@ -232,6 +232,9 @@ database/
     └── 20180328184257.sql
 ```
 
+You can enable the script for particular type of database by adding the driver
+name as suffix: `20180328184257_slite3.sql`.
+
 It has the following contents:
 
 ```sql
