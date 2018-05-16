@@ -21,12 +21,23 @@ Golang.  It has a command line interface that provides:
 
 ## Installation
 
+#### GitHub
+
 ```console
 $ go get -u github.com/phogolabs/prana
 $ go install github.com/phogolabs/prana/cmd/prana
 ```
 
+#### Homebrew (for Mac OS X)
+
+```console
+$ brew tap phogolabs/tap
+$ brew install prana
+```
+
 ## Introduction
+
+Note that we may introduce breaking changes until we reach v1.0.
 
 ### SQL Migrations
 
