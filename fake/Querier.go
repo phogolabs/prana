@@ -28,14 +28,6 @@ type Querier struct {
 	queryRowReturns struct {
 		result1 *sql.Row
 	}
-	RebindStub        func(query string) string
-	rebindMutex       sync.RWMutex
-	rebindArgsForCall []struct {
-		query string
-	}
-	rebindReturns struct {
-		result1 string
-	}
 	CloseStub        func() error
 	closeMutex       sync.RWMutex
 	closeArgsForCall []struct{}
@@ -113,38 +105,6 @@ func (fake *Querier) QueryRowReturns(result1 *sql.Row) {
 	}{result1}
 }
 
-func (fake *Querier) Rebind(query string) string {
-	fake.rebindMutex.Lock()
-	fake.rebindArgsForCall = append(fake.rebindArgsForCall, struct {
-		query string
-	}{query})
-	fake.recordInvocation("Rebind", []interface{}{query})
-	fake.rebindMutex.Unlock()
-	if fake.RebindStub != nil {
-		return fake.RebindStub(query)
-	}
-	return fake.rebindReturns.result1
-}
-
-func (fake *Querier) RebindCallCount() int {
-	fake.rebindMutex.RLock()
-	defer fake.rebindMutex.RUnlock()
-	return len(fake.rebindArgsForCall)
-}
-
-func (fake *Querier) RebindArgsForCall(i int) string {
-	fake.rebindMutex.RLock()
-	defer fake.rebindMutex.RUnlock()
-	return fake.rebindArgsForCall[i].query
-}
-
-func (fake *Querier) RebindReturns(result1 string) {
-	fake.RebindStub = nil
-	fake.rebindReturns = struct {
-		result1 string
-	}{result1}
-}
-
 func (fake *Querier) Close() error {
 	fake.closeMutex.Lock()
 	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
@@ -176,8 +136,6 @@ func (fake *Querier) Invocations() map[string][][]interface{} {
 	defer fake.queryMutex.RUnlock()
 	fake.queryRowMutex.RLock()
 	defer fake.queryRowMutex.RUnlock()
-	fake.rebindMutex.RLock()
-	defer fake.rebindMutex.RUnlock()
 	fake.closeMutex.RLock()
 	defer fake.closeMutex.RUnlock()
 	return fake.invocations

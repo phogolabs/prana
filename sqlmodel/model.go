@@ -104,8 +104,6 @@ type Querier interface {
 	Query(query string, args ...interface{}) (*sql.Rows, error)
 	// QueryRow performs a query and returns a row
 	QueryRow(query string, args ...interface{}) *sql.Row
-	// Rebind rebinds the query
-	Rebind(query string) string
 	// Close closes the connection
 	Close() error
 }

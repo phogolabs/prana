@@ -35,10 +35,8 @@ var _ = Describe("Provider", func() {
 			Expect(n).To(Equal(int64(1)))
 			Expect(err).To(Succeed())
 
-			cmd, err := provider.Query("up")
+			query, err := provider.Query("up")
 			Expect(err).To(BeNil())
-
-			query, _ := cmd.NamedQuery()
 			Expect(query).To(Equal("SELECT * FROM users;"))
 		})
 
@@ -128,7 +126,7 @@ var _ = Describe("Provider", func() {
 				It("does not load the driver", func() {
 					Expect(provider.ReadDir(fileSystem)).To(Succeed())
 					cmd, err := provider.Query("up")
-					Expect(cmd).To(BeNil())
+					Expect(cmd).To(BeEmpty())
 					Expect(err).To(MatchError("query 'up' not found"))
 				})
 			})
@@ -150,7 +148,7 @@ var _ = Describe("Provider", func() {
 			Expect(provider.ReadDir(fileSystem)).To(Succeed())
 
 			cmd, err := provider.Query("up")
-			Expect(cmd).To(BeNil())
+			Expect(cmd).To(BeEmpty())
 			Expect(err).To(MatchError("query 'up' not found"))
 		})
 
@@ -204,22 +202,8 @@ var _ = Describe("Provider", func() {
 		})
 
 		It("returns a command", func() {
-			stmt, err := provider.Query("up")
+			query, err := provider.Query("up")
 			Expect(err).To(BeNil())
-			Expect(stmt).NotTo(BeNil())
-
-			query, params := stmt.NamedQuery()
-			Expect(params).To(BeEmpty())
-			Expect(query).To(Equal("SELECT * FROM users"))
-		})
-
-		It("returns a named command", func() {
-			stmt, err := provider.NamedQuery("up", sqlexec.P{"id": 1})
-			Expect(err).To(BeNil())
-			Expect(stmt).NotTo(BeNil())
-
-			query, params := stmt.NamedQuery()
-			Expect(params).To(HaveKeyWithValue("id", 1))
 			Expect(query).To(Equal("SELECT * FROM users"))
 		})
 
@@ -232,42 +216,14 @@ var _ = Describe("Provider", func() {
 				n, err := provider.ReadFrom(buffer)
 				Expect(n).To(Equal(int64(1)))
 				Expect(err).To(Succeed())
+
+				provider.DriverName = "ora"
 			})
 
 			It("returns a command with params", func() {
-				stmt, err := provider.Query("show-users", 1)
+				query, err := provider.Query("show-users")
 				Expect(err).To(BeNil())
-				Expect(stmt).NotTo(BeNil())
-
-				query, params := stmt.NamedQuery()
-				Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg0"))
-				Expect(params).To(HaveKeyWithValue("arg0", 1))
-			})
-		})
-
-		Context("when the named command has arguments", func() {
-			BeforeEach(func() {
-				buffer := bytes.NewBufferString("-- name: show-users")
-				fmt.Fprintln(buffer)
-				fmt.Fprintln(buffer, "SELECT * FROM users WHERE id_pk = :id_pk")
-
-				n, err := provider.ReadFrom(buffer)
-				Expect(n).To(Equal(int64(1)))
-				Expect(err).To(Succeed())
-			})
-
-			It("returns a command with params", func() {
-				type param struct {
-					ID int `db:"id_pk"`
-				}
-
-				stmt, err := provider.NamedQuery("show-users", param{ID: 1})
-				Expect(err).To(BeNil())
-				Expect(stmt).NotTo(BeNil())
-
-				query, params := stmt.NamedQuery()
-				Expect(query).To(Equal("SELECT * FROM users WHERE id_pk = :id_pk"))
-				Expect(params).To(HaveKeyWithValue("id_pk", 1))
+				Expect(query).To(Equal("SELECT * FROM users WHERE id = :arg1"))
 			})
 		})
 
@@ -276,15 +232,7 @@ var _ = Describe("Provider", func() {
 				It("returns a error", func() {
 					cmd, err := provider.Query("down")
 					Expect(err).To(MatchError("query 'down' not found"))
-					Expect(cmd).To(BeNil())
-				})
-			})
-
-			Describe("NamedCmd", func() {
-				It("returns a error", func() {
-					cmd, err := provider.NamedQuery("down", sqlexec.P{"id": 1})
-					Expect(err).To(MatchError("query 'down' not found"))
-					Expect(cmd).To(BeNil())
+					Expect(cmd).To(BeEmpty())
 				})
 			})
 		})

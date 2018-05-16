@@ -213,7 +213,6 @@ var _ = Describe("PostgreSQLProvider", func() {
 				querier := &fake.Querier{}
 				querier.CloseStub = db.Close
 				querier.QueryRowStub = db.QueryRow
-				querier.RebindStub = db.Rebind
 				querier.QueryStub = func(txt string, args ...interface{}) (*sql.Rows, error) {
 					if strings.Contains(txt, "information_schema.columns") {
 						return nil, fmt.Errorf("oh no!")
@@ -414,7 +413,6 @@ var _ = Describe("MySQLProvider", func() {
 				querier := &fake.Querier{}
 				querier.CloseStub = db.Close
 				querier.QueryRowStub = db.QueryRow
-				querier.RebindStub = db.Rebind
 				querier.QueryStub = func(txt string, args ...interface{}) (*sql.Rows, error) {
 					if strings.Contains(txt, "information_schema.table_constraints") {
 						return nil, fmt.Errorf("oh no!")
@@ -437,7 +435,6 @@ var _ = Describe("MySQLProvider", func() {
 				querier := &fake.Querier{}
 				querier.CloseStub = db.Close
 				querier.QueryRowStub = db.QueryRow
-				querier.RebindStub = db.Rebind
 				querier.QueryStub = func(txt string, args ...interface{}) (*sql.Rows, error) {
 					if strings.Contains(txt, "information_schema.columns") {
 						return nil, fmt.Errorf("oh no!")

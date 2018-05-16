@@ -72,7 +72,7 @@ func (m *PostgreSQLProvider) Schema(schema string, names ...string) (*Schema, er
 
 	tables := []Table{}
 	for _, name := range names {
-		primaryKey, err := primaryKeyFromInformationSchema(m.DB, schema, name)
+		primaryKey, err := m.primaryKey(schema, name)
 		if err != nil {
 			return nil, err
 		}
@@ -121,6 +121,32 @@ func (m *PostgreSQLProvider) Schema(schema string, names ...string) (*Schema, er
 	}
 
 	return schemaDef, nil
+}
+
+func (m *PostgreSQLProvider) primaryKey(schema, table string) ([]string, error) {
+	query := &bytes.Buffer{}
+	query.WriteString("SELECT c.column_name ")
+	query.WriteString("FROM information_schema.key_column_usage AS c ")
+	query.WriteString("LEFT JOIN information_schema.table_constraints AS t ")
+	query.WriteString("ON t.constraint_name = c.constraint_name ")
+	query.WriteString("WHERE t.table_schema = $1 AND t.table_name = $2 AND t.constraint_type = 'PRIMARY KEY' ")
+	query.WriteString("ORDER BY c.column_name")
+
+	rows, err := m.DB.Query(query.String(), schema, table)
+	if err != nil {
+		return nil, err
+	}
+
+	columns := []string{}
+
+	for rows.Next() {
+		column := ""
+
+		_ = rows.Scan(&column)
+		columns = append(columns, column)
+	}
+
+	return columns, nil
 }
 
 func (m *PostgreSQLProvider) nameOf(schema string) string {
@@ -356,7 +382,7 @@ func (m *MySQLProvider) Schema(schema string, names ...string) (*Schema, error) 
 			Name: name,
 		}
 
-		primaryKey, err := primaryKeyFromInformationSchema(m.DB, schema, name)
+		primaryKey, err := m.primaryKey(schema, name)
 		if err != nil {
 			return nil, err
 		}
@@ -415,7 +441,7 @@ func (m *MySQLProvider) database() (string, error) {
 	return schema, nil
 }
 
-func primaryKeyFromInformationSchema(db Querier, schema, table string) ([]string, error) {
+func (m *MySQLProvider) primaryKey(schema, table string) ([]string, error) {
 	query := &bytes.Buffer{}
 	query.WriteString("SELECT c.column_name ")
 	query.WriteString("FROM information_schema.key_column_usage AS c ")
@@ -424,7 +450,7 @@ func primaryKeyFromInformationSchema(db Querier, schema, table string) ([]string
 	query.WriteString("WHERE t.table_schema = ? AND t.table_name = ? AND t.constraint_type = 'PRIMARY KEY' ")
 	query.WriteString("ORDER BY c.column_name")
 
-	rows, err := db.Query(db.Rebind(query.String()), schema, table)
+	rows, err := m.DB.Query(query.String(), schema, table)
 	if err != nil {
 		return nil, err
 	}

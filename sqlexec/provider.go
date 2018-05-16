@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+
+	"github.com/jmoiron/sqlx"
 )
 
 const every = "sql"
@@ -85,34 +87,15 @@ func (p *Provider) ReadFrom(r io.Reader) (int64, error) {
 
 // Query returns a query statement for given name and parameters. The operation can
 // err if the command cannot be found.
-func (p *Provider) Query(name string, params ...Param) (Query, error) {
+func (p *Provider) Query(name string) (string, error) {
 	p.mu.RLock()
 	defer p.mu.RUnlock()
 
 	if query, ok := p.repository[name]; ok {
-		return &Stmt{
-			query:  query,
-			params: params,
-		}, nil
+		return sqlx.Rebind(sqlx.BindType(p.DriverName), query), nil
 	}
 
-	return nil, nonExistQueryErr(name)
-}
-
-// NamedQuery returns a query statement for given name and parameters. The operation can
-// err if the command cannot be found.
-func (p *Provider) NamedQuery(name string, param Param) (Query, error) {
-	p.mu.RLock()
-	defer p.mu.RUnlock()
-
-	if query, ok := p.repository[name]; ok {
-		return &NamedStmt{
-			query: query,
-			param: param,
-		}, nil
-	}
-
-	return nil, nonExistQueryErr(name)
+	return "", nonExistQueryErr(name)
 }
 
 // Filter returns true if the file can be processed for the current driver

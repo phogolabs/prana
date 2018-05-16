@@ -18,14 +18,12 @@ func (r *Runner) Run(name string, args ...Param) (*Rows, error) {
 		return nil, err
 	}
 
-	cmd, err := provider.Query(name, args...)
+	query, err := provider.Query(name)
 	if err != nil {
 		return nil, err
 	}
 
-	query, params := cmd.NamedQuery()
-
-	stmt, err := r.DB.PrepareNamed(query)
+	stmt, err := r.DB.Preparex(query)
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +34,5 @@ func (r *Runner) Run(name string, args ...Param) (*Rows, error) {
 		}
 	}()
 
-	var rows *Rows
-	rows, err = stmt.Queryx(params)
-	return rows, err
+	return stmt.Queryx(args...)
 }
