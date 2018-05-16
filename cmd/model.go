@@ -210,8 +210,8 @@ func (m *SQLModel) sync(ctx *cli.Context) error {
 
 func (m *SQLModel) script(ctx *cli.Context) error {
 	spec := &sqlmodel.Spec{
-		Name:       filepath.Base(ctx.GlobalString("routine-directory")),
-		FileSystem: parcello.Dir(ctx.GlobalString("routine-directory")),
+		Name:       filepath.Base(ctx.GlobalString("routine-dir")),
+		FileSystem: parcello.Dir(ctx.GlobalString("routine-dir")),
 		Schema:     ctx.String("schema-name"),
 		Tables:     ctx.StringSlice("table-name"),
 	}

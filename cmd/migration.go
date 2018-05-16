@@ -31,7 +31,7 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 		After:        m.after,
 		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name:   "directory, dir, d",
+				Name:   "migration-dir, d",
 				Usage:  "path to the directory that contain the migrations",
 				EnvVar: "PRANA_MIGRATION_DIR",
 				Value:  "./database/migration",
@@ -95,7 +95,7 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 		return err
 	}
 
-	m.dir, err = filepath.Abs(ctx.String("directory"))
+	m.dir, err = filepath.Abs(ctx.String("migration-dir"))
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeArg)
 	}

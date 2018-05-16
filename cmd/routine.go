@@ -29,7 +29,7 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 		Before:       m.before,
 		Flags: []cli.Flag{
 			cli.StringFlag{
-				Name:   "routine-directory, dir, d",
+				Name:   "routine-dir, d",
 				Usage:  "path to the directory that contain the SQL routines",
 				EnvVar: "PRANA_ROUTINE_DIR",
 				Value:  "./database/routine",
@@ -99,7 +99,7 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 
 func (m *SQLRoutine) before(ctx *cli.Context) error {
 	var err error
-	m.dir, err = filepath.Abs(ctx.String("routine-directory"))
+	m.dir, err = filepath.Abs(ctx.String("routine-dir"))
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeArg)
 	}
