@@ -354,6 +354,24 @@ var _ = Describe("QueryGenerator", func() {
 		})
 	})
 
+	Context("when the table does not have columns", func() {
+		BeforeEach(func() {
+			schemaDef.Tables[0].Columns = []sqlmodel.Column{}
+		})
+
+		It("generates the schema successfully", func() {
+			reader := &bytes.Buffer{}
+			ctx := &sqlmodel.GeneratorContext{
+				Writer:  reader,
+				Package: "model",
+				Schema:  schemaDef,
+			}
+
+			Expect(generator.Generate(ctx)).To(Succeed())
+			Expect(reader.String()).To(ContainSubstring("select-all-table1"))
+		})
+	})
+
 	Context("when more than one table are provided", func() {
 		BeforeEach(func() {
 			schemaDef.Tables = append(schemaDef.Tables,

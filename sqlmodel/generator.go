@@ -169,14 +169,25 @@ func (g *QueryGenerator) writeSQLQuerySelectAll(w io.Writer, schema *Schema, tab
 
 func (g *QueryGenerator) writeSQLQuerySelect(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
+	condition := g.pkCondition(table)
+
+	if len(condition) == 0 {
+		return
+	}
+
 	fmt.Fprintf(w, "-- name: select-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "SELECT * FROM %s\n", tableName)
-	fmt.Fprintf(w, "WHERE %s;\n\n", g.pkCondition(table))
+	fmt.Fprintf(w, "WHERE %s;\n\n", condition)
 }
 
 func (g *QueryGenerator) writeSQLQueryInsert(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	columns, values := g.insertParam(table)
+
+	if len(columns) == 0 || len(values) == 0 {
+		return
+	}
+
 	fmt.Fprintf(w, "-- name: insert-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "INSERT INTO %s (%s)\n", tableName, columns)
 	fmt.Fprintf(w, "VALUES (%s);\n\n", values)
@@ -185,6 +196,11 @@ func (g *QueryGenerator) writeSQLQueryInsert(w io.Writer, schema *Schema, table 
 func (g *QueryGenerator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
 	condition, values := g.updateParam(table)
+
+	if len(condition) == 0 || len(values) == 0 {
+		return
+	}
+
 	fmt.Fprintf(w, "-- name: update-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "UPDATE %s\n", tableName)
 	fmt.Fprintf(w, "SET %s\n", values)
@@ -193,9 +209,15 @@ func (g *QueryGenerator) writeSQLQueryUpdate(w io.Writer, schema *Schema, table 
 
 func (g *QueryGenerator) writeSQLQueryDelete(w io.Writer, schema *Schema, table *Table) {
 	tableName := g.tableName(schema, table)
+	condition := g.pkCondition(table)
+
+	if len(condition) == 0 {
+		return
+	}
+
 	fmt.Fprintf(w, "-- name: delete-%s\n", g.commandName(tableName, true))
 	fmt.Fprintf(w, "DELETE FROM %s\n", tableName)
-	fmt.Fprintf(w, "WHERE %s;\n", g.pkCondition(table))
+	fmt.Fprintf(w, "WHERE %s;\n", condition)
 }
 
 func (g *QueryGenerator) writeSQLComment(w io.Writer) {
