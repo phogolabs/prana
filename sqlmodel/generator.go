@@ -293,7 +293,7 @@ func (g *QueryGenerator) updateParam(table *Table) (string, string) {
 		}
 	}
 
-	return strings.Join(conditions, ", "), strings.Join(values, ", ")
+	return strings.Join(conditions, " AND "), strings.Join(values, ", ")
 }
 
 func (g *QueryGenerator) pkCondition(table *Table) string {
