@@ -74,10 +74,10 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				db, err := sqlx.Open("postgres", "postgres://localhost/prana?sslmode=disable")
+				dbb, err := sqlx.Open("postgres", "postgres://localhost/prana?sslmode=disable")
 				Expect(err).NotTo(HaveOccurred())
-				Expect(db.Close()).To(Succeed())
-				provider.DB = db
+				Expect(dbb.Close()).To(Succeed())
+				provider.DB = dbb
 			})
 
 			It("return an error", func() {
@@ -123,7 +123,9 @@ var _ = Describe("PostgreSQLProvider", func() {
 			fmt.Fprintln(query, " hstore_field_null                    hstore NULL,")
 			fmt.Fprintln(query, " hstore_field_not_null                hstore NOT NULL,")
 			fmt.Fprintln(query, " mood_field_null                      mood NULL,")
-			fmt.Fprintln(query, " mood_field_not_null                  mood NOT NULL")
+			fmt.Fprintln(query, " mood_field_not_null                  mood NOT NULL,")
+			fmt.Fprintln(query, " abstime_field_null                   abstime NULL,")
+			fmt.Fprintln(query, " abstime_field_not_null               abstime NOT NULL")
 
 			_, err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 			Expect(err).NotTo(HaveOccurred())
@@ -153,7 +155,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 			table := schema.Tables[0]
 			Expect(table.Name).To(Equal("test"))
-			Expect(table.Columns).To(HaveLen(65))
+			Expect(table.Columns).To(HaveLen(67))
 			ExpectColumnsForPostgreSQL(table.Columns)
 		})
 

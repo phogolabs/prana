@@ -722,6 +722,26 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
 	Expect(column.ScanType).To(Equal("string"))
+
+	column = columns[65]
+	Expect(column.Name).To(Equal("abstime_field_null"))
+	Expect(column.Type.Name).To(Equal("abstime"))
+	Expect(column.Type.Underlying).To(Equal("abstime"))
+	Expect(column.Type.IsNullable).To(Equal(true))
+	Expect(column.Type.CharMaxLength).To(Equal(0))
+	Expect(column.Type.Precision).To(Equal(0))
+	Expect(column.Type.PrecisionScale).To(Equal(0))
+	Expect(column.ScanType).To(Equal("null.Time"))
+
+	column = columns[66]
+	Expect(column.Name).To(Equal("abstime_field_not_null"))
+	Expect(column.Type.Name).To(Equal("abstime"))
+	Expect(column.Type.Underlying).To(Equal("abstime"))
+	Expect(column.Type.IsNullable).To(Equal(false))
+	Expect(column.Type.CharMaxLength).To(Equal(0))
+	Expect(column.Type.Precision).To(Equal(0))
+	Expect(column.Type.PrecisionScale).To(Equal(0))
+	Expect(column.ScanType).To(Equal("time.Time"))
 }
 
 func ExpectColumnsForMySQL(columns []sqlmodel.Column) {

@@ -526,7 +526,7 @@ func translate(columnType *ColumnType) string {
 		return byteSliceDef.As(nullable)
 	case "boolean":
 		return boolDef.As(nullable)
-	case "date", "time", "datetime", "timestamp", "timestamp without time zone", "timestamp with time zone", "time without time zone", "time with time zone":
+	case "abstime", "date", "time", "datetime", "timestamp", "timestamp without time zone", "timestamp with time zone", "time without time zone", "time with time zone":
 		return timeDef.As(nullable)
 	case "uuid":
 		return uuidDef.As(nullable)
