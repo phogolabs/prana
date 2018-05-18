@@ -36,6 +36,17 @@ var _ = Describe("Model", func() {
 			}
 		})
 
+		Context("when the type is user-defined", func() {
+			BeforeEach(func() {
+				columnType.Name = "USER-DEFINED"
+				columnType.Underlying = "under"
+			})
+
+			It("returns the correct db type", func() {
+				Expect(columnType.String()).To(Equal("UNDER(200) PRIMARY KEY NULL"))
+			})
+		})
+
 		It("returns the column type as string correctly", func() {
 			Expect(columnType.String()).To(Equal("VARCHAR(200) PRIMARY KEY NULL"))
 		})

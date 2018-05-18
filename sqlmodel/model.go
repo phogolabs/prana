@@ -203,10 +203,10 @@ type ColumnType struct {
 
 // DBType returns the db type as string
 func (t ColumnType) DBType() string {
-	name := t.Underlying
+	name := t.Name
 
-	if name == "" {
-		name = t.Name
+	if strings.EqualFold(name, "USER-DEFINED") {
+		name = t.Underlying
 	}
 
 	if t.CharMaxLength > 0 {
