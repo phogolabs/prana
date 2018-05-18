@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 	"io"
+	"sort"
 	"strings"
 
 	"github.com/phogolabs/parcello"
@@ -275,4 +276,12 @@ type sqliteInf struct {
 	NotNullable  int
 	DefaultValue interface{}
 	PK           int
+}
+
+func contains(arr []string, item string) bool {
+	if index := sort.SearchStrings(arr, item); index < len(arr) {
+		return arr[index] == item
+	}
+
+	return false
 }

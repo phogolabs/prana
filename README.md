@@ -188,7 +188,7 @@ installed:
 - [null](https://github.com/guregu/null) package
 
 The generated `db` tag is recognized by
-[prana.Gateway](https://godoc.org/github.com/phogolabs/prana#Gateway) as well as
+[oak.Gateway](https://godoc.org/github.com/phogolabs/oak#Gateway) as well as
 [sqlx](https://github.com/jmoiron/sqlx).
 
 If you wan to generate models for [gorm](http://gorm.io), you should

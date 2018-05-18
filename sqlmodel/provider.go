@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 )
@@ -101,8 +100,7 @@ func (m *PostgreSQLProvider) Schema(schema string, names ...string) (*Schema, er
 
 			_ = rows.Scan(fields...)
 
-			indx := sort.SearchStrings(primaryKey, column.Name)
-			column.Type.IsPrimaryKey = indx >= 0 && indx < len(primaryKey)
+			column.Type.IsPrimaryKey = contains(primaryKey, column.Name)
 			column.ScanType = m.translate(&column.Type)
 			table.Columns = append(table.Columns, column)
 		}
@@ -137,11 +135,12 @@ func (m *PostgreSQLProvider) primaryKey(schema, table string) ([]string, error) 
 		return nil, err
 	}
 
-	columns := []string{}
+	var (
+		columns []string
+		column  string
+	)
 
 	for rows.Next() {
-		column := ""
-
 		_ = rows.Scan(&column)
 		columns = append(columns, column)
 	}
@@ -304,7 +303,7 @@ func (m *SQLiteProvider) create(info *sqliteInf) ColumnType {
 
 // MySQLProvider represents a metadata provider for MySQL
 type MySQLProvider struct {
-	// DB is a connection to PostgreSQL database
+	// DB is a connection to MySQL database
 	DB Querier
 }
 
@@ -408,8 +407,7 @@ func (m *MySQLProvider) Schema(schema string, names ...string) (*Schema, error) 
 
 			_ = rows.Scan(fields...)
 
-			indx := sort.SearchStrings(primaryKey, column.Name)
-			column.Type.IsPrimaryKey = indx >= 0 && indx < len(primaryKey)
+			column.Type.IsPrimaryKey = contains(primaryKey, column.Name)
 			column.ScanType = translate(&column.Type)
 			table.Columns = append(table.Columns, column)
 		}
