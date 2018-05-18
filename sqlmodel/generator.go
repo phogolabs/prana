@@ -327,8 +327,10 @@ func tables(ignore []string, schema *Schema) []Table {
 	}
 
 	for _, table := range schema.Tables {
-		if index := sort.SearchStrings(ignore, table.Name); index >= 0 && index < len(ignore) {
-			continue
+		if index := sort.SearchStrings(ignore, table.Name); index < len(ignore) {
+			if ignore[index] == table.Name {
+				continue
+			}
 		}
 
 		tables = append(tables, table)

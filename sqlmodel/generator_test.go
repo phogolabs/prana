@@ -112,7 +112,7 @@ var _ = Describe("ModelGenerator", func() {
 			generator.Config.IgnoreTables = []string{"table2", "table1"}
 		})
 
-		It("generates the schema successfully", func() {
+		It("generates the empty schema successfully", func() {
 			reader := &bytes.Buffer{}
 			ctx := &sqlmodel.GeneratorContext{
 				Writer:  reader,
@@ -122,6 +122,24 @@ var _ = Describe("ModelGenerator", func() {
 
 			Expect(generator.Generate(ctx)).To(Succeed())
 			Expect(reader.String()).To(BeEmpty())
+		})
+
+		Context("when only one table is ignored", func() {
+			BeforeEach(func() {
+				generator.Config.IgnoreTables = []string{"table2"}
+			})
+
+			It("generates the empty schema successfully", func() {
+				reader := &bytes.Buffer{}
+				ctx := &sqlmodel.GeneratorContext{
+					Writer:  reader,
+					Package: "model",
+					Schema:  schemaDef,
+				}
+
+				Expect(generator.Generate(ctx)).To(Succeed())
+				Expect(reader.String()).To(ContainSubstring("Table1"))
+			})
 		})
 	})
 
