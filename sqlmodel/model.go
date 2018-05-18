@@ -203,7 +203,11 @@ type ColumnType struct {
 
 // DBType returns the db type as string
 func (t ColumnType) DBType() string {
-	name := t.Name
+	name := t.Underlying
+
+	if name == "" {
+		name = t.Name
+	}
 
 	if t.CharMaxLength > 0 {
 		name = fmt.Sprintf("%s(%d)", name, t.CharMaxLength)

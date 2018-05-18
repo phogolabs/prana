@@ -157,7 +157,7 @@ var _ = Describe("ModelGenerator", func() {
 			}
 
 			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(ContainSubstring("// Table1 represents a data base table 'table1'"))
+			Expect(reader.String()).To(ContainSubstring("// Table1 represents a data base table 'schema.table1'"))
 			Expect(reader.String()).To(ContainSubstring("// ID represents a database column 'id' of type 'VARCHAR(200) PRIMARY KEY NULL'"))
 		})
 	})

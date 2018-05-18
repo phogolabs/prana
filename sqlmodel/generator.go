@@ -37,7 +37,7 @@ func (g *ModelGenerator) Generate(ctx *GeneratorContext) error {
 	g.writePackage(pkg, schema.Name, buffer)
 
 	for _, table := range tables {
-		g.writeTable(pkg, schema.IsDefault, &table, buffer)
+		g.writeTable(pkg, schema, &table, buffer)
 	}
 
 	if err := g.format(buffer); err != nil {
@@ -61,14 +61,14 @@ func (g *ModelGenerator) writePackage(pkg, name string, buffer io.Writer) {
 	fmt.Fprintln(buffer)
 }
 
-func (g *ModelGenerator) writeTable(pkg string, isDefaultSchema bool, table *Table, buffer io.Writer) {
+func (g *ModelGenerator) writeTable(pkg string, schema *Schema, table *Table, buffer io.Writer) {
 	columns := table.Columns
 	length := len(columns)
-	typeName := g.typeName(pkg, isDefaultSchema, table)
+	typeName := g.typeName(pkg, schema.IsDefault, table)
 
 	if g.Config.InlcudeDoc {
 		fmt.Fprintln(buffer)
-		fmt.Fprintf(buffer, "// %s represents a data base table '%s'", typeName, table.Name)
+		fmt.Fprintf(buffer, "// %s represents a data base table '%s.%s'", typeName, schema.Name, table.Name)
 		fmt.Fprintln(buffer)
 	}
 
