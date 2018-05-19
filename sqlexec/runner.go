@@ -12,7 +12,9 @@ type Runner struct {
 
 // Run runs a given command with provided parameters.
 func (r *Runner) Run(name string, args ...Param) (*Rows, error) {
-	provider := &Provider{}
+	provider := &Provider{
+		DriverName: r.DB.DriverName(),
+	}
 
 	if err := provider.ReadDir(r.FileSystem); err != nil {
 		return nil, err
