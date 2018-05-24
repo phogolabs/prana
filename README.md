@@ -84,6 +84,10 @@ CREATE TABLE users (
   last_name TEXT
 );
 
+GO; -- split execution of the migration
+
+INSERT INTO users (id, first_name, last_name) VALUES (1, 'John', 'Doe');
+
 -- name: down
 DROP TABLE IF EXISTS users;
 ```
@@ -113,7 +117,6 @@ database/
     ├── 00060524000000_setup.sql
     ├── 20180406190015_users.sql
     ├── 20180406190015_users_mysql.sql
-    ├── 20180406190015_users_postgres.sql
     └── 20180406190015_users_sqlite3.sql
 ```
 
@@ -122,6 +125,12 @@ driver is used:
 
 - `20180406190015_users.sql`
 - `20180406190015_users_mysql.sql`
+
+Presently the following suffixes are supported:
+
+- `sqlite3`
+- `mysql`
+- `postgres`
 
 ## SQL Schema and Code Generation
 

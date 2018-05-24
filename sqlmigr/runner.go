@@ -1,6 +1,7 @@
 package sqlmigr
 
 import (
+	"bytes"
 	"fmt"
 	"os"
 
@@ -77,7 +78,15 @@ func (r *Runner) routine(name string, m *Migration) ([]string, error) {
 		return []string{}, fmt.Errorf("routine '%s' not found for migration '%v'", name, m)
 	}
 
-	return routine, nil
+	queries := []string{}
+	splitter := &sqlexec.Splitter{}
+
+	for _, body := range routine {
+		stmt := splitter.Split(bytes.NewBufferString(body))
+		queries = append(queries, stmt...)
+	}
+
+	return queries, nil
 }
 
 func (r *Runner) scan(filename string) (map[string]string, error) {

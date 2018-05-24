@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-var rgxp = regexp.MustCompile("^\\s*--\\s*name:\\s*(\\S+)")
+var nameRgxp = regexp.MustCompile("^\\s*--\\s*name:\\s*(\\S+)")
 
 // Scanner loads a SQL statements for given SQL Script
 type Scanner struct{}
@@ -32,7 +32,7 @@ func (s *Scanner) Scan(reader io.Reader) map[string]string {
 }
 
 func (s *Scanner) tag(line string) string {
-	matches := rgxp.FindStringSubmatch(line)
+	matches := nameRgxp.FindStringSubmatch(line)
 	if matches == nil {
 		return ""
 	}
