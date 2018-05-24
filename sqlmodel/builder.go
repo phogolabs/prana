@@ -5,12 +5,14 @@ import (
 	"strings"
 )
 
-var _ TagBuilder = &CompositeTagBuilder{}
-var _ TagBuilder = &SQLXTagBuilder{}
-var _ TagBuilder = &GORMTagBuilder{}
-var _ TagBuilder = &JSONTagBuilder{}
-var _ TagBuilder = &XMLTagBuilder{}
-var _ TagBuilder = &ValidateTagBuilder{}
+var (
+	_ TagBuilder = &CompositeTagBuilder{}
+	_ TagBuilder = &SQLXTagBuilder{}
+	_ TagBuilder = &GORMTagBuilder{}
+	_ TagBuilder = &JSONTagBuilder{}
+	_ TagBuilder = &XMLTagBuilder{}
+	_ TagBuilder = &ValidateTagBuilder{}
+)
 
 // CompositeTagBuilder composes multiple builders
 type CompositeTagBuilder []TagBuilder
