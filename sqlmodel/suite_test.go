@@ -81,7 +81,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[1]
 	Expect(column.Name).To(Equal("char_field_not_null"))
@@ -101,7 +101,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[3]
 	Expect(column.Name).To(Equal("character_field_not_null"))
@@ -121,7 +121,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[5]
 	Expect(column.Name).To(Equal("varchar_field_not_null"))
@@ -141,7 +141,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[7]
 	Expect(column.Name).To(Equal("character_varying_field_not_null"))
@@ -161,7 +161,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[9]
 	Expect(column.Name).To(Equal("text_field_not_null"))
@@ -181,7 +181,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[11]
 	Expect(column.Name).To(Equal("bit_field_not_null"))
@@ -201,7 +201,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(16))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int16"))
+	Expect(column.ScanType).To(Equal("schema.NullInt16"))
 
 	column = columns[13]
 	Expect(column.Name).To(Equal("smallint_field_not_null"))
@@ -221,7 +221,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(32))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int"))
+	Expect(column.ScanType).To(Equal("schema.NullInt"))
 
 	column = columns[15]
 	Expect(column.Name).To(Equal("int_field_not_null"))
@@ -241,7 +241,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(32))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int"))
+	Expect(column.ScanType).To(Equal("schema.NullInt"))
 
 	column = columns[17]
 	Expect(column.Name).To(Equal("integer_field_not_null"))
@@ -261,7 +261,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(64))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int64"))
+	Expect(column.ScanType).To(Equal("schema.NullInt64"))
 
 	column = columns[19]
 	Expect(column.Name).To(Equal("bigint_field_not_null"))
@@ -291,7 +291,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(20))
 	Expect(column.Type.PrecisionScale).To(Equal(20))
-	Expect(column.ScanType).To(Equal("null.Float64"))
+	Expect(column.ScanType).To(Equal("schema.NullFloat64"))
 
 	column = columns[22]
 	Expect(column.Name).To(Equal("numeric_field_not_null"))
@@ -311,7 +311,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(53))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Float64"))
+	Expect(column.ScanType).To(Equal("schema.NullFloat64"))
 
 	column = columns[24]
 	Expect(column.Name).To(Equal("double_precision_field_not_null"))
@@ -331,7 +331,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(24))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Float32"))
+	Expect(column.ScanType).To(Equal("schema.NullFloat32"))
 
 	column = columns[26]
 	Expect(column.Name).To(Equal("real_field_not_null"))
@@ -351,7 +351,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bool"))
+	Expect(column.ScanType).To(Equal("schema.NullBool"))
 
 	column = columns[28]
 	Expect(column.Name).To(Equal("bool_field_not_null"))
@@ -371,7 +371,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bool"))
+	Expect(column.ScanType).To(Equal("schema.NullBool"))
 
 	column = columns[30]
 	Expect(column.Name).To(Equal("boolean_field_not_null"))
@@ -391,7 +391,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[32]
 	Expect(column.Name).To(Equal("date_field_not_null"))
@@ -411,7 +411,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[34]
 	Expect(column.Name).To(Equal("time_field_null"))
@@ -421,7 +421,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[35]
 	Expect(column.Name).To(Equal("time_field_not_null"))
@@ -441,7 +441,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[37]
 	Expect(column.Name).To(Equal("varbit_field_not_null"))
@@ -461,7 +461,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[39]
 	Expect(column.Name).To(Equal("bit_varying_field_not_null"))
@@ -501,7 +501,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[43]
 	Expect(column.Name).To(Equal("money_field_not_null"))
@@ -531,7 +531,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[46]
 	Expect(column.Name).To(Equal("timestamp_without_tz_field_not_null"))
@@ -551,7 +551,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[48]
 	Expect(column.Name).To(Equal("timestamp_with_tz_field_not_null"))
@@ -571,7 +571,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[50]
 	Expect(column.Name).To(Equal("time_without_tz_field_not_null"))
@@ -591,7 +591,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[52]
 	Expect(column.Name).To(Equal("time_with_tz_field_not_null"))
@@ -611,7 +611,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bytes"))
+	Expect(column.ScanType).To(Equal("schema.NullBytes"))
 
 	column = columns[54]
 	Expect(column.Name).To(Equal("bytea_field_not_null"))
@@ -631,7 +631,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.JSON"))
+	Expect(column.ScanType).To(Equal("schema.NullJSON"))
 
 	column = columns[56]
 	Expect(column.Name).To(Equal("jsonb_field_not_null"))
@@ -651,7 +651,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[58]
 	Expect(column.Name).To(Equal("xml_field_not_null"))
@@ -671,7 +671,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("uuid.NullUUID"))
+	Expect(column.ScanType).To(Equal("schema.NullUUID"))
 
 	column = columns[60]
 	Expect(column.Name).To(Equal("uuid_field_not_null"))
@@ -681,7 +681,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("uuid.UUID"))
+	Expect(column.ScanType).To(Equal("schema.UUID"))
 
 	column = columns[61]
 	Expect(column.Name).To(Equal("hstore_field_null"))
@@ -711,7 +711,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[64]
 	Expect(column.Name).To(Equal("mood_field_not_null"))
@@ -731,7 +731,7 @@ func ExpectColumnsForPostgreSQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[66]
 	Expect(column.Name).To(Equal("abstime_field_not_null"))
@@ -754,7 +754,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Byte"))
+	Expect(column.ScanType).To(Equal("schema.NullByte"))
 
 	column = columns[1]
 	Expect(column.Name).To(Equal("char_field_not_null"))
@@ -776,7 +776,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Byte"))
+	Expect(column.ScanType).To(Equal("schema.NullByte"))
 
 	column = columns[3]
 	Expect(column.Name).To(Equal("character_field_not_null"))
@@ -798,7 +798,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[5]
 	Expect(column.Name).To(Equal("varchar_field_not_null"))
@@ -820,7 +820,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[7]
 	Expect(column.Name).To(Equal("character_varying_field_not_null"))
@@ -842,7 +842,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(65535))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[9]
 	Expect(column.Name).To(Equal("text_field_not_null"))
@@ -864,7 +864,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(20))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[11]
 	Expect(column.Name).To(Equal("bit_field_not_null"))
@@ -886,7 +886,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(5))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int16"))
+	Expect(column.ScanType).To(Equal("schema.NullInt16"))
 
 	column = columns[13]
 	Expect(column.Name).To(Equal("smallint_field_not_null"))
@@ -908,7 +908,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(10))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int"))
+	Expect(column.ScanType).To(Equal("schema.NullInt"))
 
 	column = columns[15]
 	Expect(column.Name).To(Equal("int_field_not_null"))
@@ -930,7 +930,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(10))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int"))
+	Expect(column.ScanType).To(Equal("schema.NullInt"))
 
 	column = columns[17]
 	Expect(column.Name).To(Equal("integer_field_not_null"))
@@ -952,7 +952,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(19))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int64"))
+	Expect(column.ScanType).To(Equal("schema.NullInt64"))
 
 	column = columns[19]
 	Expect(column.Name).To(Equal("bigint_field_not_null"))
@@ -985,7 +985,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(20))
 	Expect(column.Type.PrecisionScale).To(Equal(20))
-	Expect(column.ScanType).To(Equal("null.Float64"))
+	Expect(column.ScanType).To(Equal("schema.NullFloat64"))
 
 	column = columns[22]
 	Expect(column.Name).To(Equal("numeric_field_not_null"))
@@ -1007,7 +1007,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(22))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[24]
 	Expect(column.Name).To(Equal("double_precision_field_not_null"))
@@ -1029,7 +1029,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(22))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[26]
 	Expect(column.Name).To(Equal("real_field_not_null"))
@@ -1051,7 +1051,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bool"))
+	Expect(column.ScanType).To(Equal("schema.NullBool"))
 
 	column = columns[28]
 	Expect(column.Name).To(Equal("bool_field_not_null"))
@@ -1073,7 +1073,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bool"))
+	Expect(column.ScanType).To(Equal("schema.NullBool"))
 
 	column = columns[30]
 	Expect(column.Name).To(Equal("boolean_field_not_null"))
@@ -1095,7 +1095,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[32]
 	Expect(column.Name).To(Equal("date_field_not_null"))
@@ -1117,7 +1117,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[34]
 	Expect(column.Name).To(Equal("time_field_null"))
@@ -1128,7 +1128,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[35]
 	Expect(column.Name).To(Equal("time_field_not_null"))
@@ -1150,7 +1150,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bool"))
+	Expect(column.ScanType).To(Equal("schema.NullBool"))
 
 	column = columns[37]
 	Expect(column.Name).To(Equal("bit_tinyint_field_unsigned_not_null"))
@@ -1172,7 +1172,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bool"))
+	Expect(column.ScanType).To(Equal("schema.NullBool"))
 
 	column = columns[39]
 	Expect(column.Name).To(Equal("bit_tinyint_field_not_null"))
@@ -1194,7 +1194,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Uint8"))
+	Expect(column.ScanType).To(Equal("schema.NullUint8"))
 
 	column = columns[41]
 	Expect(column.Name).To(Equal("tinyint_field_unsigned_not_null"))
@@ -1216,7 +1216,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int8"))
+	Expect(column.ScanType).To(Equal("schema.NullInt8"))
 
 	column = columns[43]
 	Expect(column.Name).To(Equal("tinyint_field_not_null"))
@@ -1238,7 +1238,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(5))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Uint16"))
+	Expect(column.ScanType).To(Equal("schema.NullUint16"))
 
 	column = columns[45]
 	Expect(column.Name).To(Equal("smallint_field_unsigned_not_null"))
@@ -1260,7 +1260,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(7))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Uint32"))
+	Expect(column.ScanType).To(Equal("schema.NullUint32"))
 
 	column = columns[47]
 	Expect(column.Name).To(Equal("mediumint_field_unsigned_not_null"))
@@ -1282,7 +1282,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(7))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int32"))
+	Expect(column.ScanType).To(Equal("schema.NullInt32"))
 
 	column = columns[49]
 	Expect(column.Name).To(Equal("mediumint_field_not_null"))
@@ -1304,7 +1304,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(10))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Uint"))
+	Expect(column.ScanType).To(Equal("schema.NullUint"))
 
 	column = columns[51]
 	Expect(column.Name).To(Equal("int_field_unsigned_not_null"))
@@ -1326,7 +1326,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Byte"))
+	Expect(column.ScanType).To(Equal("schema.NullByte"))
 
 	column = columns[53]
 	Expect(column.Name).To(Equal("varbinary_field_not_null"))
@@ -1349,7 +1349,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Byte"))
+	Expect(column.ScanType).To(Equal("schema.NullByte"))
 
 	column = columns[1]
 	Expect(column.Name).To(Equal("char_field_not_null"))
@@ -1369,7 +1369,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[3]
 	Expect(column.Name).To(Equal("character_field_not_null"))
@@ -1389,7 +1389,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[5]
 	Expect(column.Name).To(Equal("varchar_field_not_null"))
@@ -1409,7 +1409,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[7]
 	Expect(column.Name).To(Equal("character_varying_field_not_null"))
@@ -1429,7 +1429,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[9]
 	Expect(column.Name).To(Equal("text_field_not_null"))
@@ -1449,7 +1449,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(20))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[11]
 	Expect(column.Name).To(Equal("bit_field_not_null"))
@@ -1469,7 +1469,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int16"))
+	Expect(column.ScanType).To(Equal("schema.NullInt16"))
 
 	column = columns[13]
 	Expect(column.Name).To(Equal("smallint_field_not_null"))
@@ -1489,7 +1489,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int"))
+	Expect(column.ScanType).To(Equal("schema.NullInt"))
 
 	column = columns[15]
 	Expect(column.Name).To(Equal("int_field_not_null"))
@@ -1509,7 +1509,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int"))
+	Expect(column.ScanType).To(Equal("schema.NullInt"))
 
 	column = columns[17]
 	Expect(column.Name).To(Equal("integer_field_not_null"))
@@ -1529,7 +1529,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Int64"))
+	Expect(column.ScanType).To(Equal("schema.NullInt64"))
 
 	column = columns[19]
 	Expect(column.Name).To(Equal("bigint_field_not_null"))
@@ -1559,7 +1559,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(20))
 	Expect(column.Type.PrecisionScale).To(Equal(20))
-	Expect(column.ScanType).To(Equal("null.Float64"))
+	Expect(column.ScanType).To(Equal("schema.NullFloat64"))
 
 	column = columns[22]
 	Expect(column.Name).To(Equal("numeric_field_not_null"))
@@ -1579,7 +1579,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Float64"))
+	Expect(column.ScanType).To(Equal("schema.NullFloat64"))
 
 	column = columns[24]
 	Expect(column.Name).To(Equal("double_precision_field_not_null"))
@@ -1599,7 +1599,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Float32"))
+	Expect(column.ScanType).To(Equal("schema.NullFloat32"))
 
 	column = columns[26]
 	Expect(column.Name).To(Equal("real_field_not_null"))
@@ -1619,7 +1619,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[28]
 	Expect(column.Name).To(Equal("bool_field_not_null"))
@@ -1639,7 +1639,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bool"))
+	Expect(column.ScanType).To(Equal("schema.NullBool"))
 
 	column = columns[30]
 	Expect(column.Name).To(Equal("boolean_field_not_null"))
@@ -1659,7 +1659,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[32]
 	Expect(column.Name).To(Equal("date_field_not_null"))
@@ -1679,7 +1679,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[34]
 	Expect(column.Name).To(Equal("time_field_null"))
@@ -1689,7 +1689,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[35]
 	Expect(column.Name).To(Equal("time_field_not_null"))
@@ -1709,7 +1709,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[37]
 	Expect(column.Name).To(Equal("varbit_field_not_null"))
@@ -1729,7 +1729,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(20))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[39]
 	Expect(column.Name).To(Equal("bit_varying_field_not_null"))
@@ -1769,7 +1769,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[43]
 	Expect(column.Name).To(Equal("money_field_not_null"))
@@ -1789,7 +1789,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[45]
 	Expect(column.Name).To(Equal("timestamp_without_tz_field_not_null"))
@@ -1809,7 +1809,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[47]
 	Expect(column.Name).To(Equal("timestamp_with_tz_field_not_null"))
@@ -1829,7 +1829,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[49]
 	Expect(column.Name).To(Equal("time_without_tz_field_not_null"))
@@ -1849,7 +1849,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Time"))
+	Expect(column.ScanType).To(Equal("schema.NullTime"))
 
 	column = columns[51]
 	Expect(column.Name).To(Equal("time_with_tz_field_not_null"))
@@ -1869,7 +1869,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.Bytes"))
+	Expect(column.ScanType).To(Equal("schema.NullBytes"))
 
 	column = columns[53]
 	Expect(column.Name).To(Equal("bytea_field_not_null"))
@@ -1889,7 +1889,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.JSON"))
+	Expect(column.ScanType).To(Equal("schema.NullJSON"))
 
 	column = columns[55]
 	Expect(column.Name).To(Equal("jsonb_field_not_null"))
@@ -1909,7 +1909,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("null.String"))
+	Expect(column.ScanType).To(Equal("schema.NullString"))
 
 	column = columns[57]
 	Expect(column.Name).To(Equal("xml_field_not_null"))
@@ -1929,7 +1929,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("uuid.NullUUID"))
+	Expect(column.ScanType).To(Equal("schema.NullUUID"))
 
 	column = columns[59]
 	Expect(column.Name).To(Equal("uuid_field_not_null"))
@@ -1939,7 +1939,7 @@ func ExpectColumnsForSQLite(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(0))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("uuid.UUID"))
+	Expect(column.ScanType).To(Equal("schema.UUID"))
 
 	column = columns[60]
 	Expect(column.Name).To(Equal("timestamp_field_not_null"))

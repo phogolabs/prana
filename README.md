@@ -174,7 +174,7 @@ The model representation of the users table is:
 ```golang
 package model
 
-import null "gopkg.in/volatiletech/null.v6"
+import "github.com/phogolabs/schema"
 
 // User represents a data base table 'users'
 type User struct {
@@ -185,7 +185,7 @@ type User struct {
 	FirstName string `db:"first_name,not_null" json:"first_name" xml:"first_name" validate:"required"`
 
 	// LastName represents a database column 'last_name' of type 'TEXT NULL'
-	LastName null.String `db:"last_name,null" json:"last_name" xml:"last_name" validate:"-"`
+	LastName schema.NullString `db:"last_name,null" json:"last_name" xml:"last_name" validate:"-"`
 }
 ```
 
@@ -193,11 +193,10 @@ Note that the code generation depends on two packages. In order to produce a
 source code that compiles you should have in your `$GOPATH/src` directory
 installed:
 
-- [go.uuid](https://github.com/satori/go.uuid) package
-- [null](https://github.com/guregu/null) package
+- [schema](https://github.com/phogolabs/schema) package
 
 The generated `db` tag is recognized by
-[oak.Gateway](https://godoc.org/github.com/phogolabs/oak#Gateway) as well as
+[orm.Gateway](https://godoc.org/github.com/phogolabs/orm#Gateway) as well as
 [sqlx](https://github.com/jmoiron/sqlx).
 
 If you wan to generate models for [gorm](http://gorm.io), you should
@@ -213,7 +212,7 @@ The command above will produce the following model:
 ```golang
 package model
 
-import null "gopkg.in/volatiletech/null.v6"
+import "github.com/phogolabs/schema"
 
 // User represents a data base table 'users'
 type User struct {
@@ -224,15 +223,15 @@ type User struct {
 	FirstName string `gorm:"column:first_name;type:text;not null" json:"first_name" xml:"first_name" validate:"required"`
 
 	// LastName represents a database column 'last_name' of type 'TEXT NULL'
-	LastName null.String `gorm:"column:last_name;type:text;null" json:"last_name" xml:"last_name" validate:"-"`
+	LastName schema.NullString `gorm:"column:last_name;type:text;null" json:"last_name" xml:"last_name" validate:"-"`
 }
 ```
 
 ### SQL Scripts and Commands
 
 Also, it provides a way to work with embeddable SQL scripts which can be
-executed easily by [OAK][oak-url] as SQL Routines. You can see the
-[OAK example](https://github.com/phogolabs/oak/tree/master/example) to
+executed easily by [ORM][orm-url] as SQL Routines. You can see the
+[ORM example](https://github.com/phogolabs/orm/tree/master/example) to
 understand more about that. First of all you have create a script that contains
 your SQL statements.
 
@@ -390,5 +389,5 @@ We are welcome to any contributions. Just fork the
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
 [software-license-url]: LICENSE
 [loukoum-url]: https://github.com/ulule/loukoum
-[oak-url]: https://github.com/phogolabs/oak
+[orm-url]: https://github.com/phogolabs/orm
 [sqlx-url]: https://github.com/jmoiron/sqlx

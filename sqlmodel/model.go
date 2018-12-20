@@ -14,79 +14,79 @@ import (
 var (
 	intDef = &TypeDef{
 		Type:         "int",
-		NullableType: "null.Int",
+		NullableType: "schema.NullInt",
 	}
 	uintDef = &TypeDef{
 		Type:         "Uint",
-		NullableType: "null.Uint",
+		NullableType: "schema.NullUint",
 	}
 	int16Def = &TypeDef{
 		Type:         "int16",
-		NullableType: "null.Int16",
+		NullableType: "schema.NullInt16",
 	}
 	int64Def = &TypeDef{
 		Type:         "int64",
-		NullableType: "null.Int64",
+		NullableType: "schema.NullInt64",
 	}
 	int8Def = &TypeDef{
 		Type:         "int8",
-		NullableType: "null.Int8",
+		NullableType: "schema.NullInt8",
 	}
 	uint8Def = &TypeDef{
 		Type:         "uint8",
-		NullableType: "null.Uint8",
+		NullableType: "schema.NullUint8",
 	}
 	uint16Def = &TypeDef{
 		Type:         "uint16",
-		NullableType: "null.Uint16",
+		NullableType: "schema.NullUint16",
 	}
 	uint32Def = &TypeDef{
 		Type:         "uint32",
-		NullableType: "null.Uint32",
+		NullableType: "schema.NullUint32",
 	}
 	int32Def = &TypeDef{
 		Type:         "int32",
-		NullableType: "null.Int32",
+		NullableType: "schema.NullInt32",
 	}
 	uint64Def = &TypeDef{
 		Type:         "uint64",
-		NullableType: "null.Uint64",
+		NullableType: "schema.NullUint64",
 	}
 	float32Def = &TypeDef{
 		Type:         "float32",
-		NullableType: "null.Float32",
+		NullableType: "schema.NullFloat32",
 	}
 	float64Def = &TypeDef{
 		Type:         "float64",
-		NullableType: "null.Float64",
+		NullableType: "schema.NullFloat64",
 	}
 	stringDef = &TypeDef{
 		Type:         "string",
-		NullableType: "null.String",
+		NullableType: "schema.NullString",
 	}
 	byteDef = &TypeDef{
 		Type:         "byte",
-		NullableType: "null.Byte",
+		NullableType: "schema.NullByte",
 	}
 	byteSliceDef = &TypeDef{
 		Type:         "[]byte",
-		NullableType: "null.Bytes",
+		NullableType: "schema.NullBytes",
 	}
 	boolDef = &TypeDef{
 		Type:         "bool",
-		NullableType: "null.Bool",
+		NullableType: "schema.NullBool",
 	}
 	timeDef = &TypeDef{
 		Type:         "time.Time",
-		NullableType: "null.Time",
+		NullableType: "schema.NullTime",
 	}
 	uuidDef = &TypeDef{
-		Type:         "uuid.UUID",
-		NullableType: "uuid.NullUUID",
+		Type:         "schema.UUID",
+		NullableType: "schema.NullUUID",
 	}
 	jsonDef = &TypeDef{
 		Type:         "[]byte",
-		NullableType: "null.JSON",
+		NullableType: "schema.NullJSON",
 	}
 	hstoreDef = &TypeDef{
 		Type:         "hstore.Hstore",
