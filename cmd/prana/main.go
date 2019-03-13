@@ -50,7 +50,7 @@ func main() {
 		HelpName:             "prana",
 		Usage:                "Golang Database Manager",
 		UsageText:            "prana [global options]",
-		Version:              "1.0-beta-04",
+		Version:              "1.0-beta-05",
 		BashComplete:         cli.DefaultAppComplete,
 		EnableBashCompletion: true,
 		Writer:               os.Stdout,
