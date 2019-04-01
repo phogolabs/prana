@@ -1,6 +1,12 @@
 package sqlexec
 
-import "github.com/jmoiron/sqlx"
+import (
+	"fmt"
+	"io"
+
+	"github.com/jmoiron/sqlx"
+	"github.com/olekukonko/tablewriter"
+)
 
 // Runner runs a SQL statement for given command name and parameters.
 type Runner struct {
@@ -37,4 +43,37 @@ func (r *Runner) Run(name string, args ...Param) (*Rows, error) {
 	}()
 
 	return stmt.Queryx(args...)
+}
+
+// Print prints the rows
+func (r *Runner) Print(writer io.Writer, rows *sqlx.Rows) error {
+	table := tablewriter.NewWriter(writer)
+
+	columns, err := rows.Columns()
+	if err != nil {
+		return err
+	}
+
+	table.SetHeader(columns)
+
+	for rows.Next() {
+		record, err := rows.SliceScan()
+		if err != nil {
+			return err
+		}
+
+		row := []string{}
+
+		for _, column := range record {
+			if data, ok := column.([]byte); ok {
+				column = string(data)
+			}
+			row = append(row, fmt.Sprintf("%v", column))
+		}
+
+		table.Append(row)
+	}
+
+	table.Render()
+	return nil
 }

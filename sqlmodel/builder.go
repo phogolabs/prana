@@ -12,6 +12,7 @@ var (
 	_ TagBuilder = &JSONTagBuilder{}
 	_ TagBuilder = &XMLTagBuilder{}
 	_ TagBuilder = &ValidateTagBuilder{}
+	_ TagBuilder = &NoopTagBuilder{}
 )
 
 // CompositeTagBuilder composes multiple builders
@@ -123,4 +124,12 @@ func (builder ValidateTagBuilder) Build(column *Column) string {
 	}
 
 	return fmt.Sprintf("validate:\"%s\"", strings.Join(options, ","))
+}
+
+// NoopTagBuilder composes multiple builders
+type NoopTagBuilder struct{}
+
+// Build builds tags for given column
+func (composition NoopTagBuilder) Build(column *Column) string {
+	return ""
 }

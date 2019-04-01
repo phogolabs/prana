@@ -16,6 +16,164 @@ import (
 	"github.com/phogolabs/prana/sqlmodel"
 )
 
+var _ = Describe("ModelProvider", func() {
+	var (
+		provider *sqlmodel.ModelProvider
+		wrapped  *fake.SchemaProvider
+		builder  *fake.TagBuilder
+	)
+
+	BeforeEach(func() {
+		builder = &fake.TagBuilder{}
+		builder.BuildReturns("`db`")
+
+		wrapped = &fake.SchemaProvider{}
+
+		provider = &sqlmodel.ModelProvider{
+			Provider:   wrapped,
+			TagBuilder: builder,
+			Config: &sqlmodel.ModelProviderConfig{
+				Package:        "package",
+				UseNamedParams: true,
+				InlcudeDoc:     true,
+			},
+		}
+	})
+
+	Describe("Tables", func() {
+		It("returns the tables successfully", func() {
+			_, err := provider.Tables("test")
+			Expect(err).To(Succeed())
+			Expect(wrapped.TablesCallCount()).To(Equal(1))
+			Expect(wrapped.TablesArgsForCall(0)).To(Equal("test"))
+		})
+
+		Context("when the wrapped provider fails", func() {
+			BeforeEach(func() {
+				wrapped.TablesReturns([]string{}, fmt.Errorf("oh no!"))
+			})
+			It("returns an error", func() {
+				_, err := provider.Tables("test")
+				Expect(err).To(MatchError("oh no!"))
+			})
+		})
+	})
+
+	Describe("Close", func() {
+		It("closes the provider successfully", func() {
+			Expect(provider.Close()).To(Succeed())
+			Expect(wrapped.CloseCallCount()).To(Equal(1))
+		})
+
+		Context("when the wrapped provider fails", func() {
+			BeforeEach(func() {
+				wrapped.CloseReturns(fmt.Errorf("oh no!"))
+			})
+			It("returns an error", func() {
+				Expect(provider.Close()).To(MatchError("oh no!"))
+			})
+		})
+	})
+
+	Describe("Schema", func() {
+		BeforeEach(func() {
+			wrapped.SchemaReturns(NewSchema(), nil)
+		})
+
+		It("populates the model successfully", func() {
+			schema, err := provider.Schema("schema", "table1")
+			Expect(schema).NotTo(BeNil())
+			Expect(err).NotTo(HaveOccurred())
+
+			Expect(wrapped.SchemaCallCount()).To(Equal(1))
+
+			name, keys := wrapped.SchemaArgsForCall(0)
+			Expect(name).To(Equal("schema"))
+			Expect(keys).To(ContainElement("table1"))
+
+			Expect(schema.Model.HasDocumentation).To(BeTrue())
+			Expect(schema.Model.Package).To(Equal("package"))
+
+			for _, table := range schema.Tables {
+				Expect(table.Model.HasDocumentation).To(BeTrue())
+				Expect(table.Model.Type).To(Equal("Table1"))
+				Expect(table.Model.InsertRoutine).To(Equal("insert-table1"))
+				Expect(table.Model.InsertColumns).To(Equal("id, name"))
+				Expect(table.Model.InsertValues).To(Equal(":id, :name"))
+				Expect(table.Model.SelectByPKRoutine).To(Equal("select-table1-by-pk"))
+				Expect(table.Model.SelectAllRoutine).To(Equal("select-all-table1"))
+				Expect(table.Model.DeleteByPKRoutine).To(Equal("delete-table1-by-pk"))
+				Expect(table.Model.UpdateByPKRoutine).To(Equal("update-table1-by-pk"))
+				Expect(table.Model.UpdateByPKColumns).To(Equal("name = :name"))
+				Expect(table.Model.PrimaryKeyCondition).To(Equal("id = :id"))
+				Expect(table.Model.PrimaryKeyArgs).To(Equal("id string"))
+				Expect(table.Model.PrimaryKey).To(ContainElement("id"))
+
+				for _, column := range table.Columns {
+					Expect(column.Model.HasDocumentation).To(BeTrue())
+					Expect(column.Model.Tag).To(Equal("`db`"))
+				}
+			}
+		})
+
+		Context("when the schema is not default", func() {
+			BeforeEach(func() {
+				schema := NewSchema()
+				schema.IsDefault = false
+				wrapped.SchemaReturns(schema, nil)
+			})
+
+			It("populates the model successfully", func() {
+				schema, err := provider.Schema("schema", "table1")
+				Expect(schema).NotTo(BeNil())
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(wrapped.SchemaCallCount()).To(Equal(1))
+
+				name, keys := wrapped.SchemaArgsForCall(0)
+				Expect(name).To(Equal("schema"))
+				Expect(keys).To(ContainElement("table1"))
+
+				Expect(schema.Model.HasDocumentation).To(BeTrue())
+				Expect(schema.Model.Package).To(Equal("package"))
+
+				for _, table := range schema.Tables {
+					Expect(table.Model.HasDocumentation).To(BeTrue())
+					Expect(table.Model.Type).To(Equal("SchemaTable1"))
+					Expect(table.Model.InsertRoutine).To(Equal("insert-schema-table1"))
+					Expect(table.Model.InsertColumns).To(Equal("id, name"))
+					Expect(table.Model.InsertValues).To(Equal(":id, :name"))
+					Expect(table.Model.SelectByPKRoutine).To(Equal("select-schema-table1-by-pk"))
+					Expect(table.Model.SelectAllRoutine).To(Equal("select-all-schema-table1"))
+					Expect(table.Model.DeleteByPKRoutine).To(Equal("delete-schema-table1-by-pk"))
+					Expect(table.Model.UpdateByPKRoutine).To(Equal("update-schema-table1-by-pk"))
+					Expect(table.Model.UpdateByPKColumns).To(Equal("name = :name"))
+					Expect(table.Model.PrimaryKeyCondition).To(Equal("id = :id"))
+					Expect(table.Model.PrimaryKeyArgs).To(Equal("id string"))
+					Expect(table.Model.PrimaryKey).To(ContainElement("id"))
+
+					for _, column := range table.Columns {
+						Expect(column.Model.HasDocumentation).To(BeTrue())
+						Expect(column.Model.Tag).To(Equal("`db`"))
+					}
+				}
+			})
+		})
+
+		Context("when the wrapped provider fails", func() {
+			BeforeEach(func() {
+				wrapped.SchemaReturns(nil, fmt.Errorf("oh no!"))
+			})
+
+			It("returns an error", func() {
+				schema, err := provider.Schema("schema", "table1")
+				Expect(schema).To(BeNil())
+				Expect(err).To(MatchError("oh no!"))
+			})
+		})
+	})
+})
+
 var _ = Describe("PostgreSQLProvider", func() {
 	var (
 		provider *sqlmodel.PostgreSQLProvider

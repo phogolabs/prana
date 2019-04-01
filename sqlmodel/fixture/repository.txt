@@ -1,0 +1,63 @@
+package model
+
+type Table1Repository struct {
+  // Gateway connects the repository to the underlying database
+  Gateway *orm.Gateway
+}
+                                                                                     
+func (r *Table1Repository) SelectAll() ([]*model.Table1, error) {
+  records := []*model.Table1{}
+  routine := orm.Routine("select-all-table1")
+                                                                                     
+  if err := r.Gateway.Select(&records, routine); err != nil {
+    return nil, err
+  }
+                                                                                     
+  return records, nil
+}
+
+func (r *Table1Repository) SelectByPK(id string) (*model.Table1, error) {
+  param := orm.Map{
+      "id": id,
+  }
+                                                                                     
+  routine := orm.Routine("select-table1-by-pk", param)
+  record := &model.Table1{}
+                                                                                     
+  if err := r.Gateway.SelectOne(record, routine); err != nil {
+    return nil, err
+  }
+                                                                                     
+  return record, nil
+}
+                                                                                     
+func (r *Table1Repository) SearchAll(query *orm.RQLQuery) ([]*model.Table1, error) {
+  records := []*model.Table1{}
+  routine = orm.RQL("table1", query)
+                                                                                     
+  if err := r.Gateway.Select(&records, routine); err != nil {
+    return nil, err
+  }
+                                                                                     
+  return records, nil
+}
+                                                                                     
+func (r *Table1Repository) Insert(row *model.Table1) error {
+  routine := orm.Routine("insert-table1", row)
+  return r.Gateway.SelectOne(row, routine)
+}
+                                                                                     
+func (r *Table1Repository) UpdateByPK(row *model.Table1) error {
+  routine := orm.Routine("update-table1-by-pk", row)
+  return r.Gateway.SelectOne(row, routine)
+}
+                                                                                     
+func (r *Table1Repository) DeleteByPK(id string) error {
+  param := orm.Map{
+      "id": id,
+  }
+                                                                                     
+  routine := orm.Routine("delete-table1-by-pk", param)
+  _, err := r.Gateway.Exec(routine)
+  return err
+}

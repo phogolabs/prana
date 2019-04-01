@@ -6,13 +6,230 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/go-openapi/inflect"
 )
 
 var (
+	_ SchemaProvider = &ModelProvider{}
 	_ SchemaProvider = &PostgreSQLProvider{}
 	_ SchemaProvider = &MySQLProvider{}
 	_ SchemaProvider = &SQLiteProvider{}
 )
+
+// ModelProviderConfig is the ModelProvider's config
+type ModelProviderConfig struct {
+	// Package name
+	Package string
+	// UseNamedParams determines whether to use named params
+	UseNamedParams bool
+	// InlcudeDoc determines whether to include documentation
+	InlcudeDoc bool
+}
+
+// ModelProvider represents the model provider
+type ModelProvider struct {
+	// Config for this provider
+	Config *ModelProviderConfig
+	// Provider represents the actual provider
+	Provider SchemaProvider
+	// TagBuilder builds struct tags from column type
+	TagBuilder TagBuilder
+}
+
+// Tables returns all tables for this schema
+func (m *ModelProvider) Tables(schema string) ([]string, error) {
+	return m.Provider.Tables(schema)
+}
+
+// Schema returns the schema definition
+func (m *ModelProvider) Schema(name string, tables ...string) (*Schema, error) {
+	schema, err := m.Provider.Schema(name, tables...)
+	if err != nil {
+		return nil, err
+	}
+
+	schema.Model = SchemaModel{
+		Package:          m.Config.Package,
+		HasDocumentation: m.Config.InlcudeDoc,
+	}
+
+	for index, table := range schema.Tables {
+		table.Name = m.tableName(schema, &table)
+		table.Model = TableModel{
+			HasDocumentation: m.Config.InlcudeDoc,
+			Type:             m.typeName(&table),
+		}
+
+		m.setPrimaryKey(schema, &table)
+		m.setSelectAllRoutine(schema, &table)
+		m.setSelectByPKRoutine(schema, &table)
+		m.setInsertRoutine(schema, &table)
+		m.setDeleteByPKRoutine(schema, &table)
+		m.setUpdateByPKRoutine(schema, &table)
+
+		for index, column := range table.Columns {
+			column.Model = ColumnModel{
+				HasDocumentation: m.Config.InlcudeDoc,
+				Name:             m.fieldName(&column),
+				Type:             m.fieldType(&column),
+				Tag:              m.TagBuilder.Build(&column),
+			}
+
+			table.Columns[index] = column
+		}
+
+		schema.Tables[index] = table
+	}
+
+	return schema, nil
+}
+
+// Close closes connection to the db
+func (m *ModelProvider) Close() error {
+	return m.Provider.Close()
+}
+
+func (m *ModelProvider) setPrimaryKey(schema *Schema, table *Table) {
+	var (
+		conditions []string
+		cond       string
+		arguments  []string
+		arg        string
+		pk         []string
+	)
+
+	for _, column := range table.Columns {
+		if !column.Type.IsPrimaryKey {
+			continue
+		}
+
+		pk = append(pk, column.Name)
+
+		if m.Config.UseNamedParams {
+			cond = fmt.Sprintf("%s = :%s", column.Name, column.Name)
+		} else {
+			cond = fmt.Sprintf("%s = ?", column.Name)
+		}
+
+		arg = fmt.Sprintf("%s %s", column.Name, column.ScanType)
+
+		arguments = append(arguments, arg)
+		conditions = append(conditions, cond)
+	}
+
+	table.Model.PrimaryKeyCondition = strings.Join(conditions, " AND ")
+	table.Model.PrimaryKeyArgs = strings.Join(arguments, ", ")
+	table.Model.PrimaryKey = pk
+}
+
+func (m *ModelProvider) setSelectAllRoutine(schema *Schema, table *Table) {
+	table.Model.SelectAllRoutine = fmt.Sprintf("select-all-%s", m.commandName(table.Name, false))
+}
+
+func (m *ModelProvider) setSelectByPKRoutine(schema *Schema, table *Table) {
+	table.Model.SelectByPKRoutine = fmt.Sprintf("select-%s-by-pk", m.commandName(table.Name, true))
+}
+
+func (m *ModelProvider) setInsertRoutine(schema *Schema, table *Table) {
+	columns, values := m.insertParam(table)
+
+	if len(columns) == 0 || len(values) == 0 {
+		return
+	}
+
+	table.Model.InsertRoutine = fmt.Sprintf("insert-%s", m.commandName(table.Name, true))
+	table.Model.InsertColumns = columns
+	table.Model.InsertValues = values
+}
+
+func (m *ModelProvider) setUpdateByPKRoutine(schema *Schema, table *Table) {
+	table.Model.UpdateByPKRoutine = fmt.Sprintf("update-%s-by-pk", m.commandName(table.Name, true))
+	table.Model.UpdateByPKColumns = m.updateColumns(table)
+}
+
+func (m *ModelProvider) setDeleteByPKRoutine(schema *Schema, table *Table) {
+	table.Model.DeleteByPKRoutine = fmt.Sprintf("delete-%s-by-pk", m.commandName(table.Name, true))
+}
+
+func (m *ModelProvider) commandName(name string, singularize bool) string {
+	name = strings.Replace(name, ".", "-", -1)
+	name = strings.Replace(name, "_", "-", -1)
+	if singularize {
+		name = inflect.Singularize(name)
+	}
+	return name
+}
+
+func (m *ModelProvider) tableName(schema *Schema, table *Table) string {
+	name := table.Name
+
+	if !schema.IsDefault {
+		name = fmt.Sprintf("%s.%s", schema.Name, name)
+	}
+
+	return name
+}
+
+func (m *ModelProvider) insertParam(table *Table) (string, string) {
+	var (
+		columns []string
+		values  []string
+		param   string
+	)
+
+	for _, column := range table.Columns {
+		columns = append(columns, column.Name)
+
+		if m.Config.UseNamedParams {
+			param = fmt.Sprintf(":%s", column.Name)
+		} else {
+			param = "?"
+		}
+
+		values = append(values, param)
+	}
+
+	return strings.Join(columns, ", "), strings.Join(values, ", ")
+}
+
+func (m *ModelProvider) updateColumns(table *Table) string {
+	var (
+		values []string
+		param  string
+	)
+
+	for _, column := range table.Columns {
+		if m.Config.UseNamedParams {
+			param = fmt.Sprintf("%s = :%s", column.Name, column.Name)
+		} else {
+			param = fmt.Sprintf("%s = ?", column.Name)
+		}
+
+		if !column.Type.IsPrimaryKey {
+			values = append(values, param)
+		}
+	}
+
+	return strings.Join(values, ", ")
+}
+
+func (m *ModelProvider) typeName(table *Table) string {
+	name := strings.Replace(table.Name, ".", " ", -1)
+	name = inflect.Camelize(name)
+	name = inflect.Singularize(name)
+	return name
+}
+
+func (m *ModelProvider) fieldName(column *Column) string {
+	name := inflect.Camelize(column.Name)
+	name = strings.Replace(name, "Id", "ID", -1)
+	return name
+}
+
+func (m *ModelProvider) fieldType(column *Column) string {
+	return column.ScanType
+}
 
 // PostgreSQLProvider represents a metadata provider for PostgreSQL
 type PostgreSQLProvider struct {

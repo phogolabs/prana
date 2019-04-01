@@ -2,6 +2,7 @@ module github.com/phogolabs/prana
 
 require (
 	github.com/apex/log v1.1.0
+	github.com/aymerick/raymond v2.0.2+incompatible
 	github.com/blang/vfs v1.0.0 // indirect
 	github.com/daaku/go.zipexe v0.0.0-20150329023125-a5fe2436ffcb // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

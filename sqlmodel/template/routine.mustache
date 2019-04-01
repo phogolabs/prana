@@ -1,0 +1,26 @@
+{{#if Model.HasDocumentation}}
+-- Auto-generated at {{now}}
+
+{{/if}}
+{{#tables}}
+-- name: {{Model.SelectAllRoutine}}
+SELECT * FROM {{Name}};
+
+-- name: {{Model.SelectByPKRoutine}}
+SELECT * FROM {{Name}}
+WHERE {{Model.PrimaryKeyCondition}};
+
+-- name: {{Model.InsertRoutine}}
+INSERT INTO {{Name}} ({{Model.InsertColumns}})
+VALUES ({{Model.InsertValues}});
+
+-- name: {{Model.UpdateByPKRoutine}}
+UPDATE {{Name}}
+SET {{Model.UpdateByPKColumns}}
+WHERE {{Model.PrimaryKeyCondition}};
+
+-- name: {{Model.DeleteByPKRoutine}}
+DELETE FROM {{Name}}
+WHERE {{Model.PrimaryKeyCondition}};
+
+{{/tables}}

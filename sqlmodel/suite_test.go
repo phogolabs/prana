@@ -20,6 +20,71 @@ func TestSchema(t *testing.T) {
 	RunSpecs(t, "Model Suite")
 }
 
+// NewSchema creates a new schema
+func NewSchema() *sqlmodel.Schema {
+	return &sqlmodel.Schema{
+		Name:      "schema",
+		IsDefault: true,
+		Model: sqlmodel.SchemaModel{
+			Package:          "model",
+			HasDocumentation: false,
+		},
+		Tables: []sqlmodel.Table{
+			sqlmodel.Table{
+				Name: "table1",
+				Model: sqlmodel.TableModel{
+					HasDocumentation:    false,
+					Type:                "Table1",
+					InsertRoutine:       "insert-table1",
+					InsertColumns:       "id, name",
+					InsertValues:        "?, ?",
+					SelectByPKRoutine:   "select-table1-by-pk",
+					SelectAllRoutine:    "select-all-table1",
+					DeleteByPKRoutine:   "delete-table1-by-pk",
+					UpdateByPKRoutine:   "update-table1-by-pk",
+					UpdateByPKColumns:   "name = ?",
+					PrimaryKeyCondition: "id = ?",
+					PrimaryKeyArgs:      "id string",
+					PrimaryKey:          []string{"id"},
+				},
+				Columns: []sqlmodel.Column{
+					sqlmodel.Column{
+						Name:     "id",
+						ScanType: "string",
+						Model: sqlmodel.ColumnModel{
+							HasDocumentation: false,
+							Name:             "ID",
+							Type:             "string",
+							Tag:              "`db`",
+						},
+						Type: sqlmodel.ColumnType{
+							Name:          "varchar",
+							IsPrimaryKey:  true,
+							IsNullable:    true,
+							CharMaxLength: 200,
+						},
+					},
+					sqlmodel.Column{
+						Name:     "name",
+						ScanType: "string",
+						Model: sqlmodel.ColumnModel{
+							Name: "Name",
+							Type: "string",
+							Tag:  "`db`",
+						},
+						Type: sqlmodel.ColumnType{
+							Name:          "varchar",
+							IsPrimaryKey:  false,
+							IsNullable:    false,
+							CharMaxLength: 200,
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func CreateTable(reader *bytes.Buffer) string {
 	query := &bytes.Buffer{}
 	fmt.Fprintln(query, "CREATE TABLE test (")
