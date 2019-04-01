@@ -4,434 +4,286 @@ import (
 	"bytes"
 	"fmt"
 	"go/format"
+	"io/ioutil"
 	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmodel"
 	"golang.org/x/tools/imports"
 )
 
-var _ = Describe("ModelGenerator", func() {
+var _ = Describe("Codegen", func() {
 	var (
-		generator *sqlmodel.ModelGenerator
-		builder   *fake.ModelTagBuilder
+		generator *sqlmodel.Codegen
 		schemaDef *sqlmodel.Schema
 	)
 
 	BeforeEach(func() {
-		schemaDef = &sqlmodel.Schema{
-			Name:      "schema",
-			IsDefault: true,
-			Tables: []sqlmodel.Table{
-				{
-					Name: "table1",
-					Columns: []sqlmodel.Column{
-						{
-							Name:     "id",
-							ScanType: "string",
-							Type: sqlmodel.ColumnType{
-								Name:          "varchar",
-								IsPrimaryKey:  true,
-								IsNullable:    true,
-								CharMaxLength: 200,
-							},
-						},
-						{
-							Name:     "name",
-							ScanType: "string",
-							Type: sqlmodel.ColumnType{
-								Name:          "varchar",
-								IsPrimaryKey:  false,
-								IsNullable:    false,
-								CharMaxLength: 200,
-							},
-						},
-					},
-				},
-			},
-		}
-
-		builder = &fake.ModelTagBuilder{}
-		builder.BuildReturns("`db`")
-
-		generator = &sqlmodel.ModelGenerator{
-			TagBuilder: builder,
-			Config: &sqlmodel.ModelGeneratorConfig{
-				InlcudeDoc: false,
-			},
-		}
+		schemaDef = NewSchema()
+		generator = &sqlmodel.Codegen{}
 	})
 
-	ItGeneratesTheModelSuccessfully := func(table string) {
-		It("generates the schema successfully", func() {
-			source := &bytes.Buffer{}
-			fmt.Fprintln(source, "package model")
-			fmt.Fprintln(source)
-			fmt.Fprintf(source, "type %s struct {", table)
-			fmt.Fprintln(source, "        ID string `db`")
-			fmt.Fprintln(source, "        Name string `db`")
-			fmt.Fprintln(source, "}")
-
-			data, err := imports.Process("model", source.Bytes(), nil)
-			Expect(err).To(BeNil())
-
-			data, err = format.Source(data)
-			Expect(err).To(BeNil())
-
-			reader := &bytes.Buffer{}
-
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(builder.BuildCallCount()).To(Equal(2))
-			Expect(builder.BuildArgsForCall(0)).To(Equal(&schemaDef.Tables[0].Columns[0]))
-			Expect(builder.BuildArgsForCall(1)).To(Equal(&schemaDef.Tables[0].Columns[1]))
-
-			Expect(reader.String()).To(Equal(string(data)))
-		})
-	}
-
-	ItGeneratesTheModelSuccessfully("Table1")
-
-	Context("when the schema is not default", func() {
+	Describe("Model", func() {
 		BeforeEach(func() {
-			schemaDef.IsDefault = false
+			generator.Template = "model"
+			generator.Format = true
 		})
 
-		ItGeneratesTheModelSuccessfully("Table1")
-	})
+		ItGeneratesTheModelSuccessfully := func(table string) {
+			It("generates the schema successfully", func() {
+				source := &bytes.Buffer{}
+				fmt.Fprintln(source, "package model")
+				fmt.Fprintln(source)
+				fmt.Fprintf(source, "type %s struct {", table)
+				fmt.Fprintln(source, "        ID string `db`")
+				fmt.Fprintln(source, "        Name string `db`")
+				fmt.Fprintln(source, "}")
 
-	Context("when the table is ignored", func() {
-		BeforeEach(func() {
-			generator.Config.IgnoreTables = []string{"table2", "table1"}
-		})
+				data, err := imports.Process("model", source.Bytes(), nil)
+				Expect(err).To(BeNil())
 
-		It("generates the empty schema successfully", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
+				data, err = format.Source(data)
+				Expect(err).To(BeNil())
 
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(BeEmpty())
-		})
-
-		Context("when only one table is ignored", func() {
-			BeforeEach(func() {
-				generator.Config.IgnoreTables = []string{"table2"}
-			})
-
-			It("generates the empty schema successfully", func() {
 				reader := &bytes.Buffer{}
+
 				ctx := &sqlmodel.GeneratorContext{
-					Writer:  reader,
-					Package: "model",
-					Schema:  schemaDef,
+					Writer: reader,
+					Schema: schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
-				Expect(reader.String()).To(ContainSubstring("Table1"))
+				Expect(reader.String()).To(Equal(string(data)))
+			})
+		}
+
+		ItGeneratesTheModelSuccessfully("Table1")
+
+		Context("when the schema is not default", func() {
+			BeforeEach(func() {
+				schemaDef.IsDefault = false
+			})
+
+			ItGeneratesTheModelSuccessfully("Table1")
+		})
+
+		Context("when no tables are provided", func() {
+			BeforeEach(func() {
+				schemaDef.Tables = []sqlmodel.Table{}
+			})
+
+			It("generates the schema successfully", func() {
+				reader := &bytes.Buffer{}
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+
+				Expect(generator.Generate(ctx)).To(Succeed())
+				Expect(reader.String()).To(BeEmpty())
+			})
+		})
+
+		Context("when the package name is not provided", func() {
+			It("returns an error", func() {
+				reader := &bytes.Buffer{}
+				schemaDef.Model.Package = ""
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+				err := generator.Generate(ctx)
+				Expect(err.Error()).To(Equal("model:3:1: expected 'IDENT', found 'type'"))
 			})
 		})
 	})
 
-	Context("when including documentation is disabled", func() {
+	Describe("Routine", func() {
 		BeforeEach(func() {
-			generator.Config.InlcudeDoc = true
+			generator.Template = "routine"
+			generator.Format = false
 		})
 
-		It("generates the schema successfully", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
+		ItGeneratesTheScriptSuccessfully := func(table string) {
+			It("generates the SQL script successfully", func() {
+				w := &bytes.Buffer{}
+				t := strings.Replace(table, ".", "-", -1)
+				fmt.Fprintf(w, "-- name: select-all-%s\n", t)
+				fmt.Fprintf(w, "SELECT * FROM %s;\n\n", table)
+				fmt.Fprintf(w, "-- name: select-%s-by-pk\n", t)
+				fmt.Fprintf(w, "SELECT * FROM %s\n", table)
+				fmt.Fprint(w, "WHERE id = ?;\n\n")
+				fmt.Fprintf(w, "-- name: insert-%s\n", t)
+				fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
+				fmt.Fprint(w, "VALUES (?, ?);\n\n")
+				fmt.Fprintf(w, "-- name: update-%s-by-pk\n", t)
+				fmt.Fprintf(w, "UPDATE %s\n", table)
+				fmt.Fprint(w, "SET name = ?\n")
+				fmt.Fprint(w, "WHERE id = ?;\n\n")
+				fmt.Fprintf(w, "-- name: delete-%s-by-pk\n", t)
+				fmt.Fprintf(w, "DELETE FROM %s\n", table)
+				fmt.Fprint(w, "WHERE id = ?;\n\n")
 
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(ContainSubstring("// Table1 represents a data base table 'schema.table1'"))
-			Expect(reader.String()).To(ContainSubstring("// ID represents a database column 'id' of type 'VARCHAR(200) PRIMARY KEY NULL'"))
+				reader := &bytes.Buffer{}
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+
+				Expect(generator.Generate(ctx)).To(Succeed())
+				Expect(reader.String()).To(Equal(w.String()))
+			})
+		}
+
+		ItGeneratesTheScriptSuccessfully("table1")
+
+		Context("when no tables are provided", func() {
+			BeforeEach(func() {
+				schemaDef.Tables = []sqlmodel.Table{}
+			})
+
+			It("generates the schema successfully", func() {
+				reader := &bytes.Buffer{}
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+
+				Expect(generator.Generate(ctx)).To(Succeed())
+				Expect(reader.String()).To(BeEmpty())
+			})
 		})
-	})
 
-	Context("when no tables are provided", func() {
-		BeforeEach(func() {
-			schemaDef.Tables = []sqlmodel.Table{}
+		Context("when the table does not have columns", func() {
+			BeforeEach(func() {
+				schemaDef.Tables[0].Columns = []sqlmodel.Column{}
+			})
+
+			It("generates the schema successfully", func() {
+				reader := &bytes.Buffer{}
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+
+				Expect(generator.Generate(ctx)).To(Succeed())
+				Expect(reader.String()).To(ContainSubstring("select-all-table1"))
+			})
 		})
 
-		It("generates the schema successfully", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(BeEmpty())
-		})
-	})
-
-	Context("when the package name is not provided", func() {
-		It("returns an error", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer: reader,
-				Schema: schemaDef,
-			}
-			err := generator.Generate(ctx)
-			Expect(err).To(MatchError("model:2:1: expected 'IDENT', found 'type'"))
-		})
-	})
-})
-
-var _ = Describe("QueryGenerator", func() {
-	var (
-		generator *sqlmodel.QueryGenerator
-		schemaDef *sqlmodel.Schema
-	)
-
-	BeforeEach(func() {
-		schemaDef = &sqlmodel.Schema{
-			Name:      "schema",
-			IsDefault: true,
-			Tables: []sqlmodel.Table{
-				{
-					Name: "table1",
-					Columns: []sqlmodel.Column{
-						{
-							Name:     "id",
-							ScanType: "string",
-							Type: sqlmodel.ColumnType{
-								Name:          "varchar",
-								IsPrimaryKey:  true,
-								IsNullable:    true,
-								CharMaxLength: 200,
+		Context("when more than one table are provided", func() {
+			BeforeEach(func() {
+				schemaDef.Tables = append(schemaDef.Tables,
+					sqlmodel.Table{
+						Name: "table2",
+						Columns: []sqlmodel.Column{
+							{
+								Name:     "id",
+								ScanType: "string",
+								Type: sqlmodel.ColumnType{
+									Name:          "varchar",
+									IsPrimaryKey:  true,
+									IsNullable:    true,
+									CharMaxLength: 200,
+								},
 							},
-						},
-						{
-							Name:     "name",
-							ScanType: "string",
-							Type: sqlmodel.ColumnType{
-								Name:          "varchar",
-								IsPrimaryKey:  false,
-								IsNullable:    false,
-								CharMaxLength: 200,
+							{
+								Name:     "name",
+								ScanType: "string",
+								Type: sqlmodel.ColumnType{
+									Name:          "varchar",
+									IsPrimaryKey:  false,
+									IsNullable:    false,
+									CharMaxLength: 200,
+								},
 							},
 						},
 					},
-				},
-			},
+				)
+			})
+
+			It("generates the script successfully", func() {
+				reader := &bytes.Buffer{}
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+
+				Expect(generator.Generate(ctx)).To(Succeed())
+				Expect(reader.String()).To(ContainSubstring("table1"))
+				Expect(reader.String()).To(ContainSubstring("table2"))
+			})
+		})
+	})
+
+	Describe("Repository", func() {
+		BeforeEach(func() {
+			generator.Template = "repository"
+			generator.Format = true
+		})
+
+		ItGeneratesTheRepositorySuccessfully := func(table string) {
+			It("generates the repository successfully", func() {
+				source, err := ioutil.ReadFile("./fixture/repository.txt")
+				Expect(err).To(BeNil())
+
+				data, err := imports.Process("model", source, nil)
+				Expect(err).To(BeNil())
+
+				data, err = format.Source(data)
+				Expect(err).To(BeNil())
+
+				reader := &bytes.Buffer{}
+
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+
+				Expect(generator.Generate(ctx)).To(Succeed())
+				Expect(reader.String()).To(Equal(string(data)))
+			})
 		}
 
-		generator = &sqlmodel.QueryGenerator{
-			Config: &sqlmodel.QueryGeneratorConfig{
-				InlcudeDoc: false,
-			},
-		}
-	})
+		ItGeneratesTheRepositorySuccessfully("Table1")
 
-	ItGeneratesTheScriptSuccessfully := func(table string) {
-		It("generates the SQL script successfully", func() {
-			w := &bytes.Buffer{}
-			t := strings.Replace(table, ".", "-", -1)
-			fmt.Fprintf(w, "-- name: select-all-%s\n", t)
-			fmt.Fprintf(w, "SELECT * FROM %s;\n\n", table)
-			fmt.Fprintf(w, "-- name: select-%s\n", t)
-			fmt.Fprintf(w, "SELECT * FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = ?;\n\n")
-			fmt.Fprintf(w, "-- name: insert-%s\n", t)
-			fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
-			fmt.Fprint(w, "VALUES (?, ?);\n\n")
-			fmt.Fprintf(w, "-- name: update-%s\n", t)
-			fmt.Fprintf(w, "UPDATE %s\n", table)
-			fmt.Fprint(w, "SET name = ?\n")
-			fmt.Fprint(w, "WHERE id = ?;\n\n")
-			fmt.Fprintf(w, "-- name: delete-%s\n", t)
-			fmt.Fprintf(w, "DELETE FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = ?;\n")
+		Context("when the schema is not default", func() {
+			BeforeEach(func() {
+				schemaDef.IsDefault = false
+			})
 
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(Equal(w.String()))
-		})
-	}
-
-	ItGeneratesTheScriptSuccessfully("table1")
-
-	Context("when the schema is not default", func() {
-		BeforeEach(func() {
-			schemaDef.IsDefault = false
+			ItGeneratesTheRepositorySuccessfully("Table1")
 		})
 
-		ItGeneratesTheScriptSuccessfully("schema.table1")
-	})
+		Context("when no tables are provided", func() {
+			BeforeEach(func() {
+				schemaDef.Tables = []sqlmodel.Table{}
+			})
 
-	Context("when named parameters are used", func() {
-		BeforeEach(func() {
-			generator.Config.UseNamedParams = true
+			It("generates the schema successfully", func() {
+				reader := &bytes.Buffer{}
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+
+				Expect(generator.Generate(ctx)).To(Succeed())
+				Expect(reader.String()).To(BeEmpty())
+			})
 		})
 
-		It("generates the SQL script successfully", func() {
-			table := "table1"
-			w := &bytes.Buffer{}
-			t := strings.Replace(table, ".", "-", -1)
-			fmt.Fprintf(w, "-- name: select-all-%s\n", t)
-			fmt.Fprintf(w, "SELECT * FROM %s;\n\n", table)
-			fmt.Fprintf(w, "-- name: select-%s\n", t)
-			fmt.Fprintf(w, "SELECT * FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = :id;\n\n")
-			fmt.Fprintf(w, "-- name: insert-%s\n", t)
-			fmt.Fprintf(w, "INSERT INTO %s (id, name)\n", table)
-			fmt.Fprint(w, "VALUES (:id, :name);\n\n")
-			fmt.Fprintf(w, "-- name: update-%s\n", t)
-			fmt.Fprintf(w, "UPDATE %s\n", table)
-			fmt.Fprint(w, "SET name = :name\n")
-			fmt.Fprint(w, "WHERE id = :id;\n\n")
-			fmt.Fprintf(w, "-- name: delete-%s\n", t)
-			fmt.Fprintf(w, "DELETE FROM %s\n", table)
-			fmt.Fprint(w, "WHERE id = :id;\n")
-
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(Equal(w.String()))
-		})
-	})
-
-	Context("when the table is ignored", func() {
-		BeforeEach(func() {
-			generator.Config.IgnoreTables = []string{"table1"}
-		})
-
-		It("generates the commands successfully", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(BeEmpty())
-		})
-	})
-
-	Context("when including documentation is disabled", func() {
-		BeforeEach(func() {
-			generator.Config.InlcudeDoc = true
-		})
-
-		It("generates the schema successfully", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(ContainSubstring("-- Auto-generated"))
-		})
-	})
-
-	Context("when no tables are provided", func() {
-		BeforeEach(func() {
-			schemaDef.Tables = []sqlmodel.Table{}
-		})
-
-		It("generates the schema successfully", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(BeEmpty())
-		})
-	})
-
-	Context("when the table does not have columns", func() {
-		BeforeEach(func() {
-			schemaDef.Tables[0].Columns = []sqlmodel.Column{}
-		})
-
-		It("generates the schema successfully", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(ContainSubstring("select-all-table1"))
-		})
-	})
-
-	Context("when more than one table are provided", func() {
-		BeforeEach(func() {
-			schemaDef.Tables = append(schemaDef.Tables,
-				sqlmodel.Table{
-					Name: "table2",
-					Columns: []sqlmodel.Column{
-						{
-							Name:     "id",
-							ScanType: "string",
-							Type: sqlmodel.ColumnType{
-								Name:          "varchar",
-								IsPrimaryKey:  true,
-								IsNullable:    true,
-								CharMaxLength: 200,
-							},
-						},
-						{
-							Name:     "name",
-							ScanType: "string",
-							Type: sqlmodel.ColumnType{
-								Name:          "varchar",
-								IsPrimaryKey:  false,
-								IsNullable:    false,
-								CharMaxLength: 200,
-							},
-						},
-					},
-				},
-			)
-		})
-
-		It("generates the script successfully", func() {
-			reader := &bytes.Buffer{}
-			ctx := &sqlmodel.GeneratorContext{
-				Writer:  reader,
-				Package: "model",
-				Schema:  schemaDef,
-			}
-
-			Expect(generator.Generate(ctx)).To(Succeed())
-			Expect(reader.String()).To(ContainSubstring("table1"))
-			Expect(reader.String()).To(ContainSubstring("table2"))
+		Context("when the package name is not provided", func() {
+			It("returns an error", func() {
+				reader := &bytes.Buffer{}
+				schemaDef.Model.Package = ""
+				ctx := &sqlmodel.GeneratorContext{
+					Writer: reader,
+					Schema: schemaDef,
+				}
+				err := generator.Generate(ctx)
+				Expect(err.Error()).To(Equal("repository:3:1: expected 'IDENT', found 'type'"))
+			})
 		})
 	})
 })

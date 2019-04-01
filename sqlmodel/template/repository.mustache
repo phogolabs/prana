@@ -1,0 +1,95 @@
+{{#if Model.HasDocumentation}}
+// Package {{Model.Package}} contains an object model of database schema '{{Name}}'
+// Auto-generated at {{now}}
+
+{{/if}}
+package {{Model.Package}}
+{{#tables}}
+
+{{#if Model.HasDocumentation}}
+// {{Model.Type}}Repository represents a repository for '{{Name}}'
+{{/if}}
+type {{Model.Type}}Repository struct {
+  // Gateway connects the repository to the underlying database
+  Gateway *orm.Gateway
+}
+
+{{#if Model.HasDocumentation}}
+// SelectAll returns all {{Model.Type}} from the database
+{{/if}}
+func (r *{{Model.Type}}Repository) SelectAll() ([]*model.{{Model.Type}}, error) {
+  records := []*model.{{Model.Type}}{}
+  routine := orm.Routine("{{Model.SelectAllRoutine}}")
+  
+  if err := r.Gateway.Select(&records, routine); err != nil {
+    return nil, err
+  }
+
+  return records, nil
+}
+
+{{#if Model.HasDocumentation}}
+// SelectByPK returns a record of {{Model.Type}} for given primary key
+{{/if}}
+func (r *{{Model.Type}}Repository) SelectByPK({{Model.PrimaryKeyArgs}}) (*model.{{Model.Type}}, error) {
+  param := orm.Map{
+    {{#Model.PrimaryKey}}
+      "{{.}}": {{.}},
+    {{/Model.PrimaryKey}}
+  }
+
+  routine := orm.Routine("{{Model.SelectByPKRoutine}}", param)
+  record := &model.{{Model.Type}}{}
+
+  if err := r.Gateway.SelectOne(record, routine); err != nil {
+    return nil, err
+  }
+  
+  return record, nil
+}
+
+{{#if Model.HasDocumentation}}
+// SearchAll returns all {{Type}} from the database for given RQL query
+{{/if}}
+func (r *{{Model.Type}}Repository) SearchAll(query *orm.RQLQuery) ([]*model.{{model.type}}, error) {
+  records := []*model.{{Model.Type}}{}
+  routine = orm.RQL("{{Name}}", query)
+  
+  if err := r.Gateway.Select(&records, routine); err != nil {
+    return nil, err
+  }
+
+  return records, nil
+}
+
+{{#if Model.HasDocumentation}}
+// Insert inserts a record of type {{model.type}} into the database
+{{/if}}
+func (r *{{Model.Type}}Repository) Insert(row *model.{{Model.Type}}) error {
+  routine := orm.Routine("{{Model.InsertRoutine}}", row)
+  return r.Gateway.SelectOne(row, routine)
+}
+
+{{#if Model.HasDocumentation}}
+// Update updates a record of type {{model.type}}
+{{/if}}
+func (r *{{Model.Type}}Repository) UpdateByPK(row *model.{{Model.Type}}) error {
+  routine := orm.Routine("{{Model.UpdateByPKRoutine}}", row)
+  return r.Gateway.SelectOne(row, routine)
+}
+
+{{#if Model.HasDocumentation}}
+// DeleteByPK deletes a record of {{Model.Type}} for given primary key
+{{/if}}
+func (r *{{Model.Type}}Repository) DeleteByPK({{Model.PrimaryKeyArgs}}) error {
+  param := orm.Map{
+    {{#Model.PrimaryKey}}
+      "{{.}}": {{.}},
+    {{/Model.PrimaryKey}}
+  }
+
+  routine := orm.Routine("{{Model.DeleteByPKRoutine}}", param)
+  _, err := r.Gateway.Exec(routine)
+  return err
+}
+{{/tables}}

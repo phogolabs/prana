@@ -27,10 +27,10 @@ var _ = Describe("Executor", func() {
 			Name:      "public",
 			IsDefault: true,
 			Tables: []sqlmodel.Table{
-				{
+				sqlmodel.Table{
 					Name: "table1",
 					Columns: []sqlmodel.Column{
-						{
+						sqlmodel.Column{
 							Name:     "ID",
 							ScanType: "string",
 						},
@@ -45,7 +45,7 @@ var _ = Describe("Executor", func() {
 		spec = &sqlmodel.Spec{
 			Schema:     "public",
 			Tables:     []string{"table1"},
-			Name:       "entity",
+			Filename:   "schema.go",
 			FileSystem: parcello.Dir(dir),
 		}
 
@@ -55,9 +55,8 @@ var _ = Describe("Executor", func() {
 
 		composer = &fake.ModelGenerator{}
 		executor = &sqlmodel.Executor{
-			Provider:       provider,
-			ModelGenerator: composer,
-			QueryGenerator: composer,
+			Provider:  provider,
+			Generator: composer,
 		}
 	})
 
@@ -84,7 +83,6 @@ var _ = Describe("Executor", func() {
 			Expect(composer.GenerateCallCount()).To(Equal(1))
 			ctx := composer.GenerateArgsForCall(0)
 
-			Expect(ctx.Package).To(Equal("entity"))
 			Expect(ctx.Schema).To(Equal(schemaDef))
 		})
 
@@ -98,7 +96,6 @@ var _ = Describe("Executor", func() {
 				Expect(composer.GenerateCallCount()).To(Equal(1))
 				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(ctx.Package).To(Equal("entity"))
 				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 		})
@@ -126,7 +123,6 @@ var _ = Describe("Executor", func() {
 				Expect(composer.GenerateCallCount()).To(Equal(1))
 				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(ctx.Package).To(Equal("entity"))
 				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 
@@ -182,7 +178,6 @@ var _ = Describe("Executor", func() {
 				Expect(composer.GenerateCallCount()).To(Equal(1))
 				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(ctx.Package).To(Equal(pkg))
 				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 		}
@@ -230,7 +225,6 @@ var _ = Describe("Executor", func() {
 				Expect(composer.GenerateCallCount()).To(Equal(1))
 				ctx := composer.GenerateArgsForCall(0)
 
-				Expect(ctx.Package).To(Equal("entity"))
 				Expect(ctx.Schema).To(Equal(schemaDef))
 			})
 
@@ -321,170 +315,6 @@ var _ = Describe("Executor", func() {
 
 			It("returns the error", func() {
 				path, err := executor.Create(spec)
-				Expect(err).To(MatchError("mkdir /mydir: permission denied"))
-				Expect(path).To(BeEmpty())
-			})
-		})
-	})
-
-	Describe("CreateScript", func() {
-		BeforeEach(func() {
-			composer.GenerateStub = func(ctx *sqlmodel.GeneratorContext) error {
-				ctx.Writer.Write([]byte("source"))
-				return nil
-			}
-		})
-
-		ItCreatesTheSQLScript := func(filename string) {
-			It("generates a SQL script successfully", func() {
-				path, err := executor.CreateScript(spec)
-				Expect(err).To(Succeed())
-
-				dir := fmt.Sprintf("%v", spec.FileSystem)
-				Expect(dir).To(BeADirectory())
-				Expect(filepath.Join(dir, path)).To(BeARegularFile())
-
-				Expect(provider.TablesCallCount()).To(BeZero())
-				Expect(provider.SchemaCallCount()).To(Equal(1))
-
-				schemaName, tables := provider.SchemaArgsForCall(0)
-				Expect(schemaName).To(Equal("public"))
-				Expect(tables).To(ContainElement("table1"))
-
-				Expect(composer.GenerateCallCount()).To(Equal(1))
-				ctx := composer.GenerateArgsForCall(0)
-				Expect(ctx.Schema).To(Equal(schemaDef))
-			})
-		}
-
-		ItCreatesTheSQLScript("routine.sql")
-
-		Context("when the schema is not default", func() {
-			BeforeEach(func() {
-				schemaDef.IsDefault = false
-			})
-
-			ItCreatesTheSQLScript("public.sql")
-		})
-
-		Context("when the tables are not provided", func() {
-			BeforeEach(func() {
-				spec.Tables = []string{}
-			})
-
-			It("generates the SQL script scuessfully", func() {
-				path, err := executor.CreateScript(spec)
-				Expect(err).To(Succeed())
-				Expect(path).To(Equal("routine.sql"))
-
-				dir := fmt.Sprintf("%v", spec.FileSystem)
-				Expect(dir).To(BeADirectory())
-				Expect(filepath.Join(dir, path)).To(BeARegularFile())
-
-				Expect(provider.TablesCallCount()).To(Equal(1))
-				Expect(provider.TablesArgsForCall(0)).To(Equal("public"))
-				Expect(provider.SchemaCallCount()).To(Equal(1))
-
-				schemaName, tables := provider.SchemaArgsForCall(0)
-				Expect(schemaName).To(Equal("public"))
-				Expect(tables).To(ContainElement("table1"))
-
-				Expect(composer.GenerateCallCount()).To(Equal(1))
-				ctx := composer.GenerateArgsForCall(0)
-				Expect(ctx.Schema).To(Equal(schemaDef))
-			})
-
-			Context("when the provider fails to get table names", func() {
-				BeforeEach(func() {
-					provider.TablesReturns([]string{}, fmt.Errorf("Oh no!"))
-				})
-
-				It("returns the error", func() {
-					path, err := executor.CreateScript(spec)
-					Expect(err).To(MatchError("Oh no!"))
-					Expect(path).To(BeEmpty())
-				})
-			})
-		})
-
-		Context("when the spec schema is not default", func() {
-			BeforeEach(func() {
-				schemaDef.IsDefault = false
-			})
-
-			It("creates a package with generated source successfully", func() {
-				path, err := executor.CreateScript(spec)
-				Expect(err).To(Succeed())
-				Expect(path).To(Equal("public.sql"))
-
-				dir := fmt.Sprintf("%v", spec.FileSystem)
-				Expect(dir).To(BeADirectory())
-				Expect(filepath.Join(dir, path)).To(BeARegularFile())
-			})
-		})
-
-		Context("when getting the schame fails", func() {
-			BeforeEach(func() {
-				provider.SchemaReturns(nil, fmt.Errorf("Oh no!"))
-			})
-
-			It("returns the error", func() {
-				path, err := executor.CreateScript(spec)
-				Expect(err).To(MatchError("Oh no!"))
-				Expect(path).To(BeEmpty())
-			})
-		})
-
-		Context("when the reader has empty content", func() {
-			BeforeEach(func() {
-				composer.GenerateStub = func(ctx *sqlmodel.GeneratorContext) error {
-					return nil
-				}
-			})
-
-			It("generates a script successfully", func() {
-				path, err := executor.CreateScript(spec)
-				Expect(err).To(Succeed())
-				Expect(path).To(BeEmpty())
-			})
-		})
-
-		Context("when the generator fails", func() {
-			BeforeEach(func() {
-				composer.GenerateReturns(fmt.Errorf("Oh no!"))
-			})
-
-			It("returns the error", func() {
-				path, err := executor.CreateScript(spec)
-				Expect(err).To(MatchError("Oh no!"))
-				Expect(path).To(BeEmpty())
-			})
-		})
-
-		Context("when writing the file fails", func() {
-			BeforeEach(func() {
-				file := &fake.File{}
-				file.WriteReturns(0, fmt.Errorf("oh no!"))
-
-				fs := &fake.FileSystem{}
-				fs.OpenFileReturns(file, nil)
-				spec.FileSystem = fs
-			})
-
-			It("returns the error", func() {
-				path, err := executor.CreateScript(spec)
-				Expect(err).To(MatchError("oh no!"))
-				Expect(path).To(BeEmpty())
-			})
-		})
-
-		Context("when creating the dir fails", func() {
-			BeforeEach(func() {
-				spec.FileSystem = parcello.Dir("/mydir")
-			})
-
-			It("returns the error", func() {
-				path, err := executor.CreateScript(spec)
 				Expect(err).To(MatchError("mkdir /mydir: permission denied"))
 				Expect(path).To(BeEmpty())
 			})

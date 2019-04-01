@@ -11,6 +11,7 @@ import (
 	"github.com/apex/log/handlers/json"
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/prana"
+	"github.com/phogolabs/prana/sqlmodel"
 	"github.com/urfave/cli"
 )
 
@@ -63,4 +64,18 @@ func open(ctx *cli.Context) (*sqlx.DB, error) {
 	}
 
 	return db, nil
+}
+
+func provider(db *sqlx.DB) (sqlmodel.SchemaProvider, error) {
+	switch db.DriverName() {
+	case "sqlite3":
+		return &sqlmodel.SQLiteProvider{DB: db}, nil
+	case "postgres":
+		return &sqlmodel.PostgreSQLProvider{DB: db}, nil
+	case "mysql":
+		return &sqlmodel.MySQLProvider{DB: db}, nil
+	default:
+		err := fmt.Errorf("Cannot find provider for database driver '%s'", db.DriverName())
+		return nil, cli.NewExitError(err.Error(), ErrCodeArg)
+	}
 }

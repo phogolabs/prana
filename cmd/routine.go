@@ -1,22 +1,21 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"github.com/apex/log"
-	"github.com/jmoiron/sqlx"
-	"github.com/olekukonko/tablewriter"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlexec"
+	"github.com/phogolabs/prana/sqlmodel"
 	"github.com/urfave/cli"
 )
 
 // SQLRoutine provides a subcommands to work with SQL scripts and their
 // statements.
 type SQLRoutine struct {
-	dir string
+	runner   *sqlexec.Runner
+	executor *sqlmodel.Executor
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
@@ -26,7 +25,6 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 		Usage:        "A group of commands for generating, running, and removing SQL commands",
 		Description:  "A group of commands for generating, running, and removing SQL commands",
 		BashComplete: cli.DefaultAppComplete,
-		Before:       m.before,
 		Flags: []cli.Flag{
 			cli.StringFlag{
 				Name:   "routine-dir, d",
@@ -36,42 +34,32 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 			},
 		},
 		Subcommands: []cli.Command{
-			{
+			cli.Command{
 				Name:        "sync",
 				Usage:       "Generate a SQL script of CRUD operations for given database schema",
 				Description: "Generate a SQL script of CRUD operations for given database schema",
 				Action:      m.sync,
-				Flags: []cli.Flag{
-					cli.StringFlag{
-						Name:  "schema-name, s",
-						Usage: "name of the database schema",
-						Value: "",
-					},
-					cli.StringSliceFlag{
-						Name:  "table-name, t",
-						Usage: "name of the table in the database",
-					},
-					cli.StringSliceFlag{
-						Name:  "ignore-table-name, i",
-						Usage: "name of the table in the database that should be skipped",
-						Value: &cli.StringSlice{"migrations"},
-					},
-					cli.BoolFlag{
-						Name:  "use-named-params, n",
-						Usage: "use named parameter instead of questionmark",
-					},
-					cli.BoolTFlag{
-						Name:  "include-docs, d",
-						Usage: "include API documentation in generated source code",
-					},
-				},
+				Before:      m.before,
+				After:       m.after,
+				Flags:       m.flags(),
 			},
-			{
+			cli.Command{
+				Name:        "print",
+				Usage:       "Print a SQL script of CRUD operations for given database schema",
+				Description: "Print a SQL script of CRUD operations for given database schema",
+				Action:      m.print,
+				Before:      m.before,
+				After:       m.after,
+				Flags:       m.flags(),
+			},
+			cli.Command{
 				Name:        "create",
 				Usage:       "Create a new SQL command for given container filename",
 				Description: "Create a new SQL command for given container filename",
 				ArgsUsage:   "[name]",
 				Action:      m.create,
+				Before:      m.before,
+				After:       m.after,
 				Flags: []cli.Flag{
 					cli.StringFlag{
 						Name:  "filename, n",
@@ -80,12 +68,14 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 					},
 				},
 			},
-			{
+			cli.Command{
 				Name:        "run",
 				Usage:       "Run a SQL command for given arguments",
 				Description: "Run a SQL command for given arguments",
 				ArgsUsage:   "[name]",
 				Action:      m.run,
+				Before:      m.before,
+				After:       m.after,
 				Flags: []cli.Flag{
 					cli.StringSliceFlag{
 						Name:  "param, p",
@@ -97,11 +87,68 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 	}
 }
 
+func (m *SQLRoutine) flags() []cli.Flag {
+	return []cli.Flag{
+		cli.StringFlag{
+			Name:  "schema-name, s",
+			Usage: "name of the database schema",
+			Value: "",
+		},
+		cli.StringSliceFlag{
+			Name:  "table-name, t",
+			Usage: "name of the table in the database",
+		},
+		cli.StringSliceFlag{
+			Name:  "ignore-table-name, i",
+			Usage: "name of the table in the database that should be skipped",
+			Value: &cli.StringSlice{"migrations"},
+		},
+		cli.BoolFlag{
+			Name:  "use-named-params, n",
+			Usage: "use named parameter instead of questionmark",
+		},
+		cli.BoolTFlag{
+			Name:  "include-docs, d",
+			Usage: "include API documentation in generated source code",
+		},
+	}
+}
+
 func (m *SQLRoutine) before(ctx *cli.Context) error {
-	var err error
-	m.dir, err = filepath.Abs(ctx.String("routine-dir"))
+	dir, err := filepath.Abs(ctx.GlobalString("routine-dir"))
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeArg)
+	}
+
+	db, err := open(ctx)
+	if err != nil {
+		return err
+	}
+
+	provider, err := provider(db)
+	if err != nil {
+		return err
+	}
+
+	m.runner = &sqlexec.Runner{
+		FileSystem: parcello.Dir(dir),
+		DB:         db,
+	}
+
+	m.executor = &sqlmodel.Executor{
+		Provider: &sqlmodel.ModelProvider{
+			Config: &sqlmodel.ModelProviderConfig{
+				Package:        filepath.Base(ctx.GlobalString("routine-dir")),
+				UseNamedParams: ctx.Bool("use-named-params"),
+				InlcudeDoc:     ctx.BoolT("include-docs"),
+			},
+			TagBuilder: &sqlmodel.NoopTagBuilder{},
+			Provider:   provider,
+		},
+		Generator: &sqlmodel.Codegen{
+			Format:   false,
+			Template: "routine",
+		},
 	}
 
 	return nil
@@ -115,7 +162,7 @@ func (m *SQLRoutine) create(ctx *cli.Context) error {
 	}
 
 	generator := &sqlexec.Generator{
-		FileSystem: parcello.Dir(m.dir),
+		FileSystem: m.runner.FileSystem,
 	}
 
 	name, path, err := generator.Create(ctx.String("filename"), args[0])
@@ -123,7 +170,12 @@ func (m *SQLRoutine) create(ctx *cli.Context) error {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
-	log.Infof("Created command '%s' at '%s'", name, filepath.Join(m.dir, path))
+	dir, err := filepath.Abs(ctx.GlobalString("routine-dir"))
+	if err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeArg)
+	}
+
+	log.Infof("Created command '%s' at '%s'", name, filepath.Join(dir, path))
 	return nil
 }
 
@@ -136,84 +188,62 @@ func (m *SQLRoutine) run(ctx *cli.Context) error {
 	}
 
 	name := args[0]
+	log.Infof("Running command '%s' from '%v'", name, m.runner.FileSystem)
 
-	log.Infof("Running command '%s' from '%s'", name, m.dir)
-
-	db, err := open(ctx)
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		if ioErr := db.Close(); err == nil {
-			err = ioErr
-		}
-	}()
-
-	runner := &sqlexec.Runner{
-		FileSystem: parcello.Dir(m.dir),
-		DB:         db,
-	}
-
-	var rows *sqlx.Rows
-	rows, err = runner.Run(name, params...)
-
+	rows, err := m.runner.Run(name, params...)
 	if err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
-	if err := m.print(rows); err != nil {
+	if err := m.runner.Print(os.Stdout, rows); err != nil {
 		return cli.NewExitError(err.Error(), ErrCodeCommand)
 	}
 
 	return nil
 }
 
-func (m *SQLRoutine) print(rows *sqlx.Rows) error {
-	table := tablewriter.NewWriter(os.Stdout)
-
-	columns, err := rows.Columns()
-	if err != nil {
-		return err
+func (m *SQLRoutine) after(ctx *cli.Context) error {
+	if m.executor == nil {
+		return nil
 	}
 
-	table.SetHeader(columns)
+	if err := m.executor.Provider.Close(); err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeSchema)
+	}
+	return nil
+}
 
-	for rows.Next() {
-		record, err := rows.SliceScan()
-		if err != nil {
-			return err
-		}
-
-		row := []string{}
-
-		for _, column := range record {
-			if data, ok := column.([]byte); ok {
-				column = string(data)
-			}
-			row = append(row, fmt.Sprintf("%v", column))
-		}
-
-		table.Append(row)
+func (m *SQLRoutine) print(ctx *cli.Context) error {
+	if err := m.executor.Write(os.Stdout, m.spec(ctx)); err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeSchema)
 	}
 
-	table.Render()
 	return nil
 }
 
 func (m *SQLRoutine) sync(ctx *cli.Context) error {
-	model := &SQLModel{skip: true}
-
-	if err := model.before(ctx); err != nil {
-		return err
+	path, err := m.executor.Create(m.spec(ctx))
+	if err != nil {
+		return cli.NewExitError(err.Error(), ErrCodeSchema)
 	}
 
-	if err := model.script(ctx); err != nil {
-		_ = model.after(ctx)
-		return err
+	if path != "" {
+		log.Infof("Generated a database model at: '%s'", path)
 	}
 
-	return model.after(ctx)
+	return nil
+}
+
+func (m *SQLRoutine) spec(ctx *cli.Context) *sqlmodel.Spec {
+	spec := &sqlmodel.Spec{
+		Filename:     "routine.sql",
+		FileSystem:   parcello.Dir(ctx.GlobalString("routine-dir")),
+		Schema:       ctx.String("schema-name"),
+		Tables:       ctx.StringSlice("table-name"),
+		IgnoreTables: ctx.StringSlice("ignore-table-name"),
+	}
+
+	return spec
 }
 
 func params(args []string) []interface{} {

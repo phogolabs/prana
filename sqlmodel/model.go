@@ -11,6 +11,8 @@ import (
 	"github.com/phogolabs/parcello"
 )
 
+//go:generate parcello -r
+
 var (
 	intDef = &TypeDef{
 		Type:         "int",
@@ -123,28 +125,8 @@ type SchemaProvider interface {
 type GeneratorContext struct {
 	// Writer where the output will be written
 	Writer io.Writer
-	// Package name
-	Package string
 	// Schema definition
 	Schema *Schema
-}
-
-// ModelGeneratorConfig controls how the code generation happens
-type ModelGeneratorConfig struct {
-	// InlcudeDoc determines whether to include documentation
-	InlcudeDoc bool
-	// IgnoreTables ecludes the those tables from generation
-	IgnoreTables []string
-}
-
-// QueryGeneratorConfig controls how the code generation happens
-type QueryGeneratorConfig struct {
-	// UseNamedParams determines whether to use named params
-	UseNamedParams bool
-	// InlcudeDoc determines whether to include documentation
-	InlcudeDoc bool
-	// IgnoreTables ecludes the those tables from generation
-	IgnoreTables []string
 }
 
 // Generator generates the sqlmodels
@@ -161,14 +143,56 @@ type Schema struct {
 	Tables []Table
 	// IsDefault returns if this schema is default
 	IsDefault bool
+	// Model for this schema
+	Model SchemaModel
+}
+
+// SchemaModel represents the schema's model
+type SchemaModel struct {
+	// Package name
+	Package string
+	// HasDocumentation return true if the schema has documentation
+	HasDocumentation bool
 }
 
 // Table represents a table name and its schema
 type Table struct {
 	// Name of this table
 	Name string
+	// Model representation of this table
+	Model TableModel
 	// Columns of this table
 	Columns []Column
+}
+
+// TableModel represents the model definition
+type TableModel struct {
+	// HasDocumentation return true if the table has documentation
+	HasDocumentation bool
+	// Type of this model
+	Type string
+	// InsertRoutine is the insert routine name
+	InsertRoutine string
+	// InsertColumns are the columns
+	InsertColumns string
+	// InsertValues are the values to be inserted
+	InsertValues string
+	// SelectByPKRoutine is the select by primary key routine
+	SelectByPKRoutine string
+	// SelectAllRoutine is the select-all's routine
+	SelectAllRoutine string
+	// DeleteByPkRoutine is the delete by primary key routine
+	DeleteByPKRoutine string
+	// UpdateByPKRoutine is the update by primary key routine
+	UpdateByPKRoutine string
+	// UpdateByPKColumns is the columns for update condition
+	UpdateByPKColumns string
+	// PrimaryKeyCondition is a where clause condition
+	PrimaryKeyCondition string
+	// PrimaryKeyArgs is the primary key args
+	PrimaryKeyArgs string
+	// PrimaryKey is the map of primary key args
+	PrimaryKey []string
 }
 
 // Column represents a metadata for database column
@@ -177,8 +201,22 @@ type Column struct {
 	Name string
 	// Type is the database type of this column
 	Type ColumnType
-	// ScanType is the scannable data type for this column
+	// ScanType is the database type of this column
 	ScanType string
+	// Model representation of this column
+	Model ColumnModel
+}
+
+// ColumnModel represents the field definition for given column
+type ColumnModel struct {
+	// HasDocumentation return true if the column has documentation
+	HasDocumentation bool
+	// Name is the name of this column
+	Name string
+	// Type is the database type of this column
+	Type string
+	// Tage is the field tag
+	Tag string
 }
 
 // ColumnType is the type of the column
@@ -258,14 +296,16 @@ func (t *TypeDef) As(nullable bool) string {
 
 // Spec specifies the generation options
 type Spec struct {
+	// Filename of the spec
+	Filename string
 	// FileSystem is the underlying file system
 	FileSystem FileSystem
 	// Schema is the database schema name
 	Schema string
-	// Name of the spec
-	Name string
 	// Tables is the list of the desired tables from the database schema
 	Tables []string
+	// IgnoreTables ecludes the those tables from generation
+	IgnoreTables []string
 }
 
 // TagBuilder builds tags from column type

@@ -7,28 +7,28 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"sort"
 )
 
 // Executor executes the schema generation
 type Executor struct {
-	// ModelGenerator is the SQL model generator
-	ModelGenerator Generator
-	// QueryGenerator is the SQL script generator
-	QueryGenerator Generator
+	// Generator is the generator
+	Generator Generator
 	// Provider provides information the database schema
 	Provider SchemaProvider
 }
 
 // Write writes the generated schema sqlmodels to a writer
 func (e *Executor) Write(w io.Writer, spec *Spec) error {
-	_, err := e.writeSchema(w, spec)
+	_, err := e.write(w, spec)
 	return err
 }
 
 // Create creates a package with the generated schema sqlmodels
 func (e *Executor) Create(spec *Spec) (string, error) {
 	reader := &bytes.Buffer{}
-	schema, err := e.writeSchema(reader, spec)
+
+	schema, err := e.write(reader, spec)
 	if err != nil {
 		return "", err
 	}
@@ -38,7 +38,8 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		return "", nil
 	}
 
-	filepath := e.fileOf(e.nameOf(schema), "schema.go")
+	filepath := e.fileOf(e.nameOf(schema), spec.Filename)
+
 	file, err := spec.FileSystem.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
 	if err != nil {
 		return "", err
@@ -57,61 +58,18 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 	return filepath, nil
 }
 
-// CreateScript creates a model SQL routines
-func (e *Executor) CreateScript(spec *Spec) (string, error) {
-	schema, err := e.schemaOf(spec)
-	if err != nil {
-		return "", err
-	}
-
-	reader := &bytes.Buffer{}
-	ctx := &GeneratorContext{
-		Writer:  reader,
-		Package: spec.Name,
-		Schema:  schema,
-	}
-
-	if err = e.QueryGenerator.Generate(ctx); err != nil {
-		return "", err
-	}
-
-	body, _ := ioutil.ReadAll(reader)
-	if len(body) == 0 {
-		return "", nil
-	}
-
-	filepath := e.fileOf(e.nameOf(schema), "routine.sql")
-	file, err := spec.FileSystem.OpenFile(filepath, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0666)
-	if err != nil {
-		return "", err
-	}
-
-	defer func() {
-		if ioErr := file.Close(); err == nil {
-			err = ioErr
-		}
-	}()
-
-	if _, err = file.Write(body); err != nil {
-		return "", err
-	}
-
-	return filepath, nil
-}
-
-func (e *Executor) writeSchema(w io.Writer, spec *Spec) (*Schema, error) {
+func (e *Executor) write(writer io.Writer, spec *Spec) (*Schema, error) {
 	schema, err := e.schemaOf(spec)
 	if err != nil {
 		return nil, err
 	}
 
 	ctx := &GeneratorContext{
-		Writer:  w,
-		Package: spec.Name,
-		Schema:  schema,
+		Writer: writer,
+		Schema: schema,
 	}
 
-	if err = e.ModelGenerator.Generate(ctx); err != nil {
+	if err = e.Generator.Generate(ctx); err != nil {
 		return nil, err
 	}
 
@@ -127,6 +85,8 @@ func (e *Executor) schemaOf(spec *Spec) (*Schema, error) {
 
 		spec.Tables = tables
 	}
+
+	spec.Tables = filter(spec.IgnoreTables, spec.Tables)
 
 	schema, err := e.Provider.Schema(spec.Schema, spec.Tables...)
 	if err != nil {
@@ -149,4 +109,22 @@ func (e *Executor) nameOf(schema *Schema) string {
 		return schema.Name
 	}
 	return ""
+}
+
+func filter(ignore, tables []string) []string {
+	var result []string
+
+	if !sort.StringsAreSorted(ignore) {
+		sort.Strings(ignore)
+	}
+
+	for _, table := range tables {
+		if contains(ignore, table) {
+			continue
+		}
+
+		result = append(result, table)
+	}
+
+	return result
 }
