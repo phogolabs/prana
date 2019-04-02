@@ -16,7 +16,7 @@ type {{Model.Type}} struct {
   {{#if Model.HasDocumentation}}
   // {{Model.Name}} represents a database column '{{Name}}' of type '{{Type}}'
   {{/if}}
-  {{Model.Name}} {{Model.Type}} {{Model.Tag}} 
+  {{Model.Name}} {{Model.Type}} {{{Model.Tag}}}
 {{/columns}}
 }
 {{/tables}}
