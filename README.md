@@ -1,7 +1,7 @@
 # Prana
 
 [![Documentation][godoc-img]][godoc-url]
-[![License][license-img]]
+[![License][license-img]][license-url]
 [![Build Status][travis-img]][travis-url]
 [![Coverage][codecov-img]][codecov-url]
 [![Go Report Card][report-img]][report-url]
@@ -387,7 +387,7 @@ We are welcome to any contributions. Just fork the
 [godoc-url]: https://godoc.org/github.com/phogolabs/prana
 [godoc-img]: https://godoc.org/github.com/phogolabs/prana?status.svg
 [license-img]: https://img.shields.io/badge/license-MIT-blue.svg
-[software-license-url]: LICENSE
+[license-url]: LICENSE
 [loukoum-url]: https://github.com/ulule/loukoum
 [orm-url]: https://github.com/phogolabs/orm
 [sqlx-url]: https://github.com/jmoiron/sqlx
