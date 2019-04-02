@@ -11,7 +11,7 @@ import (
 	"github.com/phogolabs/parcello"
 )
 
-//go:generate parcello -r
+//go:generate parcello -r -i fixture/
 
 var (
 	intDef = &TypeDef{

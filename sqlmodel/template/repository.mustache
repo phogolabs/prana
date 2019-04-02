@@ -1,7 +1,6 @@
 {{#if Model.HasDocumentation}}
 // Package {{Model.Package}} contains an object model of database schema '{{Name}}'
 // Auto-generated at {{now}}
-
 {{/if}}
 package {{Model.Package}}
 {{#tables}}
@@ -53,7 +52,7 @@ func (r *{{Model.Type}}Repository) SelectByPK({{Model.PrimaryKeyArgs}}) (*model.
 {{/if}}
 func (r *{{Model.Type}}Repository) SearchAll(query *orm.RQLQuery) ([]*model.{{model.type}}, error) {
   records := []*model.{{Model.Type}}{}
-  routine = orm.RQL("{{Name}}", query)
+  routine := orm.RQL("{{Name}}", query)
   
   if err := r.Gateway.Select(&records, routine); err != nil {
     return nil, err
@@ -67,15 +66,17 @@ func (r *{{Model.Type}}Repository) SearchAll(query *orm.RQLQuery) ([]*model.{{mo
 {{/if}}
 func (r *{{Model.Type}}Repository) Insert(row *model.{{Model.Type}}) error {
   routine := orm.Routine("{{Model.InsertRoutine}}", row)
-  return r.Gateway.SelectOne(row, routine)
+  _, err := r.Gateway.Exec(routine)
+  return err
 }
 
 {{#if Model.HasDocumentation}}
-// Update updates a record of type {{model.type}}
+// UpdateByPK updates a record of type {{model.type}} for given primary key
 {{/if}}
 func (r *{{Model.Type}}Repository) UpdateByPK(row *model.{{Model.Type}}) error {
   routine := orm.Routine("{{Model.UpdateByPKRoutine}}", row)
-  return r.Gateway.SelectOne(row, routine)
+  _, err := r.Gateway.Exec(routine)
+  return err
 }
 
 {{#if Model.HasDocumentation}}

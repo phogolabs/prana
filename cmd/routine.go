@@ -103,7 +103,7 @@ func (m *SQLRoutine) flags() []cli.Flag {
 			Usage: "name of the table in the database that should be skipped",
 			Value: &cli.StringSlice{"migrations"},
 		},
-		cli.BoolFlag{
+		cli.BoolTFlag{
 			Name:  "use-named-params, n",
 			Usage: "use named parameter instead of questionmark",
 		},
@@ -139,7 +139,7 @@ func (m *SQLRoutine) before(ctx *cli.Context) error {
 		Provider: &sqlmodel.ModelProvider{
 			Config: &sqlmodel.ModelProviderConfig{
 				Package:        filepath.Base(ctx.GlobalString("routine-dir")),
-				UseNamedParams: ctx.Bool("use-named-params"),
+				UseNamedParams: ctx.BoolT("use-named-params"),
 				InlcudeDoc:     ctx.BoolT("include-docs"),
 			},
 			TagBuilder: &sqlmodel.NoopTagBuilder{},

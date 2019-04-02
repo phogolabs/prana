@@ -33,7 +33,7 @@ func (r *Table1Repository) SelectByPK(id string) (*model.Table1, error) {
                                                                                      
 func (r *Table1Repository) SearchAll(query *orm.RQLQuery) ([]*model.Table1, error) {
   records := []*model.Table1{}
-  routine = orm.RQL("table1", query)
+  routine := orm.RQL("table1", query)
                                                                                      
   if err := r.Gateway.Select(&records, routine); err != nil {
     return nil, err
@@ -44,12 +44,14 @@ func (r *Table1Repository) SearchAll(query *orm.RQLQuery) ([]*model.Table1, erro
                                                                                      
 func (r *Table1Repository) Insert(row *model.Table1) error {
   routine := orm.Routine("insert-table1", row)
-  return r.Gateway.SelectOne(row, routine)
+  _, err := r.Gateway.Exec(routine)
+  return err
 }
                                                                                      
 func (r *Table1Repository) UpdateByPK(row *model.Table1) error {
   routine := orm.Routine("update-table1-by-pk", row)
-  return r.Gateway.SelectOne(row, routine)
+  _, err := r.Gateway.Exec(routine)
+  return err
 }
                                                                                      
 func (r *Table1Repository) DeleteByPK(id string) error {
