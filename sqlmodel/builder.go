@@ -113,6 +113,10 @@ func (builder ValidateTagBuilder) Build(column *Column) string {
 
 	if !column.Type.IsNullable {
 		options = append(options, "required")
+
+		if strings.EqualFold(column.ScanType, "string") {
+			options = append(options, "gt=0")
+		}
 	}
 
 	if size := column.Type.CharMaxLength; size > 0 {
