@@ -115,7 +115,6 @@ func (builder ValidateTagBuilder) Build(column *Column) string {
 		options = append(options, "required")
 
 		if strings.EqualFold(column.ScanType, "string") {
-			options = append(options, "nonblank")
 			options = append(options, "gt=0")
 		}
 	}
