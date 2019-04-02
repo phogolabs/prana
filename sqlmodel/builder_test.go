@@ -230,16 +230,18 @@ var _ = Describe("ValidateTagBuilder", func() {
 	BeforeEach(func() {
 		builder = &sqlmodel.ValidateTagBuilder{}
 		column = &sqlmodel.Column{
-			Name: "id",
+			Name:     "id",
+			ScanType: "string",
 		}
 	})
 
 	It("creates a validation tag", func() {
-		Expect(builder.Build(column)).To(Equal("validate:\"required\""))
+		Expect(builder.Build(column)).To(Equal("validate:\"required,gt=0\""))
 	})
 
 	Context("when the value has length", func() {
 		BeforeEach(func() {
+			column.ScanType = ""
 			column.Type.CharMaxLength = 200
 		})
 
