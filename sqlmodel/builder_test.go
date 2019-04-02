@@ -236,7 +236,7 @@ var _ = Describe("ValidateTagBuilder", func() {
 	})
 
 	It("creates a validation tag", func() {
-		Expect(builder.Build(column)).To(Equal("validate:\"required,gt=0\""))
+		Expect(builder.Build(column)).To(Equal("validate:\"required,nonblank,gt=0\""))
 	})
 
 	Context("when the value has length", func() {
