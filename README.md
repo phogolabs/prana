@@ -1,7 +1,7 @@
 # Prana
 
 [![Documentation][godoc-img]][godoc-url]
-[![License][license-img]
+[![License][license-img]]
 [![Build Status][travis-img]][travis-url]
 [![Coverage][codecov-img]][codecov-url]
 [![Go Report Card][report-img]][report-url]
