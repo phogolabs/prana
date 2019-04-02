@@ -204,7 +204,7 @@ pass `--orm-tag gorm`. Note that constraints like unique or indexes are not
 included for now.
 
 ```console
-$ prana model --orm-tag gorm -e json -e xml -e validate sync
+$ prana model sync --orm-tag gorm -e json -e xml -e validate
 ```
 
 The command above will produce the following model:
@@ -350,13 +350,14 @@ USAGE:
    prana [global options]
 
 VERSION:
-   1.0
+   1.0-beta-05
 
 COMMANDS:
-     migration  A group of commands for generating, running, and reverting migrations
-     model      A group of commands for generating object model from database schema
-     routine    A group of commands for generating, running, and removing SQL commands
-     help, h    Shows a list of commands or help for one command
+     migration   A group of commands for generating, running, and reverting migrations
+     model       A group of commands for generating object model from database schema
+     repository  A group of commands for generating database repository from schema
+     routine     A group of commands for generating, running, and removing SQL commands
+     help, h     Shows a list of commands or help for one command
 
 GLOBAL OPTIONS:
    --database-url value  Database URL (default: "sqlite3://prana.db") [$PRANA_DB_URL]
