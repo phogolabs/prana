@@ -394,7 +394,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 	})
 })
 
-var _ = PDescribe("MySQLProvider", func() {
+var _ = Describe("MySQLProvider", func() {
 	var (
 		provider *sqlmodel.MySQLProvider
 		db       *sqlx.DB
