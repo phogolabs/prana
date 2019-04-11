@@ -105,7 +105,7 @@ var _ = Describe("Migration Revert", func() {
 			session, err := gexec.Start(cmd, GinkgoWriter, GinkgoWriter)
 			Expect(err).NotTo(HaveOccurred())
 			Eventually(session).Should(gexec.Exit(-1))
-			Expect(session.Out).To(gbytes.Say(`Incorrect Usage: invalid value "wrong" for flag -count: strconv.ParseInt: parsing "wrong": invalid syntax`))
+			Expect(session.Out).To(gbytes.Say(`Incorrect Usage: invalid value "wrong" for flag -count: parse error`))
 		})
 	})
 })
