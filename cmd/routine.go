@@ -146,8 +146,7 @@ func (m *SQLRoutine) before(ctx *cli.Context) error {
 			Provider:   provider,
 		},
 		Generator: &sqlmodel.Codegen{
-			Format:   false,
-			Template: "routine",
+			Format: false,
 		},
 	}
 
@@ -237,6 +236,7 @@ func (m *SQLRoutine) sync(ctx *cli.Context) error {
 func (m *SQLRoutine) spec(ctx *cli.Context) *sqlmodel.Spec {
 	spec := &sqlmodel.Spec{
 		Filename:     "routine.sql",
+		Template:     "routine",
 		FileSystem:   parcello.Dir(ctx.GlobalString("routine-dir")),
 		Schema:       ctx.String("schema-name"),
 		Tables:       ctx.StringSlice("table-name"),

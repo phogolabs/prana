@@ -59,14 +59,9 @@ func (m *ModelProvider) Schema(name string, tables ...string) (*Schema, error) {
 		table.Model = TableModel{
 			HasDocumentation: m.Config.InlcudeDoc,
 			Type:             m.typeName(&table),
+			Package:          schema.Model.Package,
+			PrimaryKey:       make(map[string]string),
 		}
-
-		m.setPrimaryKey(schema, &table)
-		m.setSelectAllRoutine(schema, &table)
-		m.setSelectByPKRoutine(schema, &table)
-		m.setInsertRoutine(schema, &table)
-		m.setDeleteByPKRoutine(schema, &table)
-		m.setUpdateByPKRoutine(schema, &table)
 
 		for index, column := range table.Columns {
 			column.Model = ColumnModel{
@@ -78,6 +73,13 @@ func (m *ModelProvider) Schema(name string, tables ...string) (*Schema, error) {
 
 			table.Columns[index] = column
 		}
+
+		m.setPrimaryKey(schema, &table)
+		m.setSelectAllRoutine(schema, &table)
+		m.setSelectByPKRoutine(schema, &table)
+		m.setInsertRoutine(schema, &table)
+		m.setDeleteByPKRoutine(schema, &table)
+		m.setUpdateByPKRoutine(schema, &table)
 
 		schema.Tables[index] = table
 	}
@@ -96,7 +98,8 @@ func (m *ModelProvider) setPrimaryKey(schema *Schema, table *Table) {
 		cond       string
 		arguments  []string
 		arg        string
-		pk         []string
+		parameters []string
+		param      string
 	)
 
 	for _, column := range table.Columns {
@@ -104,7 +107,7 @@ func (m *ModelProvider) setPrimaryKey(schema *Schema, table *Table) {
 			continue
 		}
 
-		pk = append(pk, column.Name)
+		parameters = append(parameters, fmt.Sprintf("entity.%s", column.Model.Name))
 
 		if m.Config.UseNamedParams {
 			cond = fmt.Sprintf("%s = :%s", column.Name, column.Name)
@@ -112,7 +115,10 @@ func (m *ModelProvider) setPrimaryKey(schema *Schema, table *Table) {
 			cond = fmt.Sprintf("%s = ?", column.Name)
 		}
 
-		arg = fmt.Sprintf("%s %s", column.Name, column.ScanType)
+		param = inflect.CamelizeDownFirst(column.Name)
+		table.Model.PrimaryKey[column.Name] = param
+
+		arg = fmt.Sprintf("%s %s", param, column.ScanType)
 
 		arguments = append(arguments, arg)
 		conditions = append(conditions, cond)
@@ -120,7 +126,7 @@ func (m *ModelProvider) setPrimaryKey(schema *Schema, table *Table) {
 
 	table.Model.PrimaryKeyCondition = strings.Join(conditions, " AND ")
 	table.Model.PrimaryKeyArgs = strings.Join(arguments, ", ")
-	table.Model.PrimaryKey = pk
+	table.Model.PrimaryKeyParams = strings.Join(parameters, ", ")
 }
 
 func (m *ModelProvider) setSelectAllRoutine(schema *Schema, table *Table) {
@@ -294,7 +300,8 @@ func (m *PostgreSQLProvider) Schema(schema string, names ...string) (*Schema, er
 		}
 
 		table := Table{
-			Name: name,
+			Name:   name,
+			Driver: "postgresql",
 		}
 
 		rows, err := m.DB.Query(query.String(), schema, name)
@@ -331,6 +338,7 @@ func (m *PostgreSQLProvider) Schema(schema string, names ...string) (*Schema, er
 
 	schemaDef := &Schema{
 		Name:      schema,
+		Driver:    "postgresql",
 		Tables:    tables,
 		IsDefault: schema == "public",
 	}
@@ -436,7 +444,8 @@ func (m *SQLiteProvider) Schema(schema string, names ...string) (*Schema, error)
 
 	for _, name := range names {
 		table := Table{
-			Name: name,
+			Name:   name,
+			Driver: "sqlite",
 		}
 
 		query := fmt.Sprintf("pragma table_info(%s)", name)
@@ -475,6 +484,7 @@ func (m *SQLiteProvider) Schema(schema string, names ...string) (*Schema, error)
 
 	schemaDef := &Schema{
 		Name:      "default",
+		Driver:    "sqlite",
 		Tables:    tables,
 		IsDefault: true,
 	}
@@ -595,7 +605,8 @@ func (m *MySQLProvider) Schema(schema string, names ...string) (*Schema, error) 
 	tables := []Table{}
 	for _, name := range names {
 		table := Table{
-			Name: name,
+			Name:   name,
+			Driver: "mysql",
 		}
 
 		primaryKey, err := m.primaryKey(schema, name)
@@ -638,6 +649,7 @@ func (m *MySQLProvider) Schema(schema string, names ...string) (*Schema, error) 
 
 	schemaDef := &Schema{
 		Name:      schema,
+		Driver:    "mysql",
 		Tables:    tables,
 		IsDefault: schema == database,
 	}

@@ -65,8 +65,9 @@ func (e *Executor) write(writer io.Writer, spec *Spec) (*Schema, error) {
 	}
 
 	ctx := &GeneratorContext{
-		Writer: writer,
-		Schema: schema,
+		Writer:   writer,
+		Template: spec.Template,
+		Schema:   schema,
 	}
 
 	if err = e.Generator.Generate(ctx); err != nil {

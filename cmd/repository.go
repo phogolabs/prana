@@ -28,6 +28,11 @@ func (m *SQLRepository) CreateCommand() cli.Command {
 				Usage: "path to the package, where the source code will be generated",
 				Value: "./database",
 			},
+			cli.StringFlag{
+				Name:  "model-package-dir",
+				Usage: "path to the model's package",
+				Value: "./database/model",
+			},
 		},
 		Subcommands: []cli.Command{
 			cli.Command{
@@ -37,7 +42,7 @@ func (m *SQLRepository) CreateCommand() cli.Command {
 				Action:      m.print,
 				Before:      m.before,
 				After:       m.after,
-				Flags:       m.flags(),
+				Flags:       m.flags(false),
 			},
 			cli.Command{
 				Name:        "sync",
@@ -46,14 +51,14 @@ func (m *SQLRepository) CreateCommand() cli.Command {
 				Action:      m.sync,
 				Before:      m.before,
 				After:       m.after,
-				Flags:       m.flags(),
+				Flags:       m.flags(true),
 			},
 		},
 	}
 }
 
-func (m *SQLRepository) flags() []cli.Flag {
-	return []cli.Flag{
+func (m *SQLRepository) flags(include bool) []cli.Flag {
+	flags := []cli.Flag{
 		cli.StringFlag{
 			Name:  "schema-name, s",
 			Usage: "name of the database schema",
@@ -73,6 +78,17 @@ func (m *SQLRepository) flags() []cli.Flag {
 			Usage: "include API documentation in generated source code",
 		},
 	}
+
+	if include {
+		flag := cli.BoolTFlag{
+			Name:  "include-tests",
+			Usage: "include repository tests",
+		}
+
+		flags = append(flags, flag)
+	}
+
+	return flags
 }
 
 func (m *SQLRepository) before(ctx *cli.Context) error {
@@ -89,7 +105,7 @@ func (m *SQLRepository) before(ctx *cli.Context) error {
 	m.executor = &sqlmodel.Executor{
 		Provider: &sqlmodel.ModelProvider{
 			Config: &sqlmodel.ModelProviderConfig{
-				Package:        filepath.Base(ctx.GlobalString("package-dir")),
+				Package:        filepath.Base(ctx.GlobalString("model-package-dir")),
 				UseNamedParams: ctx.Bool("use-named-params"),
 				InlcudeDoc:     ctx.BoolT("include-docs"),
 			},
@@ -97,8 +113,10 @@ func (m *SQLRepository) before(ctx *cli.Context) error {
 			Provider:   provider,
 		},
 		Generator: &sqlmodel.Codegen{
-			Format:   true,
-			Template: "repository",
+			Meta: map[string]interface{}{
+				"RepositoryPackage": filepath.Base(ctx.GlobalString("package-dir")),
+			},
+			Format: true,
 		},
 	}
 
@@ -113,34 +131,70 @@ func (m *SQLRepository) after(ctx *cli.Context) error {
 }
 
 func (m *SQLRepository) print(ctx *cli.Context) error {
-	if err := m.executor.Write(os.Stdout, m.spec(ctx)); err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeSchema)
+	for _, spec := range m.specs(ctx) {
+		if err := m.executor.Write(os.Stdout, spec); err != nil {
+			return cli.NewExitError(err.Error(), ErrCodeSchema)
+		}
 	}
 
 	return nil
 }
 
 func (m *SQLRepository) sync(ctx *cli.Context) error {
-	path, err := m.executor.Create(m.spec(ctx))
-	if err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeSchema)
-	}
+	for _, spec := range m.specs(ctx) {
+		path, err := m.executor.Create(spec)
+		if err != nil {
+			return cli.NewExitError(err.Error(), ErrCodeSchema)
+		}
 
-	if path != "" {
-		log.Infof("Generated a database repository at: '%s'", path)
+		if path != "" {
+			log.Infof("Generated a database repository at: '%s'", path)
+		}
 	}
 
 	return nil
 }
 
-func (m *SQLRepository) spec(ctx *cli.Context) *sqlmodel.Spec {
-	spec := &sqlmodel.Spec{
+func (m *SQLRepository) specs(ctx *cli.Context) []*sqlmodel.Spec {
+	var (
+		specs = []*sqlmodel.Spec{}
+		spec  *sqlmodel.Spec
+	)
+
+	spec = &sqlmodel.Spec{
 		Filename:     "repository.go",
+		Template:     "repository",
 		FileSystem:   parcello.Dir(ctx.GlobalString("package-dir")),
 		Schema:       ctx.String("schema-name"),
 		Tables:       ctx.StringSlice("table-name"),
 		IgnoreTables: ctx.StringSlice("ignore-table-name"),
 	}
 
-	return spec
+	specs = append(specs, spec)
+
+	if ctx.BoolT("include-tests") {
+		spec = &sqlmodel.Spec{
+			Filename:     "repository_test.go",
+			Template:     "repository_test",
+			FileSystem:   spec.FileSystem,
+			Schema:       spec.Schema,
+			Tables:       spec.Tables,
+			IgnoreTables: spec.IgnoreTables,
+		}
+
+		specs = append(specs, spec)
+
+		spec = &sqlmodel.Spec{
+			Filename:     "suite_test.go",
+			Template:     "suite_test",
+			FileSystem:   spec.FileSystem,
+			Schema:       spec.Schema,
+			Tables:       spec.Tables,
+			IgnoreTables: spec.IgnoreTables,
+		}
+
+		specs = append(specs, spec)
+	}
+
+	return specs
 }

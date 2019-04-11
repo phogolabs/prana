@@ -1,3 +1,4 @@
+{{#Schema}}
 {{#if Model.HasDocumentation}}
 -- Auto-generated at {{now}}
 
@@ -12,15 +13,16 @@ WHERE {{Model.PrimaryKeyCondition}};
 
 -- name: {{Model.InsertRoutine}}
 INSERT INTO {{Name}} ({{Model.InsertColumns}})
-VALUES ({{Model.InsertValues}});
+VALUES ({{Model.InsertValues}}){{#equal Driver "postgresql"}} RETURNING *{{/equal}};
 
 -- name: {{Model.UpdateByPKRoutine}}
 UPDATE {{Name}}
 SET {{Model.UpdateByPKColumns}}
-WHERE {{Model.PrimaryKeyCondition}};
+WHERE {{Model.PrimaryKeyCondition}}{{#equal Driver "postgresql"}} RETURNING *{{/equal}};
 
 -- name: {{Model.DeleteByPKRoutine}}
 DELETE FROM {{Name}}
 WHERE {{Model.PrimaryKeyCondition}};
 
 {{/tables}}
+{{/Schema}}

@@ -11,7 +11,7 @@ import (
 	"github.com/phogolabs/parcello"
 )
 
-//go:generate parcello -r -i fixture/
+//go:generate parcello -r -i *.txt
 
 var (
 	intDef = &TypeDef{
@@ -123,6 +123,8 @@ type SchemaProvider interface {
 
 // GeneratorContext is the generator's context
 type GeneratorContext struct {
+	// Template name
+	Template string
 	// Writer where the output will be written
 	Writer io.Writer
 	// Schema definition
@@ -139,6 +141,8 @@ type Generator interface {
 type Schema struct {
 	// Name of the schema
 	Name string
+	// Driver name
+	Driver string
 	// Tables are the associated tables
 	Tables []Table
 	// IsDefault returns if this schema is default
@@ -159,6 +163,8 @@ type SchemaModel struct {
 type Table struct {
 	// Name of this table
 	Name string
+	// Driver name
+	Driver string
 	// Model representation of this table
 	Model TableModel
 	// Columns of this table
@@ -171,6 +177,8 @@ type TableModel struct {
 	HasDocumentation bool
 	// Type of this model
 	Type string
+	// Package name
+	Package string
 	// InsertRoutine is the insert routine name
 	InsertRoutine string
 	// InsertColumns are the columns
@@ -189,10 +197,12 @@ type TableModel struct {
 	UpdateByPKColumns string
 	// PrimaryKeyCondition is a where clause condition
 	PrimaryKeyCondition string
+	// PrimaryKeyParams is the primary key args
+	PrimaryKeyParams string
 	// PrimaryKeyArgs is the primary key args
 	PrimaryKeyArgs string
 	// PrimaryKey is the map of primary key args
-	PrimaryKey []string
+	PrimaryKey map[string]string
 }
 
 // Column represents a metadata for database column
@@ -298,6 +308,8 @@ func (t *TypeDef) As(nullable bool) string {
 type Spec struct {
 	// Filename of the spec
 	Filename string
+	// Template name
+	Template string
 	// FileSystem is the underlying file system
 	FileSystem FileSystem
 	// Schema is the database schema name

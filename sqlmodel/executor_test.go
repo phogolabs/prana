@@ -44,6 +44,7 @@ var _ = Describe("Executor", func() {
 
 		spec = &sqlmodel.Spec{
 			Schema:     "public",
+			Template:   "model",
 			Tables:     []string{"table1"},
 			Filename:   "schema.go",
 			FileSystem: parcello.Dir(dir),

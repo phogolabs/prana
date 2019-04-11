@@ -26,7 +26,6 @@ var _ = Describe("Codegen", func() {
 
 	Describe("Model", func() {
 		BeforeEach(func() {
-			generator.Template = "model"
 			generator.Format = true
 		})
 
@@ -49,8 +48,9 @@ var _ = Describe("Codegen", func() {
 				reader := &bytes.Buffer{}
 
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "model",
+					Schema:   schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
@@ -76,8 +76,9 @@ var _ = Describe("Codegen", func() {
 			It("generates the schema successfully", func() {
 				reader := &bytes.Buffer{}
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "model",
+					Schema:   schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
@@ -90,8 +91,9 @@ var _ = Describe("Codegen", func() {
 				reader := &bytes.Buffer{}
 				schemaDef.Model.Package = ""
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "model",
+					Schema:   schemaDef,
 				}
 				err := generator.Generate(ctx)
 				Expect(err.Error()).To(Equal("model:3:1: expected 'IDENT', found 'type'"))
@@ -101,7 +103,6 @@ var _ = Describe("Codegen", func() {
 
 	Describe("Routine", func() {
 		BeforeEach(func() {
-			generator.Template = "routine"
 			generator.Format = false
 		})
 
@@ -127,8 +128,9 @@ var _ = Describe("Codegen", func() {
 
 				reader := &bytes.Buffer{}
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "routine",
+					Schema:   schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
@@ -146,8 +148,9 @@ var _ = Describe("Codegen", func() {
 			It("generates the schema successfully", func() {
 				reader := &bytes.Buffer{}
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "routine",
+					Schema:   schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
@@ -163,8 +166,9 @@ var _ = Describe("Codegen", func() {
 			It("generates the schema successfully", func() {
 				reader := &bytes.Buffer{}
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "routine",
+					Schema:   schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
@@ -206,8 +210,9 @@ var _ = Describe("Codegen", func() {
 			It("generates the script successfully", func() {
 				reader := &bytes.Buffer{}
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "routine",
+					Schema:   schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
@@ -219,8 +224,10 @@ var _ = Describe("Codegen", func() {
 
 	Describe("Repository", func() {
 		BeforeEach(func() {
-			generator.Template = "repository"
 			generator.Format = true
+			generator.Meta = map[string]interface{}{
+				"RepositoryPackage": "model",
+			}
 		})
 
 		ItGeneratesTheRepositorySuccessfully := func(table string) {
@@ -237,8 +244,9 @@ var _ = Describe("Codegen", func() {
 				reader := &bytes.Buffer{}
 
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "repository",
+					Schema:   schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
@@ -264,8 +272,9 @@ var _ = Describe("Codegen", func() {
 			It("generates the schema successfully", func() {
 				reader := &bytes.Buffer{}
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "repository",
+					Schema:   schemaDef,
 				}
 
 				Expect(generator.Generate(ctx)).To(Succeed())
@@ -275,11 +284,13 @@ var _ = Describe("Codegen", func() {
 
 		Context("when the package name is not provided", func() {
 			It("returns an error", func() {
+				generator.Meta = map[string]interface{}{}
 				reader := &bytes.Buffer{}
 				schemaDef.Model.Package = ""
 				ctx := &sqlmodel.GeneratorContext{
-					Writer: reader,
-					Schema: schemaDef,
+					Writer:   reader,
+					Template: "repository",
+					Schema:   schemaDef,
 				}
 				err := generator.Generate(ctx)
 				Expect(err.Error()).To(Equal("repository:3:1: expected 'IDENT', found 'type'"))

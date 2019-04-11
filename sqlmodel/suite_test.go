@@ -45,7 +45,7 @@ func NewSchema() *sqlmodel.Schema {
 					UpdateByPKColumns:   "name = ?",
 					PrimaryKeyCondition: "id = ?",
 					PrimaryKeyArgs:      "id string",
-					PrimaryKey:          []string{"id"},
+					PrimaryKey:          map[string]string{"id": "id"},
 				},
 				Columns: []sqlmodel.Column{
 					sqlmodel.Column{

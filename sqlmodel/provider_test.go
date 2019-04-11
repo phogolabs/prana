@@ -107,7 +107,8 @@ var _ = Describe("ModelProvider", func() {
 				Expect(table.Model.UpdateByPKColumns).To(Equal("name = :name"))
 				Expect(table.Model.PrimaryKeyCondition).To(Equal("id = :id"))
 				Expect(table.Model.PrimaryKeyArgs).To(Equal("id string"))
-				Expect(table.Model.PrimaryKey).To(ContainElement("id"))
+				Expect(table.Model.PrimaryKeyParams).To(Equal("entity.ID"))
+				Expect(table.Model.PrimaryKey).To(HaveKey("id"))
 
 				for _, column := range table.Columns {
 					Expect(column.Model.HasDocumentation).To(BeTrue())
@@ -150,7 +151,8 @@ var _ = Describe("ModelProvider", func() {
 					Expect(table.Model.UpdateByPKColumns).To(Equal("name = :name"))
 					Expect(table.Model.PrimaryKeyCondition).To(Equal("id = :id"))
 					Expect(table.Model.PrimaryKeyArgs).To(Equal("id string"))
-					Expect(table.Model.PrimaryKey).To(ContainElement("id"))
+					Expect(table.Model.PrimaryKeyParams).To(Equal("entity.ID"))
+					Expect(table.Model.PrimaryKey).To(HaveKey("id"))
 
 					for _, column := range table.Columns {
 						Expect(column.Model.HasDocumentation).To(BeTrue())
@@ -392,7 +394,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 	})
 })
 
-var _ = Describe("MySQLProvider", func() {
+var _ = PDescribe("MySQLProvider", func() {
 	var (
 		provider *sqlmodel.MySQLProvider
 		db       *sqlx.DB

@@ -113,8 +113,7 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 			Provider:   provider,
 		},
 		Generator: &sqlmodel.Codegen{
-			Format:   true,
-			Template: "model",
+			Format: true,
 		},
 	}
 
@@ -187,6 +186,7 @@ func (m *SQLModel) sync(ctx *cli.Context) error {
 func (m *SQLModel) spec(ctx *cli.Context) *sqlmodel.Spec {
 	spec := &sqlmodel.Spec{
 		Filename:     "schema.go",
+		Template:     "model",
 		FileSystem:   parcello.Dir(ctx.GlobalString("package-dir")),
 		Schema:       ctx.String("schema-name"),
 		Tables:       ctx.StringSlice("table-name"),

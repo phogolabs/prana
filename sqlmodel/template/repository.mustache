@@ -1,8 +1,9 @@
-{{#if Model.HasDocumentation}}
-// Package {{Model.Package}} contains an object model of database schema '{{Name}}'
+{{#if Schema.Model.HasDocumentation}}
+// Package {{Meta.RepositoryPackage}} contains an repository of database schema '{{Name}}'
 // Auto-generated at {{now}}
 {{/if}}
-package {{Model.Package}}
+package {{Meta.RepositoryPackage}}
+{{#Schema}}
 {{#tables}}
 
 {{#if Model.HasDocumentation}}
@@ -32,9 +33,9 @@ func (r *{{Model.Type}}Repository) SelectAll() ([]*model.{{Model.Type}}, error) 
 {{/if}}
 func (r *{{Model.Type}}Repository) SelectByPK({{Model.PrimaryKeyArgs}}) (*model.{{Model.Type}}, error) {
   param := orm.Map{
-    {{#Model.PrimaryKey}}
-      "{{.}}": {{.}},
-    {{/Model.PrimaryKey}}
+    {{#each Model.PrimaryKey}}
+      "{{@key}}": {{this}},
+    {{/each}}
   }
 
   routine := orm.Routine("{{Model.SelectByPKRoutine}}", param)
@@ -66,7 +67,11 @@ func (r *{{Model.Type}}Repository) SearchAll(query *orm.RQLQuery) ([]*model.{{mo
 {{/if}}
 func (r *{{Model.Type}}Repository) Insert(row *model.{{Model.Type}}) error {
   routine := orm.Routine("{{Model.InsertRoutine}}", row)
+  {{#if (equal Driver "postgresql")}}
+  err := r.Gateway.SelectOne(row, routine)
+  {{else}}
   _, err := r.Gateway.Exec(routine)
+  {{/if}}
   return err
 }
 
@@ -75,7 +80,11 @@ func (r *{{Model.Type}}Repository) Insert(row *model.{{Model.Type}}) error {
 {{/if}}
 func (r *{{Model.Type}}Repository) UpdateByPK(row *model.{{Model.Type}}) error {
   routine := orm.Routine("{{Model.UpdateByPKRoutine}}", row)
+  {{#if (equal Driver "postgresql")}}
+  err := r.Gateway.SelectOne(row, routine)
+  {{else}}
   _, err := r.Gateway.Exec(routine)
+  {{/if}}
   return err
 }
 
@@ -84,9 +93,9 @@ func (r *{{Model.Type}}Repository) UpdateByPK(row *model.{{Model.Type}}) error {
 {{/if}}
 func (r *{{Model.Type}}Repository) DeleteByPK({{Model.PrimaryKeyArgs}}) error {
   param := orm.Map{
-    {{#Model.PrimaryKey}}
-      "{{.}}": {{.}},
-    {{/Model.PrimaryKey}}
+    {{#each Model.PrimaryKey}}
+      "{{@key}}": {{this}},
+    {{/each}}
   }
 
   routine := orm.Routine("{{Model.DeleteByPKRoutine}}", param)
@@ -94,3 +103,4 @@ func (r *{{Model.Type}}Repository) DeleteByPK({{Model.PrimaryKeyArgs}}) error {
   return err
 }
 {{/tables}}
+{{/Schema}}

@@ -24,8 +24,8 @@ var (
 
 // Codegen generates Golang structs from database schema
 type Codegen struct {
-	// Template name
-	Template string
+	// Meta information
+	Meta map[string]interface{}
 	// Format the code
 	Format bool
 }
@@ -38,12 +38,17 @@ func (g *Codegen) Generate(ctx *GeneratorContext) error {
 		return nil
 	}
 
-	template, err := g.template()
+	template, err := g.template(ctx.Template)
 	if err != nil {
 		return err
 	}
 
-	result, err := raymond.Render(template, ctx.Schema)
+	param := map[string]interface{}{
+		"Schema": ctx.Schema,
+		"Meta":   g.Meta,
+	}
+
+	result, err := raymond.Render(template, param)
 	if err != nil {
 		return err
 	}
@@ -54,7 +59,7 @@ func (g *Codegen) Generate(ctx *GeneratorContext) error {
 	}
 
 	if g.Format {
-		if err := g.format(buffer); err != nil {
+		if err := g.format(ctx.Template, buffer); err != nil {
 			return err
 		}
 	}
@@ -63,8 +68,8 @@ func (g *Codegen) Generate(ctx *GeneratorContext) error {
 	return err
 }
 
-func (g *Codegen) template() (string, error) {
-	template, err := parcello.Open(fmt.Sprintf("template/%s.mustache", g.Template))
+func (g *Codegen) template(name string) (string, error) {
+	template, err := parcello.Open(fmt.Sprintf("template/%s.mustache", name))
 	if err != nil {
 		return "", err
 	}
@@ -78,8 +83,8 @@ func (g *Codegen) template() (string, error) {
 	return string(data), nil
 }
 
-func (g *Codegen) format(buffer *bytes.Buffer) error {
-	data, err := imports.Process(g.Template, buffer.Bytes(), nil)
+func (g *Codegen) format(template string, buffer *bytes.Buffer) error {
+	data, err := imports.Process(template, buffer.Bytes(), nil)
 	if err != nil {
 		return err
 	}
