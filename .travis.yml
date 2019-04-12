@@ -1,6 +1,9 @@
 language: go
+
 go:
   - 1.12.3
+
+dist: xenial
 
 services:
   - postgresql
