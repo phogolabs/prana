@@ -21,22 +21,22 @@ import (
 
 var _ = Describe("{{Model.Type}}Repository", func() {
 	var (
-    repository *database.{{Model.Type}}Repository
-    entity     *{{Model.Package}}.{{Model.Type}}
+	    repository *database.{{Model.Type}}Repository
+	    entity     *{{Model.Package}}.{{Model.Type}}
 	)
 
 	BeforeEach(func() {
-    repository = &database.{{Model.Type}}Repository{
+		repository = &database.{{Model.Type}}Repository{
 			Gateway: gateway,
 		}
 
-    entity = &{{Model.Package}}.{{Model.Type}}{
-        //TODO: set the required fields
+		entity = &{{Model.Package}}.{{Model.Type}}{
+			//TODO: set the required fields
 		}
 	})
 
 	AfterEach(func() {
-    _, err := gateway.Exec(orm.SQL("DELETE FROM {{Name}}"))
+		_, err := gateway.Exec(orm.SQL("DELETE FROM {{Name}}"))
 		Expect(err).NotTo(HaveOccurred())
 	})
 
@@ -65,14 +65,14 @@ var _ = Describe("{{Model.Type}}Repository", func() {
 		It("return a record by primary key", func() {
 			Expect(repository.Insert(entity)).To(Succeed())
 
-			record, err := repository.SelectByPK({{Model.PrimaryKeyParams}})
+			record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(record).To(Equal(entity))
 		})
 
 		Context("when the record does not exist", func() {
 			It("returns an error", func() {
-        record, err := repository.SelectByPK({{Model.PrimaryKeyParams}})
+        record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
 				Expect(err).To(Equal(sql.ErrNoRows))
 				Expect(record).To(BeNil())
 			})
@@ -94,7 +94,7 @@ var _ = Describe("{{Model.Type}}Repository", func() {
 		It("inserts a new member successfully", func() {
 			Expect(repository.Insert(entity)).To(Succeed())
 
-			record, err := repository.SelectByPK({{Model.PrimaryKeyParams}})
+			record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(record).To(Equal(entity))
 		})
@@ -108,7 +108,7 @@ var _ = Describe("{{Model.Type}}Repository", func() {
 		It("updates a record by primary key", func() {
 			Expect(repository.UpdateByPK(entity)).To(Succeed())
 
-			record, err := repository.SelectByPK({{Model.PrimaryKeyParams}})
+			record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(record).To(Equal(entity))
 		})
@@ -120,9 +120,9 @@ var _ = Describe("{{Model.Type}}Repository", func() {
 		})
 
 		It("deletes a record by primary key", func() {
-      Expect(repository.DeleteByPK({{Model.PrimaryKeyParams}})).To(Succeed())
+			Expect(repository.DeleteByPK({{Model.PrimaryKeyEntityParams}})).To(Succeed())
 
-			record, err := repository.SelectByPK({{Model.PrimaryKeyParams}})
+			record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
 			Expect(err).To(Equal(sql.ErrNoRows))
 			Expect(record).To(BeNil())
 		})

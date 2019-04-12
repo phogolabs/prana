@@ -293,7 +293,7 @@ var _ = Describe("Codegen", func() {
 					Schema:   schemaDef,
 				}
 				err := generator.Generate(ctx)
-				Expect(err.Error()).To(Equal("repository:3:1: expected 'IDENT', found 'type'"))
+				Expect(err.Error()).To(Equal("repository:4:1: expected 'IDENT', found 'type'"))
 			})
 		})
 	})

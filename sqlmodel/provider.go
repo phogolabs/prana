@@ -94,12 +94,13 @@ func (m *ModelProvider) Close() error {
 
 func (m *ModelProvider) setPrimaryKey(schema *Schema, table *Table) {
 	var (
-		conditions []string
-		cond       string
-		arguments  []string
-		arg        string
-		parameters []string
-		param      string
+		conditions       []string
+		cond             string
+		arguments        []string
+		arg              string
+		entityParameters []string
+		parameters       []string
+		param            string
 	)
 
 	for _, column := range table.Columns {
@@ -107,7 +108,7 @@ func (m *ModelProvider) setPrimaryKey(schema *Schema, table *Table) {
 			continue
 		}
 
-		parameters = append(parameters, fmt.Sprintf("entity.%s", column.Model.Name))
+		entityParameters = append(entityParameters, fmt.Sprintf("entity.%s", column.Model.Name))
 
 		if m.Config.UseNamedParams {
 			cond = fmt.Sprintf("%s = :%s", column.Name, column.Name)
@@ -115,17 +116,20 @@ func (m *ModelProvider) setPrimaryKey(schema *Schema, table *Table) {
 			cond = fmt.Sprintf("%s = ?", column.Name)
 		}
 
+		conditions = append(conditions, cond)
+
 		param = inflect.CamelizeDownFirst(column.Name)
+		parameters = append(parameters, param)
+
 		table.Model.PrimaryKey[column.Name] = param
 
 		arg = fmt.Sprintf("%s %s", param, column.ScanType)
-
 		arguments = append(arguments, arg)
-		conditions = append(conditions, cond)
 	}
 
 	table.Model.PrimaryKeyCondition = strings.Join(conditions, " AND ")
 	table.Model.PrimaryKeyArgs = strings.Join(arguments, ", ")
+	table.Model.PrimaryKeyEntityParams = strings.Join(entityParameters, ", ")
 	table.Model.PrimaryKeyParams = strings.Join(parameters, ", ")
 }
 

@@ -107,7 +107,7 @@ var _ = Describe("ModelProvider", func() {
 				Expect(table.Model.UpdateByPKColumns).To(Equal("name = :name"))
 				Expect(table.Model.PrimaryKeyCondition).To(Equal("id = :id"))
 				Expect(table.Model.PrimaryKeyArgs).To(Equal("id string"))
-				Expect(table.Model.PrimaryKeyParams).To(Equal("entity.ID"))
+				Expect(table.Model.PrimaryKeyEntityParams).To(Equal("entity.ID"))
 				Expect(table.Model.PrimaryKey).To(HaveKey("id"))
 
 				for _, column := range table.Columns {
@@ -151,7 +151,7 @@ var _ = Describe("ModelProvider", func() {
 					Expect(table.Model.UpdateByPKColumns).To(Equal("name = :name"))
 					Expect(table.Model.PrimaryKeyCondition).To(Equal("id = :id"))
 					Expect(table.Model.PrimaryKeyArgs).To(Equal("id string"))
-					Expect(table.Model.PrimaryKeyParams).To(Equal("entity.ID"))
+					Expect(table.Model.PrimaryKeyEntityParams).To(Equal("entity.ID"))
 					Expect(table.Model.PrimaryKey).To(HaveKey("id"))
 
 					for _, column := range table.Columns {

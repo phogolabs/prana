@@ -199,6 +199,8 @@ type TableModel struct {
 	PrimaryKeyCondition string
 	// PrimaryKeyParams is the primary key args
 	PrimaryKeyParams string
+	// PrimaryKeyEntityParams is the primary key args
+	PrimaryKeyEntityParams string
 	// PrimaryKeyArgs is the primary key args
 	PrimaryKeyArgs string
 	// PrimaryKey is the map of primary key args
