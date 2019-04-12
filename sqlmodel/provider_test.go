@@ -543,7 +543,7 @@ var _ = Describe("MySQLProvider", func() {
 
 				column := table.Columns[0]
 				Expect(column.Name).To(Equal("id"))
-				Expect(column.Type.IsPrimaryKey).To(BeFalse())
+				Expect(column.Type.IsPrimaryKey).To(BeTrue())
 			})
 		})
 
