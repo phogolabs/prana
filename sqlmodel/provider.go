@@ -672,12 +672,13 @@ func (m *MySQLProvider) primaryKey(schema, table string) ([]string, error) {
 	query := &bytes.Buffer{}
 	query.WriteString("SELECT c.column_name ")
 	query.WriteString("FROM information_schema.key_column_usage AS c ")
-	query.WriteString("LEFT JOIN information_schema.table_constraints AS t ")
+	query.WriteString("INNER JOIN information_schema.table_constraints AS t ")
 	query.WriteString("ON t.constraint_name = c.constraint_name ")
-	query.WriteString("WHERE t.table_schema = ? AND t.table_name = ? AND t.constraint_type = 'PRIMARY KEY' ")
+	query.WriteString("WHERE c.table_schema = ? AND c.table_name = ? AND ")
+	query.WriteString("t.table_schema = ? AND t.table_name = ? AND t.constraint_type = 'PRIMARY KEY' ")
 	query.WriteString("ORDER BY c.column_name")
 
-	rows, err := m.DB.Query(query.String(), schema, table)
+	rows, err := m.DB.Query(query.String(), schema, table, schema, table)
 	if err != nil {
 		return nil, err
 	}
