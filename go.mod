@@ -12,6 +12,7 @@ require (
 	github.com/gosuri/uitable v0.0.0-20160404203958-36ee7e946282
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/kardianos/osext v0.0.0-20170510131534-ae77be60afb1 // indirect
+	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lib/pq v1.0.0
 	github.com/mattn/go-colorable v0.0.0-20180310133214-efa589957cd0 // indirect
 	github.com/mattn/go-isatty v0.0.4 // indirect
@@ -29,7 +30,7 @@ require (
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f // indirect
 	golang.org/x/sys v0.0.0-20181217223516-dcdaa6325bcb // indirect
 	golang.org/x/tools v0.0.0-20181218020041-13ba8ad772df
-	gopkg.in/DATA-DOG/go-sqlmock.v1 v1.3.0
+	google.golang.org/appengine v1.5.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

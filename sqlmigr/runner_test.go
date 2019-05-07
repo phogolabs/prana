@@ -13,7 +13,6 @@ import (
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmigr"
-	sqlmock "gopkg.in/DATA-DOG/go-sqlmock.v1"
 )
 
 var _ = Describe("Runner", func() {
@@ -105,26 +104,6 @@ var _ = Describe("Runner", func() {
 				err := runner.Run(item)
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("sql: database is closed"))
-			})
-		})
-
-		Context("when the command execution fails", func() {
-			var mock sqlmock.Sqlmock
-
-			JustBeforeEach(func() {
-				db, m, err := sqlmock.New()
-				Expect(err).NotTo(HaveOccurred())
-				runner.DB = sqlx.NewDb(db, "dummy")
-
-				mock = m
-				mock.ExpectBegin()
-				mock.ExpectExec("CREATE TABLE test(id TEXT)").
-					WillReturnError(fmt.Errorf("oh no!"))
-				mock.ExpectRollback()
-			})
-
-			It("returns the error", func() {
-				Expect(runner.Run(item)).To(HaveOccurred())
 			})
 		})
 
