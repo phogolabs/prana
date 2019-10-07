@@ -26,6 +26,8 @@ func (m *SQLMigration) CreateCommand() *cli.Command {
 		Name:        "migration",
 		Usage:       "A group of commands for generating, running, and reverting migrations",
 		Description: "A group of commands for generating, running, and reverting migrations",
+		Before:      m.before,
+		After:       m.after,
 		Flags: []cli.Flag{
 			&cli.StringFlag{
 				Name:     "migration-dir, d",
@@ -41,8 +43,6 @@ func (m *SQLMigration) CreateCommand() *cli.Command {
 				Usage:       "Setup the migration for the current project",
 				Description: "Configure the current project by creating database directory hierarchy and initial migration",
 				Action:      m.setup,
-				Before:      m.before,
-				After:       m.after,
 			},
 			{
 				Name:        "create",
@@ -50,15 +50,11 @@ func (m *SQLMigration) CreateCommand() *cli.Command {
 				Description: "Create a new migration file for the given name, and the current timestamp as the version in database/migration directory",
 				ArgsUsage:   "[name]",
 				Action:      m.create,
-				Before:      m.before,
-				After:       m.after,
 			},
 			{
 				Name:   "run",
 				Usage:  "Run the pending migrations",
 				Action: m.run,
-				Before: m.before,
-				After:  m.after,
 				Flags: []cli.Flag{
 					&cli.IntFlag{
 						Name:  "count, c",
@@ -71,8 +67,6 @@ func (m *SQLMigration) CreateCommand() *cli.Command {
 				Name:   "revert",
 				Usage:  "Revert the latest applied migrations",
 				Action: m.revert,
-				Before: m.before,
-				After:  m.after,
 				Flags: []cli.Flag{
 					&cli.IntFlag{
 						Name:  "count, c",
@@ -85,15 +79,11 @@ func (m *SQLMigration) CreateCommand() *cli.Command {
 				Name:   "reset",
 				Usage:  "Revert and re-run all migrations",
 				Action: m.reset,
-				Before: m.before,
-				After:  m.after,
 			},
 			{
 				Name:   "status",
 				Usage:  "Show all migrations, marking those that have been applied",
 				Action: m.status,
-				Before: m.before,
-				After:  m.after,
 			},
 		},
 	}
@@ -105,7 +95,7 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 		return err
 	}
 
-	m.dir, err = filepath.Abs(ctx.GlobalString("migration-dir"))
+	m.dir, err = filepath.Abs(ctx.String("migration-dir"))
 	if err != nil {
 		return cli.WrapError(err, ErrCodeArg)
 	}
