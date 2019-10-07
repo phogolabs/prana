@@ -71,6 +71,8 @@ func (m *SQLMigration) CreateCommand() *cli.Command {
 				Name:   "revert",
 				Usage:  "Revert the latest applied migrations",
 				Action: m.revert,
+				Before: m.before,
+				After:  m.after,
 				Flags: []cli.Flag{
 					&cli.IntFlag{
 						Name:  "count, c",
@@ -103,7 +105,7 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 		return err
 	}
 
-	m.dir, err = filepath.Abs(ctx.String("migration-dir"))
+	m.dir, err = filepath.Abs(ctx.GlobalString("migration-dir"))
 	if err != nil {
 		return cli.WrapError(err, ErrCodeArg)
 	}
