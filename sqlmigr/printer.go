@@ -6,13 +6,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/apex/log"
 	"github.com/fatih/color"
 	"github.com/gosuri/uitable"
+	"github.com/phogolabs/log"
 )
 
 // Flog prints the migrations as fields
-func Flog(logger log.Interface, migrations []*Migration) {
+func Flog(logger log.Logger, migrations []*Migration) {
 	for _, m := range migrations {
 		status := "pending"
 		timestamp := ""
@@ -22,7 +22,7 @@ func Flog(logger log.Interface, migrations []*Migration) {
 			timestamp = m.CreatedAt.Format(time.UnixDate)
 		}
 
-		fields := log.Fields{
+		fields := log.Map{
 			"Id":          m.ID,
 			"Description": m.Description,
 			"Status":      status,

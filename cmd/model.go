@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/apex/log"
 	"github.com/phogolabs/cli"
+	"github.com/phogolabs/log"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmodel"
 )

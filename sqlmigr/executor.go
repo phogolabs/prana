@@ -6,14 +6,14 @@ import (
 	"strings"
 	"time"
 
-	"github.com/apex/log"
 	"github.com/go-openapi/inflect"
+	"github.com/phogolabs/log"
 )
 
 // Executor provides a group of operations that works with migrations.
 type Executor struct {
 	// Logger logs each execution step
-	Logger log.Interface
+	Logger log.Logger
 	// Provider provides all migrations for the current project.
 	Provider MigrationProvider
 	// Runner runs or reverts migrations for the current project.

@@ -8,7 +8,13 @@ import (
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
+	"github.com/phogolabs/log"
 )
+
+//go:generate counterfeiter -fake-name Logger -o ./fake/logger.go . Logger
+
+// Logger used to log any output
+type Logger = log.Logger
 
 // ParseURL parses a URL and returns the database driver and connection string to the database
 func ParseURL(conn string) (string, string, error) {

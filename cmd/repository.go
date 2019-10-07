@@ -4,8 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/apex/log"
 	"github.com/phogolabs/cli"
+	"github.com/phogolabs/log"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmodel"
 )

@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"time"
 
-	"github.com/apex/log"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
+
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmigr"
 )
@@ -29,7 +29,7 @@ var _ = Describe("Printer", func() {
 
 		BeforeEach(func() {
 			logger = &fake.Logger{}
-			logger.WithFieldsReturns(log.NewEntry(log.Log.(*log.Logger)))
+			logger.WithFieldsReturns(logger)
 		})
 
 		It("logs the migration", func() {

@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
-	"github.com/apex/log"
-	"github.com/apex/log/handlers/json"
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/cli"
+	"github.com/phogolabs/log"
+	"github.com/phogolabs/log/handler/json"
 	"github.com/phogolabs/prana"
 	"github.com/phogolabs/prana/sqlmodel"
 )
@@ -30,9 +30,8 @@ type logHandler struct {
 	Writer io.Writer
 }
 
-func (h *logHandler) HandleLog(entry *log.Entry) error {
-	_, err := fmt.Fprintln(h.Writer, entry.Message)
-	return err
+func (h *logHandler) Handle(entry *log.Entry) {
+	fmt.Fprintln(h.Writer, entry.Message)
 }
 
 // BeforeEach is a function executed before each CLI operation.
@@ -48,7 +47,13 @@ func BeforeEach(ctx *cli.Context) error {
 	}
 
 	log.SetHandler(handler)
-	log.SetLevelFromString(ctx.String("log-level"))
+
+	level, err := log.ParseLevel(ctx.String("log-level"))
+	if err != nil {
+		return err
+	}
+
+	log.SetLevel(level)
 	return nil
 }
 

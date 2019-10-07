@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/cli"
+	"github.com/phogolabs/log"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmigr"
 )
@@ -102,7 +102,7 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 
 	m.db = db
 	m.executor = &sqlmigr.Executor{
-		Logger: log.Log,
+		Logger: log.WithField("command", ctx.Command.Name),
 		Provider: &sqlmigr.Provider{
 			FileSystem: parcello.Dir(m.dir),
 			DB:         db,
@@ -205,7 +205,8 @@ func (m *SQLMigration) status(ctx *cli.Context) error {
 	}
 
 	if strings.EqualFold("json", ctx.GlobalString("log-format")) {
-		sqlmigr.Flog(log.Log, migrations)
+		logger := log.WithField("command", ctx.Command.Name)
+		sqlmigr.Flog(logger, migrations)
 		return nil
 	}
 
