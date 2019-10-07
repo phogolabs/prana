@@ -128,8 +128,10 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 }
 
 func (m *SQLMigration) after(ctx *cli.Context) error {
-	if err := m.db.Close(); err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeMigration)
+	if m.db != nil {
+		if err := m.db.Close(); err != nil {
+			return cli.NewExitError(err.Error(), ErrCodeMigration)
+		}
 	}
 
 	return nil

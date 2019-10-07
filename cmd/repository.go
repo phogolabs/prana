@@ -125,9 +125,12 @@ func (m *SQLRepository) before(ctx *cli.Context) error {
 }
 
 func (m *SQLRepository) after(ctx *cli.Context) error {
-	if err := m.executor.Provider.Close(); err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeSchema)
+	if m.executor != nil {
+		if err := m.executor.Provider.Close(); err != nil {
+			return cli.NewExitError(err.Error(), ErrCodeSchema)
+		}
 	}
+
 	return nil
 }
 

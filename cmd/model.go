@@ -156,8 +156,10 @@ func (m *SQLModel) builder(ctx *cli.Context) (sqlmodel.TagBuilder, error) {
 }
 
 func (m *SQLModel) after(ctx *cli.Context) error {
-	if err := m.executor.Provider.Close(); err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeSchema)
+	if m.executor != nil {
+		if err := m.executor.Provider.Close(); err != nil {
+			return cli.NewExitError(err.Error(), ErrCodeSchema)
+		}
 	}
 	return nil
 }

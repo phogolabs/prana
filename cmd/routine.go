@@ -202,13 +202,12 @@ func (m *SQLRoutine) run(ctx *cli.Context) error {
 }
 
 func (m *SQLRoutine) after(ctx *cli.Context) error {
-	if m.executor == nil {
-		return nil
+	if m.executor != nil {
+		if err := m.executor.Provider.Close(); err != nil {
+			return cli.NewExitError(err.Error(), ErrCodeSchema)
+		}
 	}
 
-	if err := m.executor.Provider.Close(); err != nil {
-		return cli.NewExitError(err.Error(), ErrCodeSchema)
-	}
 	return nil
 }
 
