@@ -8,9 +8,9 @@ import (
 
 	"github.com/apex/log"
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/cli"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmigr"
-	"github.com/urfave/cli"
 )
 
 // SQLMigration provides a subcommands to work with SQL migrations.
@@ -21,23 +21,22 @@ type SQLMigration struct {
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
-func (m *SQLMigration) CreateCommand() cli.Command {
-	return cli.Command{
-		Name:         "migration",
-		Usage:        "A group of commands for generating, running, and reverting migrations",
-		Description:  "A group of commands for generating, running, and reverting migrations",
-		BashComplete: cli.DefaultAppComplete,
-		Before:       m.before,
-		After:        m.after,
+func (m *SQLMigration) CreateCommand() *cli.Command {
+	return &cli.Command{
+		Name:        "migration",
+		Usage:       "A group of commands for generating, running, and reverting migrations",
+		Description: "A group of commands for generating, running, and reverting migrations",
+		Before:      m.before,
+		After:       m.after,
 		Flags: []cli.Flag{
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:   "migration-dir, d",
 				Usage:  "path to the directory that contain the migrations",
 				EnvVar: "PRANA_MIGRATION_DIR",
 				Value:  "./database/migration",
 			},
 		},
-		Subcommands: []cli.Command{
+		Commands: []*cli.Command{
 			{
 				Name:        "setup",
 				Usage:       "Setup the migration for the current project",
@@ -56,7 +55,7 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 				Usage:  "Run the pending migrations",
 				Action: m.run,
 				Flags: []cli.Flag{
-					cli.IntFlag{
+					&cli.IntFlag{
 						Name:  "count, c",
 						Usage: "Number of migrations to be executed. Negative number will run all",
 						Value: -1,
@@ -68,7 +67,7 @@ func (m *SQLMigration) CreateCommand() cli.Command {
 				Usage:  "Revert the latest applied migrations",
 				Action: m.revert,
 				Flags: []cli.Flag{
-					cli.IntFlag{
+					&cli.IntFlag{
 						Name:  "count, c",
 						Usage: "Number of migrations to be reverted. Negative number will revert all",
 						Value: -1,
@@ -141,7 +140,7 @@ func (m *SQLMigration) setup(ctx *cli.Context) error {
 }
 
 func (m *SQLMigration) create(ctx *cli.Context) error {
-	args := ctx.Args()
+	args := ctx.Args
 
 	if len(args) != 1 {
 		return cli.NewExitError("Create command expects a single argument", ErrCodeMigration)

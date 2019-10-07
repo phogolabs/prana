@@ -7,9 +7,9 @@ import (
 	"strings"
 
 	"github.com/apex/log"
+	"github.com/phogolabs/cli"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmodel"
-	"github.com/urfave/cli"
 )
 
 // SQLModel provides a subcommands to work generate structs from existing schema
@@ -18,21 +18,20 @@ type SQLModel struct {
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
-func (m *SQLModel) CreateCommand() cli.Command {
-	return cli.Command{
-		Name:         "model",
-		Usage:        "A group of commands for generating object model from database schema",
-		Description:  "A group of commands for generating object model from database schema",
-		BashComplete: cli.DefaultAppComplete,
+func (m *SQLModel) CreateCommand() *cli.Command {
+	return &cli.Command{
+		Name:        "model",
+		Usage:       "A group of commands for generating object model from database schema",
+		Description: "A group of commands for generating object model from database schema",
 		Flags: []cli.Flag{
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "package-dir, p",
 				Usage: "path to the package, where the source code will be generated",
 				Value: "./database/model",
 			},
 		},
-		Subcommands: []cli.Command{
-			cli.Command{
+		Commands: []*cli.Command{
+			&cli.Command{
 				Name:        "print",
 				Usage:       "Print the object model for given database schema or tables",
 				Description: "Print the object model for given database schema or tables",
@@ -41,7 +40,7 @@ func (m *SQLModel) CreateCommand() cli.Command {
 				After:       m.after,
 				Flags:       m.flags(),
 			},
-			cli.Command{
+			&cli.Command{
 				Name:        "sync",
 				Usage:       "Generate a package of models for given database schema",
 				Description: "Generate a package of models for given database schema",
@@ -56,32 +55,33 @@ func (m *SQLModel) CreateCommand() cli.Command {
 
 func (m *SQLModel) flags() []cli.Flag {
 	return []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "schema-name, s",
 			Usage: "name of the database schema",
 			Value: "",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "table-name, t",
 			Usage: "name of the table in the database",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "ignore-table-name, i",
 			Usage: "name of the table in the database that should be skipped",
-			Value: &cli.StringSlice{"migrations"},
+			Value: []string{"migrations"},
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "orm-tag, m",
 			Usage: "tag tag that is wellknow for some ORM packages. supported: (sqlx, gorm)",
 			Value: "sqlx",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "extra-tag, e",
 			Usage: "extra tags that should be included in model fields. supported: (json, xml, validate)",
 		},
-		cli.BoolTFlag{
+		&cli.BoolFlag{
 			Name:  "include-docs, d",
 			Usage: "include API documentation in generated source code",
+			Value: true,
 		},
 	}
 }
@@ -107,7 +107,7 @@ func (m *SQLModel) before(ctx *cli.Context) error {
 			Config: &sqlmodel.ModelProviderConfig{
 				Package:        filepath.Base(ctx.GlobalString("package-dir")),
 				UseNamedParams: ctx.Bool("use-named-params"),
-				InlcudeDoc:     ctx.BoolT("include-docs"),
+				InlcudeDoc:     ctx.Bool("include-docs"),
 			},
 			TagBuilder: builder,
 			Provider:   provider,

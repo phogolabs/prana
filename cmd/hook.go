@@ -10,9 +10,9 @@ import (
 	"github.com/apex/log"
 	"github.com/apex/log/handlers/json"
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/cli"
 	"github.com/phogolabs/prana"
 	"github.com/phogolabs/prana/sqlmodel"
-	"github.com/urfave/cli"
 )
 
 const (

@@ -9,24 +9,24 @@ import (
 	_ "github.com/lib/pq"
 	_ "github.com/mattn/go-sqlite3"
 
+	"github.com/phogolabs/cli"
 	"github.com/phogolabs/prana/cmd"
-	"github.com/urfave/cli"
 )
 
 var flags = []cli.Flag{
-	cli.StringFlag{
+	&cli.StringFlag{
 		Name:   "log-level",
 		Value:  "info",
 		Usage:  "level of logging",
 		EnvVar: "PRANA_LOG_LEVEL",
 	},
-	cli.StringFlag{
+	&cli.StringFlag{
 		Name:   "log-format",
 		Value:  "",
 		Usage:  "format of the logs",
 		EnvVar: "PRANA_LOG_FORMAT",
 	},
-	cli.StringFlag{
+	&cli.StringFlag{
 		Name:   "database-url",
 		Value:  "sqlite3://prana.db",
 		Usage:  "Database URL",
@@ -42,7 +42,7 @@ func main() {
 		repository = &cmd.SQLRepository{}
 	)
 
-	commands := []cli.Command{
+	commands := []*cli.Command{
 		migration.CreateCommand(),
 		routine.CreateCommand(),
 		model.CreateCommand(),
@@ -50,18 +50,16 @@ func main() {
 	}
 
 	app := &cli.App{
-		Name:                 "prana",
-		HelpName:             "prana",
-		Usage:                "Golang Database Manager",
-		UsageText:            "prana [global options]",
-		Version:              "1.0-beta-05",
-		BashComplete:         cli.DefaultAppComplete,
-		EnableBashCompletion: true,
-		Writer:               os.Stdout,
-		ErrWriter:            os.Stderr,
-		Flags:                flags,
-		Before:               cmd.BeforeEach,
-		Commands:             commands,
+		Name:      "prana",
+		HelpName:  "prana",
+		Usage:     "Golang Database Manager",
+		UsageText: "prana [global options]",
+		Version:   "1.0-beta-05",
+		Writer:    os.Stdout,
+		ErrWriter: os.Stderr,
+		Flags:     flags,
+		Before:    cmd.BeforeEach,
+		Commands:  commands,
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
@@ -69,7 +67,7 @@ func main() {
 
 	for _, command := range commands {
 		sort.Sort(cli.FlagsByName(command.Flags))
-		sort.Sort(cli.CommandsByName(command.Subcommands))
+		sort.Sort(cli.CommandsByName(command.Commands))
 	}
 
 	app.Run(os.Args)

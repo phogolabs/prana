@@ -5,9 +5,9 @@ import (
 	"path/filepath"
 
 	"github.com/apex/log"
+	"github.com/phogolabs/cli"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmodel"
-	"github.com/urfave/cli"
 )
 
 // SQLRepository provides a subcommands to work generate repository from existing schema
@@ -16,26 +16,25 @@ type SQLRepository struct {
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
-func (m *SQLRepository) CreateCommand() cli.Command {
-	return cli.Command{
-		Name:         "repository",
-		Usage:        "A group of commands for generating database repository from schema",
-		Description:  "A group of commands for generating database repository from schema",
-		BashComplete: cli.DefaultAppComplete,
+func (m *SQLRepository) CreateCommand() *cli.Command {
+	return &cli.Command{
+		Name:        "repository",
+		Usage:       "A group of commands for generating database repository from schema",
+		Description: "A group of commands for generating database repository from schema",
 		Flags: []cli.Flag{
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "package-dir, p",
 				Usage: "path to the package, where the source code will be generated",
 				Value: "./database",
 			},
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:  "model-package-dir",
 				Usage: "path to the model's package",
 				Value: "./database/model",
 			},
 		},
-		Subcommands: []cli.Command{
-			cli.Command{
+		Commands: []*cli.Command{
+			&cli.Command{
 				Name:        "print",
 				Usage:       "Print the database repositories for given database schema or tables",
 				Description: "Print the database repositories for given database schema or tables",
@@ -44,7 +43,7 @@ func (m *SQLRepository) CreateCommand() cli.Command {
 				After:       m.after,
 				Flags:       m.flags(false),
 			},
-			cli.Command{
+			&cli.Command{
 				Name:        "sync",
 				Usage:       "Generate a package of repositories for given database schema",
 				Description: "Generate a package of repositories for given database schema",
@@ -59,30 +58,32 @@ func (m *SQLRepository) CreateCommand() cli.Command {
 
 func (m *SQLRepository) flags(include bool) []cli.Flag {
 	flags := []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "schema-name, s",
 			Usage: "name of the database schema",
 			Value: "",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "table-name, t",
 			Usage: "name of the table in the database",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "ignore-table-name, i",
 			Usage: "name of the table in the database that should be skipped",
-			Value: &cli.StringSlice{"migrations"},
+			Value: []string{"migrations"},
 		},
-		cli.BoolTFlag{
+		&cli.BoolFlag{
 			Name:  "include-docs, d",
 			Usage: "include API documentation in generated source code",
+			Value: true,
 		},
 	}
 
 	if include {
-		flag := cli.BoolTFlag{
+		flag := &cli.BoolFlag{
 			Name:  "include-tests",
 			Usage: "include repository tests",
+			Value: true,
 		}
 
 		flags = append(flags, flag)
@@ -107,7 +108,7 @@ func (m *SQLRepository) before(ctx *cli.Context) error {
 			Config: &sqlmodel.ModelProviderConfig{
 				Package:        filepath.Base(ctx.GlobalString("model-package-dir")),
 				UseNamedParams: ctx.Bool("use-named-params"),
-				InlcudeDoc:     ctx.BoolT("include-docs"),
+				InlcudeDoc:     ctx.Bool("include-docs"),
 			},
 			TagBuilder: &sqlmodel.NoopTagBuilder{},
 			Provider:   provider,
@@ -172,7 +173,7 @@ func (m *SQLRepository) specs(ctx *cli.Context) []*sqlmodel.Spec {
 
 	specs = append(specs, spec)
 
-	if ctx.BoolT("include-tests") {
+	if ctx.Bool("include-tests") {
 		spec = &sqlmodel.Spec{
 			Filename:     "repository_test.go",
 			Template:     "repository_test",

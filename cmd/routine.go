@@ -5,10 +5,10 @@ import (
 	"path/filepath"
 
 	"github.com/apex/log"
+	"github.com/phogolabs/cli"
 	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlexec"
 	"github.com/phogolabs/prana/sqlmodel"
-	"github.com/urfave/cli"
 )
 
 // SQLRoutine provides a subcommands to work with SQL scripts and their
@@ -19,22 +19,21 @@ type SQLRoutine struct {
 }
 
 // CreateCommand creates a cli.Command that can be used by cli.App.
-func (m *SQLRoutine) CreateCommand() cli.Command {
-	return cli.Command{
-		Name:         "routine",
-		Usage:        "A group of commands for generating, running, and removing SQL commands",
-		Description:  "A group of commands for generating, running, and removing SQL commands",
-		BashComplete: cli.DefaultAppComplete,
+func (m *SQLRoutine) CreateCommand() *cli.Command {
+	return &cli.Command{
+		Name:        "routine",
+		Usage:       "A group of commands for generating, running, and removing SQL commands",
+		Description: "A group of commands for generating, running, and removing SQL commands",
 		Flags: []cli.Flag{
-			cli.StringFlag{
+			&cli.StringFlag{
 				Name:   "routine-dir, d",
 				Usage:  "path to the directory that contain the SQL routines",
 				EnvVar: "PRANA_ROUTINE_DIR",
 				Value:  "./database/routine",
 			},
 		},
-		Subcommands: []cli.Command{
-			cli.Command{
+		Commands: []*cli.Command{
+			&cli.Command{
 				Name:        "sync",
 				Usage:       "Generate a SQL script of CRUD operations for given database schema",
 				Description: "Generate a SQL script of CRUD operations for given database schema",
@@ -43,7 +42,7 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 				After:       m.after,
 				Flags:       m.flags(),
 			},
-			cli.Command{
+			&cli.Command{
 				Name:        "print",
 				Usage:       "Print a SQL script of CRUD operations for given database schema",
 				Description: "Print a SQL script of CRUD operations for given database schema",
@@ -52,7 +51,7 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 				After:       m.after,
 				Flags:       m.flags(),
 			},
-			cli.Command{
+			&cli.Command{
 				Name:        "create",
 				Usage:       "Create a new SQL command for given container filename",
 				Description: "Create a new SQL command for given container filename",
@@ -61,14 +60,14 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 				Before:      m.before,
 				After:       m.after,
 				Flags: []cli.Flag{
-					cli.StringFlag{
+					&cli.StringFlag{
 						Name:  "filename, n",
 						Usage: "Name of the file that contains the command",
 						Value: "",
 					},
 				},
 			},
-			cli.Command{
+			&cli.Command{
 				Name:        "run",
 				Usage:       "Run a SQL command for given arguments",
 				Description: "Run a SQL command for given arguments",
@@ -77,7 +76,7 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 				Before:      m.before,
 				After:       m.after,
 				Flags: []cli.Flag{
-					cli.StringSliceFlag{
+					&cli.StringSliceFlag{
 						Name:  "param, p",
 						Usage: "Parameters for the command",
 					},
@@ -89,27 +88,28 @@ func (m *SQLRoutine) CreateCommand() cli.Command {
 
 func (m *SQLRoutine) flags() []cli.Flag {
 	return []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:  "schema-name, s",
 			Usage: "name of the database schema",
-			Value: "",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "table-name, t",
 			Usage: "name of the table in the database",
 		},
-		cli.StringSliceFlag{
+		&cli.StringSliceFlag{
 			Name:  "ignore-table-name, i",
 			Usage: "name of the table in the database that should be skipped",
-			Value: &cli.StringSlice{"migrations"},
+			Value: []string{"migrations"},
 		},
-		cli.BoolTFlag{
+		&cli.BoolFlag{
 			Name:  "use-named-params, n",
 			Usage: "use named parameter instead of questionmark",
+			Value: true,
 		},
-		cli.BoolTFlag{
+		&cli.BoolFlag{
 			Name:  "include-docs, d",
 			Usage: "include API documentation in generated source code",
+			Value: true,
 		},
 	}
 }
@@ -139,8 +139,8 @@ func (m *SQLRoutine) before(ctx *cli.Context) error {
 		Provider: &sqlmodel.ModelProvider{
 			Config: &sqlmodel.ModelProviderConfig{
 				Package:        filepath.Base(ctx.GlobalString("routine-dir")),
-				UseNamedParams: ctx.BoolT("use-named-params"),
-				InlcudeDoc:     ctx.BoolT("include-docs"),
+				UseNamedParams: ctx.Bool("use-named-params"),
+				InlcudeDoc:     ctx.Bool("include-docs"),
 			},
 			TagBuilder: &sqlmodel.NoopTagBuilder{},
 			Provider:   provider,
@@ -154,7 +154,7 @@ func (m *SQLRoutine) before(ctx *cli.Context) error {
 }
 
 func (m *SQLRoutine) create(ctx *cli.Context) error {
-	args := ctx.Args()
+	args := ctx.Args
 
 	if len(args) != 1 {
 		return cli.NewExitError("Create command expects a single argument", ErrCodeCommand)
@@ -179,7 +179,7 @@ func (m *SQLRoutine) create(ctx *cli.Context) error {
 }
 
 func (m *SQLRoutine) run(ctx *cli.Context) error {
-	args := ctx.Args()
+	args := ctx.Args
 	params := params(ctx.StringSlice("param"))
 
 	if len(args) != 1 {
