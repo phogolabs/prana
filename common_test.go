@@ -22,6 +22,13 @@ var _ = Describe("ParseURL", func() {
 			Expect(source).To(Equal("root@tcp(127.0.0.1:3306)/prana?parseTime=true"))
 		})
 
+		It("parses the MySQL connection string with custom port successfully", func() {
+			driver, source, err := prana.ParseURL("mysql://root:password@tcp(127.0.0.1:13306)/prana")
+			Expect(err).NotTo(HaveOccurred())
+			Expect(driver).To(Equal("mysql"))
+			Expect(source).To(Equal("root:password@tcp(127.0.0.1:13306)/prana?parseTime=true"))
+		})
+
 		Context("when the DSN is invalid", func() {
 			It("returns the error", func() {
 				driver, source, err := prana.ParseURL("mysql://@net(addr/")
@@ -39,12 +46,21 @@ var _ = Describe("ParseURL", func() {
 		Expect(source).To(Equal("postgres://localhost/prana?sslmode=disable"))
 	})
 
+	Context("when the URL is empty", func() {
+		It("returns an error", func() {
+			driver, source, err := prana.ParseURL("")
+			Expect(driver).To(BeEmpty())
+			Expect(source).To(BeEmpty())
+			Expect(err).To(MatchError("URL cannot be empty"))
+		})
+	})
+
 	Context("when the URL is invalid", func() {
 		It("returns an error", func() {
 			driver, source, err := prana.ParseURL("::")
 			Expect(driver).To(BeEmpty())
 			Expect(source).To(BeEmpty())
-			Expect(err).To(MatchError("parse ::: missing protocol scheme"))
+			Expect(err).To(MatchError("Invalid DSN"))
 		})
 	})
 })

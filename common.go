@@ -3,8 +3,8 @@
 package prana
 
 import (
-	"fmt"
-	"net/url"
+	"errors"
+	"regexp"
 	"strings"
 
 	"github.com/go-sql-driver/mysql"
@@ -16,33 +16,58 @@ import (
 // Logger used to log any output
 type Logger = log.Logger
 
+const (
+	MYSQL_DRIVER    = "mysql"
+	SQLITE_DRIVER   = "sqlite3"
+	POSTGRES_DRIVER = "postgres"
+)
+
+var (
+	errNoDriverName = errors.New("No driver name")
+	errEmptyConnURL = errors.New("URL cannot be empty")
+	errInvalidDSN   = errors.New("Invalid DSN")
+)
+
 // ParseURL parses a URL and returns the database driver and connection string to the database
 func ParseURL(conn string) (string, string, error) {
-	uri, err := url.Parse(conn)
+	driver, source, err := parseRawURL(conn)
 	if err != nil {
 		return "", "", err
 	}
 
-	driver := strings.ToLower(uri.Scheme)
-
 	switch driver {
-	case "mysql":
-		source, err := parseMySQL(driver, conn)
+	case MYSQL_DRIVER:
+		mysqlSource, err := parseMySQL(driver, source)
 		if err != nil {
 			return "", "", err
 		}
+		return driver, mysqlSource, nil
+	case SQLITE_DRIVER:
 		return driver, source, nil
-	case "sqlite3":
-		source := strings.Replace(conn, fmt.Sprintf("%s://", driver), "", -1)
-		return driver, source, nil
+	case POSTGRES_DRIVER:
+		return driver, conn, nil
 	default:
 		return driver, conn, nil
 	}
 }
 
-func parseMySQL(driver, conn string) (string, error) {
-	source := strings.Replace(conn, fmt.Sprintf("%s://", driver), "", -1)
+// parseRawURL returns the db driver name from a URL string
+func parseRawURL(url string) (driverName string, path string, err error) {
+	if url == "" {
+		return "", "", errEmptyConnURL
+	}
 
+	// scheme must match
+	prog := regexp.MustCompile(`^([a-zA-Z][a-zA-Z0-9+-.]*)://(.*)$`)
+	matches := prog.FindStringSubmatch(url)
+
+	if len(matches) > 2 {
+		return strings.ToLower(matches[1]), matches[2], nil
+	}
+	return "", "", errInvalidDSN
+}
+
+func parseMySQL(driver, source string) (string, error) {
 	cfg, err := mysql.ParseDSN(source)
 	if err != nil {
 		return "", err
