@@ -51,7 +51,7 @@ var _ = Describe("ParseURL", func() {
 			driver, source, err := prana.ParseURL("")
 			Expect(driver).To(BeEmpty())
 			Expect(source).To(BeEmpty())
-			Expect(err).To(MatchError("URL cannot be empty"))
+			Expect(err).To(MatchError("url cannot be empty"))
 		})
 	})
 
@@ -60,7 +60,7 @@ var _ = Describe("ParseURL", func() {
 			driver, source, err := prana.ParseURL("::")
 			Expect(driver).To(BeEmpty())
 			Expect(source).To(BeEmpty())
-			Expect(err).To(MatchError("Invalid DSN"))
+			Expect(err).To(MatchError("invalid dsn"))
 		})
 	})
 })

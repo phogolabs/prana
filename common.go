@@ -17,15 +17,19 @@ import (
 type Logger = log.Logger
 
 const (
-	MYSQL_DRIVER    = "mysql"
-	SQLITE_DRIVER   = "sqlite3"
-	POSTGRES_DRIVER = "postgres"
+	// DriverMySQL represents the database driver name of MySQL
+	DriverMySQL = "mysql"
+	// DriverSQLite represents the database driver name of SQLite3
+	DriverSQLite = "sqlite3"
+	// DriverPostgres represents the databse driver name of Postgres
+	DriverPostgres = "postgres"
 )
 
+// Error codes returned by failures to parse a dsn.
 var (
-	errNoDriverName = errors.New("No driver name")
-	errEmptyConnURL = errors.New("URL cannot be empty")
-	errInvalidDSN   = errors.New("Invalid DSN")
+	errNoDriverName = errors.New("no driver name")
+	errEmptyConnURL = errors.New("url cannot be empty")
+	errInvalidDSN   = errors.New("invalid dsn")
 )
 
 // ParseURL parses a URL and returns the database driver and connection string to the database
@@ -36,15 +40,15 @@ func ParseURL(conn string) (string, string, error) {
 	}
 
 	switch driver {
-	case MYSQL_DRIVER:
+	case DriverMySQL:
 		mysqlSource, err := parseMySQL(driver, source)
 		if err != nil {
 			return "", "", err
 		}
 		return driver, mysqlSource, nil
-	case SQLITE_DRIVER:
+	case DriverSQLite:
 		return driver, source, nil
-	case POSTGRES_DRIVER:
+	case DriverPostgres:
 		return driver, conn, nil
 	default:
 		return driver, conn, nil
