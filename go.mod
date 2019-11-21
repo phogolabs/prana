@@ -5,7 +5,7 @@ require (
 	github.com/fatih/color v1.7.0
 	github.com/go-openapi/inflect v0.19.0
 	github.com/go-sql-driver/mysql v1.4.1
-	github.com/gosuri/uitable v0.0.3
+	github.com/gosuri/uitable v0.0.4
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/lib/pq v1.2.0
 	github.com/mattn/go-colorable v0.1.4 // indirect
