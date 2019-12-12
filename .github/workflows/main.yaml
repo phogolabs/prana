@@ -26,7 +26,7 @@ jobs:
       mysql:
         image: mysql:latest
         ports:
-          - 3306:3306
+          - 3306
         env:
           MYSQL_USER: prana
           MYSQL_PASSWORD: prana
@@ -44,7 +44,7 @@ jobs:
         run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
         env:
           TEST_PSQL_URL: "postgres://prana:prana@127.0.0.1:${{ job.services.postgres.ports[5432] }}/prana?sslmode=disable"
-          TEST_MYSQL_URL: "mysql://prana:prana@127.0.0.1:${{ job.services.mariadb.ports[3306] }}/prana"
+          TEST_MYSQL_URL: "mysql://prana:prana@127.0.0.1:${{ job.services.mysql.ports[3306] }}/prana"
       - name: Upload tests coverage to codeconv.io
         uses: codecov/codecov-action@v1
         with:
