@@ -23,10 +23,11 @@ jobs:
           - 5432:5432
         # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-      mysql:
-        image: mysql:latest
+      mariadb:
+        image: mariadb:10.3
         ports:
           - 3309
+          - 3306
         env:
           MYSQL_USER: prana
           MYSQL_PASSWORD: prana
@@ -44,7 +45,7 @@ jobs:
         run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
         env:
           TEST_PSQL_URL: "postgres://prana:prana@127.0.0.1:${{ job.services.postgres.ports[5432] }}/prana?sslmode=disable"
-          TEST_MYSQL_URL: "mysql://prana:prana@127.0.0.1:${{ job.services.mysql.ports[3309] }}/prana"
+          TEST_MYSQL_URL: "mysql://prana:prana@127.0.0.1:3306/prana"
       - name: Upload tests coverage to codeconv.io
         uses: codecov/codecov-action@v1
         with:
