@@ -186,7 +186,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 	BeforeEach(func() {
 		var err error
 
-		db, err = sqlx.Connect(os.Getenv("TEST_PSQL_URL"))
+		db, err = sqlx.Connect("postgres", os.Getenv("TEST_PSQL_URL"))
 		Expect(err).NotTo(HaveOccurred())
 
 		provider = &sqlmodel.PostgreSQLProvider{
@@ -235,7 +235,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				dbb, err := sqlx.Connect(os.Getenv("TEST_PSQL_URL"))
+				dbb, err := sqlx.Connect("postgres", os.Getenv("TEST_PSQL_URL"))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(dbb.Close()).To(Succeed())
 				provider.DB = dbb
@@ -404,7 +404,7 @@ var _ = Describe("MySQLProvider", func() {
 	BeforeEach(func() {
 		var err error
 
-		db, err = sqlx.Connect(os.Getenv("TEST_MYSQL_URL"))
+		db, err = sqlx.Connect("mysql", os.Getenv("TEST_MYSQL_URL"))
 		Expect(err).NotTo(HaveOccurred())
 
 		provider = &sqlmodel.MySQLProvider{
@@ -453,7 +453,7 @@ var _ = Describe("MySQLProvider", func() {
 
 		Context("when the database is not available", func() {
 			BeforeEach(func() {
-				dbb, err := sqlx.Connect(os.Getenv("TEST_MYSQL_URL"))
+				dbb, err := sqlx.Connect("mysql", os.Getenv("TEST_MYSQL_URL"))
 				Expect(err).NotTo(HaveOccurred())
 				Expect(dbb.Close()).To(Succeed())
 				provider.DB = dbb
