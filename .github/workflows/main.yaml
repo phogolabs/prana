@@ -21,20 +21,22 @@ jobs:
           POSTGRES_DB: prana
         ports:
           - 5432:5432
-        # needed because the postgres container does not provide a healthcheck
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-      mariadb:
-        image: mariadb:10.3
-        ports:
-          - 3309
-          - 3306
+      mysql:
+        image: mysql:5.7
         env:
           MYSQL_USER: prana
           MYSQL_PASSWORD: prana
           MYSQL_DATABASE: prana
           MYSQL_ROOT_PASSWORD: prana
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=3
+        ports:
+        - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     steps:
+      - name: Verify MySQL connection from host
+        run: |
+          sudo apt-get install -y mysql-client
+          mysql --host 127.0.0.1 --port ${{ job.services.mysql.ports['3306'] }} -uroot -ppassword -e "SHOW DATABASES"
       - name: Check out code
         uses: actions/checkout@v1
       - name: Set up Golang
