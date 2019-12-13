@@ -13,6 +13,9 @@ import (
 	"github.com/phogolabs/prana/cmd"
 )
 
+// version is injected by goreleaser.com
+var version string = "unknown"
+
 var flags = []cli.Flag{
 	&cli.StringFlag{
 		Name:   "log-level",
@@ -54,7 +57,7 @@ func main() {
 		HelpName:  "prana",
 		Usage:     "Golang Database Manager",
 		UsageText: "prana [global options]",
-		Version:   "1.0-beta-05",
+		Version:   version,
 		Writer:    os.Stdout,
 		ErrWriter: os.Stderr,
 		Flags:     flags,
