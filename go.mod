@@ -4,7 +4,7 @@ require (
 	github.com/aymerick/raymond v2.0.2+incompatible
 	github.com/fatih/color v1.7.0
 	github.com/go-openapi/inflect v0.19.0
-	github.com/go-sql-driver/mysql v1.4.1
+	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gosuri/uitable v0.0.3
 	github.com/jmoiron/sqlx v1.2.0
 	github.com/lib/pq v1.2.0
