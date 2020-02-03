@@ -14,7 +14,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.11.0
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/onsi/ginkgo v1.8.0
-	github.com/onsi/gomega v1.5.0
+	github.com/onsi/gomega v1.9.0
 	github.com/phogolabs/cli v0.0.0-20191007115343-b45b57e5579e
 	github.com/phogolabs/log v0.0.0-20191007140342-5ee8fbe3bae8
 	github.com/phogolabs/parcello v0.8.1
