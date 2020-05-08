@@ -7,7 +7,7 @@ require (
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/gosuri/uitable v0.0.3
 	github.com/jmoiron/sqlx v1.2.0
-	github.com/lib/pq v1.4.0
+	github.com/lib/pq v1.5.2
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/mattn/go-runewidth v0.0.4 // indirect
