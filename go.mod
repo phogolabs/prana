@@ -13,9 +13,9 @@ require (
 	github.com/olekukonko/tablewriter v0.0.1
 	github.com/onsi/ginkgo v1.12.3
 	github.com/onsi/gomega v1.10.1
-	github.com/phogolabs/cli v0.0.0-20191007115343-b45b57e5579e
+	github.com/phogolabs/cli v0.0.0-20191212161310-ce689d871370
 	github.com/phogolabs/log v0.0.0-20191007140342-5ee8fbe3bae8
-	github.com/phogolabs/parcello v0.8.1
+	github.com/phogolabs/parcello v0.8.2
 	golang.org/x/tools v0.0.0-20191005014404-c9f9432ec4b2
 	google.golang.org/appengine v1.6.4 // indirect
 )
