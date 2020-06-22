@@ -97,7 +97,7 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 
 	m.dir, err = filepath.Abs(ctx.String("migration-dir"))
 	if err != nil {
-		return cli.WrapError(err, ErrCodeArg)
+		return cli.WrapError(err).WithCode(ErrCodeArg)
 	}
 
 	m.db = db
