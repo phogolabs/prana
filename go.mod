@@ -11,13 +11,13 @@ require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mattn/go-sqlite3 v1.14.1
 	github.com/olekukonko/tablewriter v0.0.4
-	github.com/onsi/ginkgo v1.14.0
+	github.com/onsi/ginkgo v1.15.0
 	github.com/onsi/gomega v1.10.1
 	github.com/phogolabs/cli v0.0.0-20200622104355-c8a9ba892359
 	github.com/phogolabs/log v0.0.0-20200622103245-74442d37de9f
 	github.com/phogolabs/parcello v0.8.2
 	golang.org/x/mod v0.3.0 // indirect
-	golang.org/x/tools v0.0.0-20200619210111-0f592d2728bb
+	golang.org/x/tools v0.0.0-20201224043029-2b0845dc783e
 )
 
 go 1.13
