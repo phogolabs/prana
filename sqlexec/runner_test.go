@@ -4,27 +4,26 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
+	"testing/fstest"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/prana/sqlexec"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/parcello"
-	"github.com/phogolabs/prana/fake"
-	"github.com/phogolabs/prana/sqlexec"
 )
 
 var _ = Describe("Runner", func() {
 	var (
-		runner *sqlexec.Runner
-		dir    string
+		runner  *sqlexec.Runner
+		storage fstest.MapFS
 	)
 
 	BeforeEach(func() {
-		var err error
+		storage = fstest.MapFS{}
 
-		dir, err = ioutil.TempDir("", "prana_runner")
+		dir, err := ioutil.TempDir("", "prana_runner")
 		Expect(err).To(BeNil())
 
 		db := filepath.Join(dir, "prana.db")
@@ -32,7 +31,7 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &sqlexec.Runner{
-			FileSystem: parcello.Dir(dir),
+			FileSystem: storage,
 			DB:         gateway,
 		}
 	})
@@ -42,8 +41,9 @@ var _ = Describe("Runner", func() {
 		fmt.Fprintln(command, "-- name: system-tables")
 		fmt.Fprintln(command, "SELECT * FROM sqlite_master")
 
-		path := filepath.Join(dir, "commands.sql")
-		Expect(ioutil.WriteFile(path, command.Bytes(), 0700)).To(Succeed())
+		storage["commands.sql"] = &fstest.MapFile{
+			Data: command.Bytes(),
+		}
 	})
 
 	AfterEach(func() {
@@ -63,27 +63,15 @@ var _ = Describe("Runner", func() {
 		Expect(columns).To(ContainElement("sql"))
 	})
 
-	Context("when the file system fails", func() {
-		BeforeEach(func() {
-			fileSystem := &fake.FileSystem{}
-			fileSystem.WalkReturns(fmt.Errorf("Oh no!"))
-			runner.FileSystem = fileSystem
-		})
-
-		It("returns the error", func() {
-			_, err := runner.Run("system-tables")
-			Expect(err).To(MatchError("Oh no!"))
-		})
-	})
-
 	Context("when the command requires parameters", func() {
 		JustBeforeEach(func() {
 			command := &bytes.Buffer{}
 			fmt.Fprintln(command, "-- name: system-tables")
 			fmt.Fprintln(command, "SELECT ? AS Param FROM sqlite_master")
 
-			path := filepath.Join(dir, "commands.sql")
-			Expect(ioutil.WriteFile(path, command.Bytes(), 0700)).To(Succeed())
+			storage["commands.sql"] = &fstest.MapFile{
+				Data: command.Bytes(),
+			}
 		})
 
 		It("runs the command successfully", func() {
@@ -98,8 +86,7 @@ var _ = Describe("Runner", func() {
 
 	Context("when the command does not exist", func() {
 		JustBeforeEach(func() {
-			path := filepath.Join(dir, "commands.sql")
-			Expect(os.Remove(path)).To(Succeed())
+			delete(storage, "commands.sql")
 		})
 
 		It("returns an error", func() {

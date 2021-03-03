@@ -5,17 +5,17 @@ package sqlmigr
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"path/filepath"
 	"strings"
 	"time"
 
-	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlexec"
 )
 
-//go:generate counterfeiter -fake-name MigrationRunner -o ../fake/MigrationRunner.go . MigrationRunner
-//go:generate counterfeiter -fake-name MigrationProvider -o ../fake/MigrationProvider.go . MigrationProvider
-//go:generate counterfeiter -fake-name MigrationGenerator -o ../fake/MigrationGenerator.go . MigrationGenerator
+//go:generate counterfeiter -fake-name MigrationRunner -o ../fake/migration_runner.go . MigrationRunner
+//go:generate counterfeiter -fake-name MigrationProvider -o ../fake/migration_provider.go . MigrationProvider
+//go:generate counterfeiter -fake-name MigrationGenerator -o ../fake/migration_generator.go . MigrationGenerator
 
 var (
 	format = "20060102150405"
@@ -24,7 +24,15 @@ var (
 )
 
 // FileSystem provides with primitives to work with the underlying file system
-type FileSystem = parcello.FileSystem
+type FileSystem = fs.FS
+
+// WriteFileSystem represents a wriable file system
+type WriteFileSystem interface {
+	FileSystem
+
+	// OpenFile opens a new file
+	OpenFile(string, int, fs.FileMode) (fs.File, error)
+}
 
 // MigrationRunner runs or reverts a given sqlmigr item.
 type MigrationRunner interface {

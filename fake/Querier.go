@@ -9,11 +9,21 @@ import (
 )
 
 type Querier struct {
-	QueryStub        func(query string, args ...interface{}) (*sql.Rows, error)
+	CloseStub        func() error
+	closeMutex       sync.RWMutex
+	closeArgsForCall []struct {
+	}
+	closeReturns struct {
+		result1 error
+	}
+	closeReturnsOnCall map[int]struct {
+		result1 error
+	}
+	QueryStub        func(string, ...interface{}) (*sql.Rows, error)
 	queryMutex       sync.RWMutex
 	queryArgsForCall []struct {
-		query string
-		args  []interface{}
+		arg1 string
+		arg2 []interface{}
 	}
 	queryReturns struct {
 		result1 *sql.Rows
@@ -23,11 +33,11 @@ type Querier struct {
 		result1 *sql.Rows
 		result2 error
 	}
-	QueryRowStub        func(query string, args ...interface{}) *sql.Row
+	QueryRowStub        func(string, ...interface{}) *sql.Row
 	queryRowMutex       sync.RWMutex
 	queryRowArgsForCall []struct {
-		query string
-		args  []interface{}
+		arg1 string
+		arg2 []interface{}
 	}
 	queryRowReturns struct {
 		result1 *sql.Row
@@ -35,35 +45,79 @@ type Querier struct {
 	queryRowReturnsOnCall map[int]struct {
 		result1 *sql.Row
 	}
-	CloseStub        func() error
-	closeMutex       sync.RWMutex
-	closeArgsForCall []struct{}
-	closeReturns     struct {
-		result1 error
-	}
-	closeReturnsOnCall map[int]struct {
-		result1 error
-	}
 	invocations      map[string][][]interface{}
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *Querier) Query(query string, args ...interface{}) (*sql.Rows, error) {
+func (fake *Querier) Close() error {
+	fake.closeMutex.Lock()
+	ret, specificReturn := fake.closeReturnsOnCall[len(fake.closeArgsForCall)]
+	fake.closeArgsForCall = append(fake.closeArgsForCall, struct {
+	}{})
+	fake.recordInvocation("Close", []interface{}{})
+	fake.closeMutex.Unlock()
+	if fake.CloseStub != nil {
+		return fake.CloseStub()
+	}
+	if specificReturn {
+		return ret.result1
+	}
+	fakeReturns := fake.closeReturns
+	return fakeReturns.result1
+}
+
+func (fake *Querier) CloseCallCount() int {
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
+	return len(fake.closeArgsForCall)
+}
+
+func (fake *Querier) CloseCalls(stub func() error) {
+	fake.closeMutex.Lock()
+	defer fake.closeMutex.Unlock()
+	fake.CloseStub = stub
+}
+
+func (fake *Querier) CloseReturns(result1 error) {
+	fake.closeMutex.Lock()
+	defer fake.closeMutex.Unlock()
+	fake.CloseStub = nil
+	fake.closeReturns = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *Querier) CloseReturnsOnCall(i int, result1 error) {
+	fake.closeMutex.Lock()
+	defer fake.closeMutex.Unlock()
+	fake.CloseStub = nil
+	if fake.closeReturnsOnCall == nil {
+		fake.closeReturnsOnCall = make(map[int]struct {
+			result1 error
+		})
+	}
+	fake.closeReturnsOnCall[i] = struct {
+		result1 error
+	}{result1}
+}
+
+func (fake *Querier) Query(arg1 string, arg2 ...interface{}) (*sql.Rows, error) {
 	fake.queryMutex.Lock()
 	ret, specificReturn := fake.queryReturnsOnCall[len(fake.queryArgsForCall)]
 	fake.queryArgsForCall = append(fake.queryArgsForCall, struct {
-		query string
-		args  []interface{}
-	}{query, args})
-	fake.recordInvocation("Query", []interface{}{query, args})
+		arg1 string
+		arg2 []interface{}
+	}{arg1, arg2})
+	fake.recordInvocation("Query", []interface{}{arg1, arg2})
 	fake.queryMutex.Unlock()
 	if fake.QueryStub != nil {
-		return fake.QueryStub(query, args...)
+		return fake.QueryStub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1, ret.result2
 	}
-	return fake.queryReturns.result1, fake.queryReturns.result2
+	fakeReturns := fake.queryReturns
+	return fakeReturns.result1, fakeReturns.result2
 }
 
 func (fake *Querier) QueryCallCount() int {
@@ -72,13 +126,22 @@ func (fake *Querier) QueryCallCount() int {
 	return len(fake.queryArgsForCall)
 }
 
+func (fake *Querier) QueryCalls(stub func(string, ...interface{}) (*sql.Rows, error)) {
+	fake.queryMutex.Lock()
+	defer fake.queryMutex.Unlock()
+	fake.QueryStub = stub
+}
+
 func (fake *Querier) QueryArgsForCall(i int) (string, []interface{}) {
 	fake.queryMutex.RLock()
 	defer fake.queryMutex.RUnlock()
-	return fake.queryArgsForCall[i].query, fake.queryArgsForCall[i].args
+	argsForCall := fake.queryArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *Querier) QueryReturns(result1 *sql.Rows, result2 error) {
+	fake.queryMutex.Lock()
+	defer fake.queryMutex.Unlock()
 	fake.QueryStub = nil
 	fake.queryReturns = struct {
 		result1 *sql.Rows
@@ -87,6 +150,8 @@ func (fake *Querier) QueryReturns(result1 *sql.Rows, result2 error) {
 }
 
 func (fake *Querier) QueryReturnsOnCall(i int, result1 *sql.Rows, result2 error) {
+	fake.queryMutex.Lock()
+	defer fake.queryMutex.Unlock()
 	fake.QueryStub = nil
 	if fake.queryReturnsOnCall == nil {
 		fake.queryReturnsOnCall = make(map[int]struct {
@@ -100,22 +165,23 @@ func (fake *Querier) QueryReturnsOnCall(i int, result1 *sql.Rows, result2 error)
 	}{result1, result2}
 }
 
-func (fake *Querier) QueryRow(query string, args ...interface{}) *sql.Row {
+func (fake *Querier) QueryRow(arg1 string, arg2 ...interface{}) *sql.Row {
 	fake.queryRowMutex.Lock()
 	ret, specificReturn := fake.queryRowReturnsOnCall[len(fake.queryRowArgsForCall)]
 	fake.queryRowArgsForCall = append(fake.queryRowArgsForCall, struct {
-		query string
-		args  []interface{}
-	}{query, args})
-	fake.recordInvocation("QueryRow", []interface{}{query, args})
+		arg1 string
+		arg2 []interface{}
+	}{arg1, arg2})
+	fake.recordInvocation("QueryRow", []interface{}{arg1, arg2})
 	fake.queryRowMutex.Unlock()
 	if fake.QueryRowStub != nil {
-		return fake.QueryRowStub(query, args...)
+		return fake.QueryRowStub(arg1, arg2...)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.queryRowReturns.result1
+	fakeReturns := fake.queryRowReturns
+	return fakeReturns.result1
 }
 
 func (fake *Querier) QueryRowCallCount() int {
@@ -124,13 +190,22 @@ func (fake *Querier) QueryRowCallCount() int {
 	return len(fake.queryRowArgsForCall)
 }
 
+func (fake *Querier) QueryRowCalls(stub func(string, ...interface{}) *sql.Row) {
+	fake.queryRowMutex.Lock()
+	defer fake.queryRowMutex.Unlock()
+	fake.QueryRowStub = stub
+}
+
 func (fake *Querier) QueryRowArgsForCall(i int) (string, []interface{}) {
 	fake.queryRowMutex.RLock()
 	defer fake.queryRowMutex.RUnlock()
-	return fake.queryRowArgsForCall[i].query, fake.queryRowArgsForCall[i].args
+	argsForCall := fake.queryRowArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *Querier) QueryRowReturns(result1 *sql.Row) {
+	fake.queryRowMutex.Lock()
+	defer fake.queryRowMutex.Unlock()
 	fake.QueryRowStub = nil
 	fake.queryRowReturns = struct {
 		result1 *sql.Row
@@ -138,6 +213,8 @@ func (fake *Querier) QueryRowReturns(result1 *sql.Row) {
 }
 
 func (fake *Querier) QueryRowReturnsOnCall(i int, result1 *sql.Row) {
+	fake.queryRowMutex.Lock()
+	defer fake.queryRowMutex.Unlock()
 	fake.QueryRowStub = nil
 	if fake.queryRowReturnsOnCall == nil {
 		fake.queryRowReturnsOnCall = make(map[int]struct {
@@ -149,55 +226,15 @@ func (fake *Querier) QueryRowReturnsOnCall(i int, result1 *sql.Row) {
 	}{result1}
 }
 
-func (fake *Querier) Close() error {
-	fake.closeMutex.Lock()
-	ret, specificReturn := fake.closeReturnsOnCall[len(fake.closeArgsForCall)]
-	fake.closeArgsForCall = append(fake.closeArgsForCall, struct{}{})
-	fake.recordInvocation("Close", []interface{}{})
-	fake.closeMutex.Unlock()
-	if fake.CloseStub != nil {
-		return fake.CloseStub()
-	}
-	if specificReturn {
-		return ret.result1
-	}
-	return fake.closeReturns.result1
-}
-
-func (fake *Querier) CloseCallCount() int {
-	fake.closeMutex.RLock()
-	defer fake.closeMutex.RUnlock()
-	return len(fake.closeArgsForCall)
-}
-
-func (fake *Querier) CloseReturns(result1 error) {
-	fake.CloseStub = nil
-	fake.closeReturns = struct {
-		result1 error
-	}{result1}
-}
-
-func (fake *Querier) CloseReturnsOnCall(i int, result1 error) {
-	fake.CloseStub = nil
-	if fake.closeReturnsOnCall == nil {
-		fake.closeReturnsOnCall = make(map[int]struct {
-			result1 error
-		})
-	}
-	fake.closeReturnsOnCall[i] = struct {
-		result1 error
-	}{result1}
-}
-
 func (fake *Querier) Invocations() map[string][][]interface{} {
 	fake.invocationsMutex.RLock()
 	defer fake.invocationsMutex.RUnlock()
+	fake.closeMutex.RLock()
+	defer fake.closeMutex.RUnlock()
 	fake.queryMutex.RLock()
 	defer fake.queryMutex.RUnlock()
 	fake.queryRowMutex.RLock()
 	defer fake.queryRowMutex.RUnlock()
-	fake.closeMutex.RLock()
-	defer fake.closeMutex.RUnlock()
 	copiedInvocations := map[string][][]interface{}{}
 	for key, value := range fake.invocations {
 		copiedInvocations[key] = value

@@ -8,10 +8,10 @@ import (
 )
 
 type TagBuilder struct {
-	BuildStub        func(column *sqlmodel.Column) string
+	BuildStub        func(*sqlmodel.Column) string
 	buildMutex       sync.RWMutex
 	buildArgsForCall []struct {
-		column *sqlmodel.Column
+		arg1 *sqlmodel.Column
 	}
 	buildReturns struct {
 		result1 string
@@ -23,21 +23,22 @@ type TagBuilder struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *TagBuilder) Build(column *sqlmodel.Column) string {
+func (fake *TagBuilder) Build(arg1 *sqlmodel.Column) string {
 	fake.buildMutex.Lock()
 	ret, specificReturn := fake.buildReturnsOnCall[len(fake.buildArgsForCall)]
 	fake.buildArgsForCall = append(fake.buildArgsForCall, struct {
-		column *sqlmodel.Column
-	}{column})
-	fake.recordInvocation("Build", []interface{}{column})
+		arg1 *sqlmodel.Column
+	}{arg1})
+	fake.recordInvocation("Build", []interface{}{arg1})
 	fake.buildMutex.Unlock()
 	if fake.BuildStub != nil {
-		return fake.BuildStub(column)
+		return fake.BuildStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.buildReturns.result1
+	fakeReturns := fake.buildReturns
+	return fakeReturns.result1
 }
 
 func (fake *TagBuilder) BuildCallCount() int {
@@ -46,13 +47,22 @@ func (fake *TagBuilder) BuildCallCount() int {
 	return len(fake.buildArgsForCall)
 }
 
+func (fake *TagBuilder) BuildCalls(stub func(*sqlmodel.Column) string) {
+	fake.buildMutex.Lock()
+	defer fake.buildMutex.Unlock()
+	fake.BuildStub = stub
+}
+
 func (fake *TagBuilder) BuildArgsForCall(i int) *sqlmodel.Column {
 	fake.buildMutex.RLock()
 	defer fake.buildMutex.RUnlock()
-	return fake.buildArgsForCall[i].column
+	argsForCall := fake.buildArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *TagBuilder) BuildReturns(result1 string) {
+	fake.buildMutex.Lock()
+	defer fake.buildMutex.Unlock()
 	fake.BuildStub = nil
 	fake.buildReturns = struct {
 		result1 string
@@ -60,6 +70,8 @@ func (fake *TagBuilder) BuildReturns(result1 string) {
 }
 
 func (fake *TagBuilder) BuildReturnsOnCall(i int, result1 string) {
+	fake.buildMutex.Lock()
+	defer fake.buildMutex.Unlock()
 	fake.BuildStub = nil
 	if fake.buildReturnsOnCall == nil {
 		fake.buildReturnsOnCall = make(map[int]struct {

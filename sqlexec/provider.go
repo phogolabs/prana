@@ -3,6 +3,7 @@ package sqlexec
 import (
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
@@ -15,17 +16,25 @@ const every = "sql"
 
 // Provider loads SQL sqlexecs and provides all SQL statements as commands.
 type Provider struct {
-	// DriverName is the current SQL driver
-	DriverName string
-	// private fields
+	dialect    string
 	mu         sync.RWMutex
 	repository map[string]string
 }
 
+// Dialect returns the dialect
+func (p *Provider) Dialect() string {
+	return p.dialect
+}
+
+// SetDialect sets the dialect
+func (p *Provider) SetDialect(value string) {
+	p.dialect = value
+}
+
 // ReadDir loads all sqlexec commands from a given directory. Note that all
 // sqlexecs should have .sql extension.
-func (p *Provider) ReadDir(fs FileSystem) error {
-	return fs.Walk("/", func(path string, info os.FileInfo, err error) error {
+func (p *Provider) ReadDir(storage FileSystem) error {
+	return fs.WalkDir(storage, ".", func(path string, info fs.DirEntry, err error) error {
 		if info == nil {
 			return os.ErrNotExist
 		}
@@ -34,17 +43,17 @@ func (p *Provider) ReadDir(fs FileSystem) error {
 			return nil
 		}
 
-		return p.ReadFile(path, fs)
+		return p.ReadFile(path, storage)
 	})
 }
 
 // ReadFile reads a given file
-func (p *Provider) ReadFile(path string, fs FileSystem) error {
+func (p *Provider) ReadFile(path string, storage FileSystem) error {
 	if !p.filter(path) {
 		return nil
 	}
 
-	file, err := fs.OpenFile(path, os.O_RDONLY, 0)
+	file, err := storage.Open(path)
 	if err != nil {
 		return err
 	}
@@ -92,7 +101,7 @@ func (p *Provider) Query(name string) (string, error) {
 	defer p.mu.RUnlock()
 
 	if query, ok := p.repository[name]; ok {
-		return sqlx.Rebind(sqlx.BindType(p.DriverName), query), nil
+		return sqlx.Rebind(sqlx.BindType(p.dialect), query), nil
 	}
 
 	return "", nonExistQueryErr(name)
@@ -107,7 +116,7 @@ func (p *Provider) filter(path string) bool {
 	}
 
 	driver := PathDriver(path)
-	return driver == every || driver == p.DriverName
+	return driver == every || driver == p.dialect
 }
 
 // PathDriver returns the driver name from a given path

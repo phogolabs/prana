@@ -2,6 +2,7 @@ package sqlexec
 
 import (
 	"fmt"
+	"io"
 	"os"
 	"strings"
 	"time"
@@ -12,7 +13,7 @@ import (
 // Generator generates a new command.
 type Generator struct {
 	// FileSystem represents the project directory file system.
-	FileSystem FileSystem
+	FileSystem WriteFileSystem
 }
 
 // Create crates a new file and command for given file name and command name.
@@ -37,6 +38,7 @@ func (g *Generator) Create(path, name string) (string, string, error) {
 	}
 
 	path = fmt.Sprintf("%s.sql", path)
+
 	file, err := g.FileSystem.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_APPEND, 0600)
 	if err != nil {
 		return "", "", err
@@ -44,10 +46,11 @@ func (g *Generator) Create(path, name string) (string, string, error) {
 
 	defer file.Close()
 
-	fmt.Fprintln(file, "-- Auto-generated at", now.Format(time.RFC1123))
-	fmt.Fprintf(file, "-- name: %s", name)
-	fmt.Fprintln(file)
-	fmt.Fprintln(file)
+	if writer, ok := file.(io.Writer); ok {
+		fmt.Fprintf(writer, "-- name: %s", name)
+		fmt.Fprintln(writer)
+		fmt.Fprintln(writer)
+	}
 
 	return name, path, err
 }

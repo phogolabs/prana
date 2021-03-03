@@ -3,9 +3,10 @@ package sqlmigr_test
 import (
 	"fmt"
 
+	"github.com/phogolabs/prana/sqlmigr"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/prana/sqlmigr"
 )
 
 var _ = Describe("Migration", func() {

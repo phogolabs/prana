@@ -9,8 +9,8 @@ import (
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/cli"
 	"github.com/phogolabs/log"
-	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmigr"
+	"github.com/phogolabs/prana/storage"
 )
 
 // SQLMigration provides a subcommands to work with SQL migrations.
@@ -89,8 +89,8 @@ func (m *SQLMigration) CreateCommand() *cli.Command {
 	}
 }
 
-func (m *SQLMigration) before(ctx *cli.Context) error {
-	db, err := open(ctx)
+func (m *SQLMigration) before(ctx *cli.Context) (err error) {
+	m.db, err = open(ctx)
 	if err != nil {
 		return err
 	}
@@ -100,19 +100,20 @@ func (m *SQLMigration) before(ctx *cli.Context) error {
 		return cli.WrapError(err).WithCode(ErrCodeArg)
 	}
 
-	m.db = db
+	storage := storage.New(m.dir)
+	// executer setup
 	m.executor = &sqlmigr.Executor{
 		Logger: log.WithField("command", ctx.Command.Name),
 		Provider: &sqlmigr.Provider{
-			FileSystem: parcello.Dir(m.dir),
-			DB:         db,
+			FileSystem: storage,
+			DB:         m.db,
 		},
 		Runner: &sqlmigr.Runner{
-			FileSystem: parcello.Dir(m.dir),
-			DB:         db,
+			FileSystem: storage,
+			DB:         m.db,
 		},
 		Generator: &sqlmigr.Generator{
-			FileSystem: parcello.Dir(m.dir),
+			FileSystem: storage,
 		},
 	}
 

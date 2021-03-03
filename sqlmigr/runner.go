@@ -3,7 +3,6 @@ package sqlmigr
 import (
 	"bytes"
 	"fmt"
-	"os"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/phogolabs/prana/sqlexec"
@@ -90,7 +89,7 @@ func (r *Runner) routine(name string, m *Migration) ([]string, error) {
 }
 
 func (r *Runner) scan(filename string) (map[string]string, error) {
-	file, err := r.FileSystem.OpenFile(filename, os.O_RDONLY, 0)
+	file, err := r.FileSystem.Open(filename)
 	if err != nil {
 		return nil, err
 	}

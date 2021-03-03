@@ -3,18 +3,15 @@ package sqlmigr
 import "github.com/jmoiron/sqlx"
 
 // RunAll runs all sqlmigrs
-func RunAll(db *sqlx.DB, fileSystem FileSystem) error {
+func RunAll(db *sqlx.DB, storage FileSystem) error {
 	executor := &Executor{
 		Provider: &Provider{
-			FileSystem: fileSystem,
+			FileSystem: storage,
 			DB:         db,
 		},
 		Runner: &Runner{
-			FileSystem: fileSystem,
+			FileSystem: storage,
 			DB:         db,
-		},
-		Generator: &Generator{
-			FileSystem: fileSystem,
 		},
 	}
 

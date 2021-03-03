@@ -3,6 +3,7 @@ package sqlmigr
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
@@ -38,7 +39,7 @@ func (m *Provider) Migrations() ([]*Migration, error) {
 func (m *Provider) files() ([]*Migration, error) {
 	local := []*Migration{}
 
-	err := m.FileSystem.Walk("/", func(path string, info os.FileInfo, err error) error {
+	err := fs.WalkDir(m.FileSystem, ".", func(path string, info os.DirEntry, err error) error {
 		if ferr := m.filter(info); ferr != nil {
 			if ferr.Error() == "skip" {
 				ferr = nil
@@ -75,7 +76,7 @@ func (m *Provider) files() ([]*Migration, error) {
 	return local, nil
 }
 
-func (m *Provider) filter(info os.FileInfo) error {
+func (m *Provider) filter(info fs.DirEntry) error {
 	skip := fmt.Errorf("skip")
 
 	if info == nil {

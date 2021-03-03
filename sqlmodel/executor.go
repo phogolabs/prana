@@ -51,8 +51,10 @@ func (e *Executor) Create(spec *Spec) (string, error) {
 		}
 	}()
 
-	if _, err = file.Write(body); err != nil {
-		return "", err
+	if writer, ok := file.(io.Writer); ok {
+		if _, err = writer.Write(body); err != nil {
+			return "", err
+		}
 	}
 
 	return filepath, nil

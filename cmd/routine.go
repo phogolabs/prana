@@ -6,9 +6,9 @@ import (
 
 	"github.com/phogolabs/cli"
 	"github.com/phogolabs/log"
-	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlexec"
 	"github.com/phogolabs/prana/sqlmodel"
+	"github.com/phogolabs/prana/storage"
 )
 
 // SQLRoutine provides a subcommands to work with SQL scripts and their
@@ -131,7 +131,7 @@ func (m *SQLRoutine) before(ctx *cli.Context) error {
 	}
 
 	m.runner = &sqlexec.Runner{
-		FileSystem: parcello.Dir(dir),
+		FileSystem: storage.New(dir),
 		DB:         db,
 	}
 
@@ -161,7 +161,7 @@ func (m *SQLRoutine) create(ctx *cli.Context) error {
 	}
 
 	generator := &sqlexec.Generator{
-		FileSystem: m.runner.FileSystem,
+		FileSystem: m.runner.FileSystem.(*storage.FileSystem),
 	}
 
 	name, path, err := generator.Create(ctx.String("filename"), args[0])
@@ -236,7 +236,7 @@ func (m *SQLRoutine) spec(ctx *cli.Context) *sqlmodel.Spec {
 	spec := &sqlmodel.Spec{
 		Filename:     "routine.sql",
 		Template:     "routine",
-		FileSystem:   parcello.Dir(ctx.GlobalString("routine-dir")),
+		FileSystem:   storage.New(ctx.GlobalString("routine-dir")),
 		Schema:       ctx.String("schema-name"),
 		Tables:       ctx.StringSlice("table-name"),
 		IgnoreTables: ctx.StringSlice("ignore-table-name"),
