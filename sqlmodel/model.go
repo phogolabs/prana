@@ -3,15 +3,16 @@ package sqlmodel
 
 import (
 	"database/sql"
+	"embed"
 	"fmt"
 	"io"
+	"io/fs"
 	"sort"
 	"strings"
-
-	"github.com/phogolabs/parcello"
 )
 
-//go:generate parcello -r -i *.txt
+//go:embed template/*
+var template embed.FS
 
 var (
 	intDef = &TypeDef{
@@ -96,10 +97,10 @@ var (
 	}
 )
 
-//go:generate counterfeiter -fake-name SchemaProvider -o ../fake/SchemaProvider.go . SchemaProvider
-//go:generate counterfeiter -fake-name ModelGenerator -o ../fake/ModelGenerator.go . Generator
-//go:generate counterfeiter -fake-name TagBuilder -o ../fake/TagBuilder.go . TagBuilder
-//go:generate counterfeiter -fake-name Querier -o ../fake/Querier.go . Querier
+//go:generate counterfeiter -fake-name SchemaProvider -o ../fake/schema_provider.go . SchemaProvider
+//go:generate counterfeiter -fake-name ModelGenerator -o ../fake/model_generator.go . Generator
+//go:generate counterfeiter -fake-name TagBuilder -o ../fake/tag_builder.go . TagBuilder
+//go:generate counterfeiter -fake-name Querier -o ../fake/querier.go . Querier
 
 // Querier executes queries
 type Querier interface {
@@ -288,7 +289,15 @@ func (t ColumnType) String() string {
 }
 
 // FileSystem provides with primitives to work with the underlying file system
-type FileSystem = parcello.FileSystem
+type FileSystem = fs.FS
+
+// WriteFileSystem represents a wriable file system
+type WriteFileSystem interface {
+	FileSystem
+
+	// OpenFile opens a new file
+	OpenFile(string, int, fs.FileMode) (fs.File, error)
+}
 
 // TypeDef represents a type definition
 type TypeDef struct {
@@ -313,7 +322,7 @@ type Spec struct {
 	// Template name
 	Template string
 	// FileSystem is the underlying file system
-	FileSystem FileSystem
+	FileSystem WriteFileSystem
 	// Schema is the database schema name
 	Schema string
 	// Tables is the list of the desired tables from the database schema

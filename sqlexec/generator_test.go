@@ -4,16 +4,15 @@ import (
 	"bytes"
 	"fmt"
 	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"github.com/phogolabs/prana/sqlexec"
+	"github.com/phogolabs/prana/storage"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/parcello"
-	"github.com/phogolabs/prana/fake"
-	"github.com/phogolabs/prana/sqlexec"
 )
 
 var _ = Describe("Generator", func() {
@@ -28,7 +27,7 @@ var _ = Describe("Generator", func() {
 		Expect(err).To(BeNil())
 
 		generator = &sqlexec.Generator{
-			FileSystem: parcello.Dir(dir),
+			FileSystem: storage.New(dir),
 		}
 	})
 
@@ -98,19 +97,6 @@ var _ = Describe("Generator", func() {
 			})
 		})
 
-		Context("when opening a file fails", func() {
-			BeforeEach(func() {
-				fileSystem := &fake.FileSystem{}
-				fileSystem.OpenFileReturns(nil, fmt.Errorf("Oh no!"))
-				generator.FileSystem = fileSystem
-			})
-
-			It("returns an error", func() {
-				_, _, err := generator.Create("commands", "update")
-				Expect(err).To(MatchError("Oh no!"))
-			})
-		})
-
 		Context("when the command already exists", func() {
 			It("returns an error", func() {
 				buffer := &bytes.Buffer{}
@@ -122,14 +108,6 @@ var _ = Describe("Generator", func() {
 
 				_, _, err := generator.Create("commands", "update")
 				Expect(err).To(MatchError("Query 'update' already exists"))
-			})
-		})
-
-		Context("when the dir is not valid", func() {
-			It("returns an error", func() {
-				generator.FileSystem = parcello.Dir("/hello")
-				_, _, err := generator.Create("commands", "update")
-				Expect(os.IsNotExist(err)).To(BeTrue())
 			})
 		})
 	})

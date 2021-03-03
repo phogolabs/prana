@@ -8,10 +8,10 @@ import (
 )
 
 type ModelGenerator struct {
-	GenerateStub        func(ctx *sqlmodel.GeneratorContext) error
+	GenerateStub        func(*sqlmodel.GeneratorContext) error
 	generateMutex       sync.RWMutex
 	generateArgsForCall []struct {
-		ctx *sqlmodel.GeneratorContext
+		arg1 *sqlmodel.GeneratorContext
 	}
 	generateReturns struct {
 		result1 error
@@ -23,21 +23,22 @@ type ModelGenerator struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *ModelGenerator) Generate(ctx *sqlmodel.GeneratorContext) error {
+func (fake *ModelGenerator) Generate(arg1 *sqlmodel.GeneratorContext) error {
 	fake.generateMutex.Lock()
 	ret, specificReturn := fake.generateReturnsOnCall[len(fake.generateArgsForCall)]
 	fake.generateArgsForCall = append(fake.generateArgsForCall, struct {
-		ctx *sqlmodel.GeneratorContext
-	}{ctx})
-	fake.recordInvocation("Generate", []interface{}{ctx})
+		arg1 *sqlmodel.GeneratorContext
+	}{arg1})
+	fake.recordInvocation("Generate", []interface{}{arg1})
 	fake.generateMutex.Unlock()
 	if fake.GenerateStub != nil {
-		return fake.GenerateStub(ctx)
+		return fake.GenerateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.generateReturns.result1
+	fakeReturns := fake.generateReturns
+	return fakeReturns.result1
 }
 
 func (fake *ModelGenerator) GenerateCallCount() int {
@@ -46,13 +47,22 @@ func (fake *ModelGenerator) GenerateCallCount() int {
 	return len(fake.generateArgsForCall)
 }
 
+func (fake *ModelGenerator) GenerateCalls(stub func(*sqlmodel.GeneratorContext) error) {
+	fake.generateMutex.Lock()
+	defer fake.generateMutex.Unlock()
+	fake.GenerateStub = stub
+}
+
 func (fake *ModelGenerator) GenerateArgsForCall(i int) *sqlmodel.GeneratorContext {
 	fake.generateMutex.RLock()
 	defer fake.generateMutex.RUnlock()
-	return fake.generateArgsForCall[i].ctx
+	argsForCall := fake.generateArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *ModelGenerator) GenerateReturns(result1 error) {
+	fake.generateMutex.Lock()
+	defer fake.generateMutex.Unlock()
 	fake.GenerateStub = nil
 	fake.generateReturns = struct {
 		result1 error
@@ -60,6 +70,8 @@ func (fake *ModelGenerator) GenerateReturns(result1 error) {
 }
 
 func (fake *ModelGenerator) GenerateReturnsOnCall(i int, result1 error) {
+	fake.generateMutex.Lock()
+	defer fake.generateMutex.Unlock()
 	fake.GenerateStub = nil
 	if fake.generateReturnsOnCall == nil {
 		fake.generateReturnsOnCall = make(map[int]struct {

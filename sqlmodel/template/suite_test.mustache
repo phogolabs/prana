@@ -11,11 +11,10 @@ import (
 	"os"
 	"testing"
 
+	"github.com/phogolabs/orm"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-
-	"github.com/phogolabs/orm"
-	"github.com/phogolabs/parcello"
 )
 
 var (
@@ -39,11 +38,8 @@ var _ = BeforeSuite(func() {
 	}
 
 	gateway, err = orm.Connect(url)
-	Expect(err).NotTo(HaveOccurred())
-
 	Expect(gateway).NotTo(BeNil())
-	Expect(gateway.Migrate(parcello.ManagerAt("migration"))).To(Succeed())
-	Expect(gateway.ReadDir(parcello.ManagerAt("routine"))).To(Succeed())
+	Expect(err).NotTo(HaveOccurred())
 })
 
 var _ = AfterSuite(func() {

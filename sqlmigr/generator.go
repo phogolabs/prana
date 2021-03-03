@@ -13,7 +13,7 @@ var _ MigrationGenerator = &Generator{}
 // Generator generates a new sqlmigr file for given directory.
 type Generator struct {
 	// FileSystem is the file system where all sqlmigrs are created.
-	FileSystem FileSystem
+	FileSystem WriteFileSystem
 }
 
 // Create creates a new sqlmigr.
@@ -62,9 +62,12 @@ func (g *Generator) write(filename string, data []byte, perm os.FileMode) error 
 	if err != nil {
 		return err
 	}
-	n, err := f.Write(data)
-	if err == nil && n < len(data) {
-		err = io.ErrShortWrite
+
+	if writer, ok := f.(io.Writer); ok {
+		n, err := writer.Write(data)
+		if err == nil && n < len(data) {
+			err = io.ErrShortWrite
+		}
 	}
 	if err1 := f.Close(); err == nil {
 		err = err1

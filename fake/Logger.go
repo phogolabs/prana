@@ -53,15 +53,15 @@ type Logger struct {
 		arg1 string
 		arg2 []interface{}
 	}
-	FieldsStub        func() log.Map
+	FieldsStub        func() map[string]interface{}
 	fieldsMutex       sync.RWMutex
 	fieldsArgsForCall []struct {
 	}
 	fieldsReturns struct {
-		result1 log.Map
+		result1 map[string]interface{}
 	}
 	fieldsReturnsOnCall map[int]struct {
-		result1 log.Map
+		result1 map[string]interface{}
 	}
 	InfoStub        func(...interface{})
 	infoMutex       sync.RWMutex
@@ -130,10 +130,10 @@ type Logger struct {
 	withFieldReturnsOnCall map[int]struct {
 		result1 log.Logger
 	}
-	WithFieldsStub        func(log.Map) log.Logger
+	WithFieldsStub        func(map[string]interface{}) log.Logger
 	withFieldsMutex       sync.RWMutex
 	withFieldsArgsForCall []struct {
-		arg1 log.Map
+		arg1 map[string]interface{}
 	}
 	withFieldsReturns struct {
 		result1 log.Logger
@@ -397,7 +397,7 @@ func (fake *Logger) FatalfArgsForCall(i int) (string, []interface{}) {
 	return argsForCall.arg1, argsForCall.arg2
 }
 
-func (fake *Logger) Fields() log.Map {
+func (fake *Logger) Fields() map[string]interface{} {
 	fake.fieldsMutex.Lock()
 	ret, specificReturn := fake.fieldsReturnsOnCall[len(fake.fieldsArgsForCall)]
 	fake.fieldsArgsForCall = append(fake.fieldsArgsForCall, struct {
@@ -420,32 +420,32 @@ func (fake *Logger) FieldsCallCount() int {
 	return len(fake.fieldsArgsForCall)
 }
 
-func (fake *Logger) FieldsCalls(stub func() log.Map) {
+func (fake *Logger) FieldsCalls(stub func() map[string]interface{}) {
 	fake.fieldsMutex.Lock()
 	defer fake.fieldsMutex.Unlock()
 	fake.FieldsStub = stub
 }
 
-func (fake *Logger) FieldsReturns(result1 log.Map) {
+func (fake *Logger) FieldsReturns(result1 map[string]interface{}) {
 	fake.fieldsMutex.Lock()
 	defer fake.fieldsMutex.Unlock()
 	fake.FieldsStub = nil
 	fake.fieldsReturns = struct {
-		result1 log.Map
+		result1 map[string]interface{}
 	}{result1}
 }
 
-func (fake *Logger) FieldsReturnsOnCall(i int, result1 log.Map) {
+func (fake *Logger) FieldsReturnsOnCall(i int, result1 map[string]interface{}) {
 	fake.fieldsMutex.Lock()
 	defer fake.fieldsMutex.Unlock()
 	fake.FieldsStub = nil
 	if fake.fieldsReturnsOnCall == nil {
 		fake.fieldsReturnsOnCall = make(map[int]struct {
-			result1 log.Map
+			result1 map[string]interface{}
 		})
 	}
 	fake.fieldsReturnsOnCall[i] = struct {
-		result1 log.Map
+		result1 map[string]interface{}
 	}{result1}
 }
 
@@ -822,11 +822,11 @@ func (fake *Logger) WithFieldReturnsOnCall(i int, result1 log.Logger) {
 	}{result1}
 }
 
-func (fake *Logger) WithFields(arg1 log.Map) log.Logger {
+func (fake *Logger) WithFields(arg1 map[string]interface{}) log.Logger {
 	fake.withFieldsMutex.Lock()
 	ret, specificReturn := fake.withFieldsReturnsOnCall[len(fake.withFieldsArgsForCall)]
 	fake.withFieldsArgsForCall = append(fake.withFieldsArgsForCall, struct {
-		arg1 log.Map
+		arg1 map[string]interface{}
 	}{arg1})
 	fake.recordInvocation("WithFields", []interface{}{arg1})
 	fake.withFieldsMutex.Unlock()
@@ -846,13 +846,13 @@ func (fake *Logger) WithFieldsCallCount() int {
 	return len(fake.withFieldsArgsForCall)
 }
 
-func (fake *Logger) WithFieldsCalls(stub func(log.Map) log.Logger) {
+func (fake *Logger) WithFieldsCalls(stub func(map[string]interface{}) log.Logger) {
 	fake.withFieldsMutex.Lock()
 	defer fake.withFieldsMutex.Unlock()
 	fake.WithFieldsStub = stub
 }
 
-func (fake *Logger) WithFieldsArgsForCall(i int) log.Map {
+func (fake *Logger) WithFieldsArgsForCall(i int) map[string]interface{} {
 	fake.withFieldsMutex.RLock()
 	defer fake.withFieldsMutex.RUnlock()
 	argsForCall := fake.withFieldsArgsForCall[i]

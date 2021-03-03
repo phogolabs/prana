@@ -9,10 +9,11 @@ import (
 	"time"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/prana/sqlmigr"
+	"github.com/phogolabs/prana/storage"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/parcello"
-	"github.com/phogolabs/prana/sqlmigr"
 )
 
 var _ = Describe("Provider", func() {
@@ -32,7 +33,7 @@ var _ = Describe("Provider", func() {
 		Expect(err).To(BeNil())
 
 		provider = &sqlmigr.Provider{
-			FileSystem: parcello.Dir(dir),
+			FileSystem: storage.New(dir),
 			DB:         db,
 		}
 	})

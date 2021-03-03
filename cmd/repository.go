@@ -6,8 +6,8 @@ import (
 
 	"github.com/phogolabs/cli"
 	"github.com/phogolabs/log"
-	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/sqlmodel"
+	"github.com/phogolabs/prana/storage"
 )
 
 // SQLRepository provides a subcommands to work generate repository from existing schema
@@ -168,7 +168,7 @@ func (m *SQLRepository) specs(ctx *cli.Context) []*sqlmodel.Spec {
 	spec = &sqlmodel.Spec{
 		Filename:     "repository.go",
 		Template:     "repository",
-		FileSystem:   parcello.Dir(ctx.GlobalString("package-dir")),
+		FileSystem:   storage.New(ctx.GlobalString("package-dir")),
 		Schema:       ctx.String("schema-name"),
 		Tables:       ctx.StringSlice("table-name"),
 		IgnoreTables: ctx.StringSlice("ignore-table-name"),

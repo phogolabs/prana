@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/aymerick/raymond"
-	"github.com/phogolabs/parcello"
 	"golang.org/x/tools/imports"
 )
 
@@ -69,7 +68,9 @@ func (g *Codegen) Generate(ctx *GeneratorContext) error {
 }
 
 func (g *Codegen) template(name string) (string, error) {
-	template, err := parcello.Open(fmt.Sprintf("template/%s.mustache", name))
+	path := fmt.Sprintf("template/%s.mustache", name)
+	// open path
+	template, err := template.Open(path)
 	if err != nil {
 		return "", err
 	}

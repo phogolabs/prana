@@ -6,15 +6,17 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-	"github.com/phogolabs/parcello"
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmodel"
+	"github.com/phogolabs/prana/storage"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Executor", func() {
 	var (
+		directory string
 		executor  *sqlmodel.Executor
 		spec      *sqlmodel.Spec
 		provider  *fake.SchemaProvider
@@ -27,10 +29,10 @@ var _ = Describe("Executor", func() {
 			Name:      "public",
 			IsDefault: true,
 			Tables: []sqlmodel.Table{
-				sqlmodel.Table{
+				{
 					Name: "table1",
 					Columns: []sqlmodel.Column{
-						sqlmodel.Column{
+						{
 							Name:     "ID",
 							ScanType: "string",
 						},
@@ -39,7 +41,8 @@ var _ = Describe("Executor", func() {
 			},
 		}
 
-		dir, err := ioutil.TempDir("", "prana")
+		var err error
+		directory, err = ioutil.TempDir("", "prana")
 		Expect(err).To(BeNil())
 
 		spec = &sqlmodel.Spec{
@@ -47,7 +50,7 @@ var _ = Describe("Executor", func() {
 			Template:   "model",
 			Tables:     []string{"table1"},
 			Filename:   "schema.go",
-			FileSystem: parcello.Dir(dir),
+			FileSystem: storage.New(directory),
 		}
 
 		provider = &fake.SchemaProvider{}
@@ -165,7 +168,7 @@ var _ = Describe("Executor", func() {
 				Expect(err).To(Succeed())
 				Expect(path).To(Equal(filename))
 
-				dir := fmt.Sprintf("%v", spec.FileSystem)
+				dir := fmt.Sprintf("%v", directory)
 				Expect(dir).To(BeADirectory())
 				Expect(filepath.Join(dir, path)).To(BeARegularFile())
 
@@ -288,35 +291,6 @@ var _ = Describe("Executor", func() {
 			It("returns the error", func() {
 				path, err := executor.Create(spec)
 				Expect(err).To(MatchError("Oh no!"))
-				Expect(path).To(BeEmpty())
-			})
-		})
-
-		Context("when writing the file fails", func() {
-			BeforeEach(func() {
-				file := &fake.File{}
-				file.WriteReturns(0, fmt.Errorf("oh no!"))
-
-				fs := &fake.FileSystem{}
-				fs.OpenFileReturns(file, nil)
-				spec.FileSystem = fs
-			})
-
-			It("returns the error", func() {
-				path, err := executor.Create(spec)
-				Expect(err).To(MatchError("oh no!"))
-				Expect(path).To(BeEmpty())
-			})
-		})
-
-		Context("when creating the dir fails", func() {
-			BeforeEach(func() {
-				spec.FileSystem = parcello.Dir("/mydir")
-			})
-
-			It("returns the error", func() {
-				path, err := executor.Create(spec)
-				Expect(err).To(MatchError("mkdir /mydir: permission denied"))
 				Expect(path).To(BeEmpty())
 			})
 		})

@@ -8,10 +8,10 @@ import (
 )
 
 type MigrationGenerator struct {
-	CreateStub        func(m *sqlmigr.Migration) error
+	CreateStub        func(*sqlmigr.Migration) error
 	createMutex       sync.RWMutex
 	createArgsForCall []struct {
-		m *sqlmigr.Migration
+		arg1 *sqlmigr.Migration
 	}
 	createReturns struct {
 		result1 error
@@ -19,11 +19,11 @@ type MigrationGenerator struct {
 	createReturnsOnCall map[int]struct {
 		result1 error
 	}
-	WriteStub        func(m *sqlmigr.Migration, content *sqlmigr.Content) error
+	WriteStub        func(*sqlmigr.Migration, *sqlmigr.Content) error
 	writeMutex       sync.RWMutex
 	writeArgsForCall []struct {
-		m       *sqlmigr.Migration
-		content *sqlmigr.Content
+		arg1 *sqlmigr.Migration
+		arg2 *sqlmigr.Content
 	}
 	writeReturns struct {
 		result1 error
@@ -35,21 +35,22 @@ type MigrationGenerator struct {
 	invocationsMutex sync.RWMutex
 }
 
-func (fake *MigrationGenerator) Create(m *sqlmigr.Migration) error {
+func (fake *MigrationGenerator) Create(arg1 *sqlmigr.Migration) error {
 	fake.createMutex.Lock()
 	ret, specificReturn := fake.createReturnsOnCall[len(fake.createArgsForCall)]
 	fake.createArgsForCall = append(fake.createArgsForCall, struct {
-		m *sqlmigr.Migration
-	}{m})
-	fake.recordInvocation("Create", []interface{}{m})
+		arg1 *sqlmigr.Migration
+	}{arg1})
+	fake.recordInvocation("Create", []interface{}{arg1})
 	fake.createMutex.Unlock()
 	if fake.CreateStub != nil {
-		return fake.CreateStub(m)
+		return fake.CreateStub(arg1)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.createReturns.result1
+	fakeReturns := fake.createReturns
+	return fakeReturns.result1
 }
 
 func (fake *MigrationGenerator) CreateCallCount() int {
@@ -58,13 +59,22 @@ func (fake *MigrationGenerator) CreateCallCount() int {
 	return len(fake.createArgsForCall)
 }
 
+func (fake *MigrationGenerator) CreateCalls(stub func(*sqlmigr.Migration) error) {
+	fake.createMutex.Lock()
+	defer fake.createMutex.Unlock()
+	fake.CreateStub = stub
+}
+
 func (fake *MigrationGenerator) CreateArgsForCall(i int) *sqlmigr.Migration {
 	fake.createMutex.RLock()
 	defer fake.createMutex.RUnlock()
-	return fake.createArgsForCall[i].m
+	argsForCall := fake.createArgsForCall[i]
+	return argsForCall.arg1
 }
 
 func (fake *MigrationGenerator) CreateReturns(result1 error) {
+	fake.createMutex.Lock()
+	defer fake.createMutex.Unlock()
 	fake.CreateStub = nil
 	fake.createReturns = struct {
 		result1 error
@@ -72,6 +82,8 @@ func (fake *MigrationGenerator) CreateReturns(result1 error) {
 }
 
 func (fake *MigrationGenerator) CreateReturnsOnCall(i int, result1 error) {
+	fake.createMutex.Lock()
+	defer fake.createMutex.Unlock()
 	fake.CreateStub = nil
 	if fake.createReturnsOnCall == nil {
 		fake.createReturnsOnCall = make(map[int]struct {
@@ -83,22 +95,23 @@ func (fake *MigrationGenerator) CreateReturnsOnCall(i int, result1 error) {
 	}{result1}
 }
 
-func (fake *MigrationGenerator) Write(m *sqlmigr.Migration, content *sqlmigr.Content) error {
+func (fake *MigrationGenerator) Write(arg1 *sqlmigr.Migration, arg2 *sqlmigr.Content) error {
 	fake.writeMutex.Lock()
 	ret, specificReturn := fake.writeReturnsOnCall[len(fake.writeArgsForCall)]
 	fake.writeArgsForCall = append(fake.writeArgsForCall, struct {
-		m       *sqlmigr.Migration
-		content *sqlmigr.Content
-	}{m, content})
-	fake.recordInvocation("Write", []interface{}{m, content})
+		arg1 *sqlmigr.Migration
+		arg2 *sqlmigr.Content
+	}{arg1, arg2})
+	fake.recordInvocation("Write", []interface{}{arg1, arg2})
 	fake.writeMutex.Unlock()
 	if fake.WriteStub != nil {
-		return fake.WriteStub(m, content)
+		return fake.WriteStub(arg1, arg2)
 	}
 	if specificReturn {
 		return ret.result1
 	}
-	return fake.writeReturns.result1
+	fakeReturns := fake.writeReturns
+	return fakeReturns.result1
 }
 
 func (fake *MigrationGenerator) WriteCallCount() int {
@@ -107,13 +120,22 @@ func (fake *MigrationGenerator) WriteCallCount() int {
 	return len(fake.writeArgsForCall)
 }
 
+func (fake *MigrationGenerator) WriteCalls(stub func(*sqlmigr.Migration, *sqlmigr.Content) error) {
+	fake.writeMutex.Lock()
+	defer fake.writeMutex.Unlock()
+	fake.WriteStub = stub
+}
+
 func (fake *MigrationGenerator) WriteArgsForCall(i int) (*sqlmigr.Migration, *sqlmigr.Content) {
 	fake.writeMutex.RLock()
 	defer fake.writeMutex.RUnlock()
-	return fake.writeArgsForCall[i].m, fake.writeArgsForCall[i].content
+	argsForCall := fake.writeArgsForCall[i]
+	return argsForCall.arg1, argsForCall.arg2
 }
 
 func (fake *MigrationGenerator) WriteReturns(result1 error) {
+	fake.writeMutex.Lock()
+	defer fake.writeMutex.Unlock()
 	fake.WriteStub = nil
 	fake.writeReturns = struct {
 		result1 error
@@ -121,6 +143,8 @@ func (fake *MigrationGenerator) WriteReturns(result1 error) {
 }
 
 func (fake *MigrationGenerator) WriteReturnsOnCall(i int, result1 error) {
+	fake.writeMutex.Lock()
+	defer fake.writeMutex.Unlock()
 	fake.WriteStub = nil
 	if fake.writeReturnsOnCall == nil {
 		fake.writeReturnsOnCall = make(map[int]struct {

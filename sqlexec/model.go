@@ -3,8 +3,9 @@
 package sqlexec
 
 import (
+	"io/fs"
+
 	"github.com/jmoiron/sqlx"
-	"github.com/phogolabs/parcello"
 )
 
 var (
@@ -19,4 +20,12 @@ type Param = interface{}
 type Rows = sqlx.Rows
 
 // FileSystem provides with primitives to work with the underlying file system
-type FileSystem = parcello.FileSystem
+type FileSystem = fs.FS
+
+// WriteFileSystem represents a wriable file system
+type WriteFileSystem interface {
+	FileSystem
+
+	// OpenFile opens a new file
+	OpenFile(string, int, fs.FileMode) (fs.File, error)
+}

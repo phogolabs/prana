@@ -5,10 +5,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/onsi/gomega/gexec"
+
 	_ "github.com/mattn/go-sqlite3"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gexec"
 )
 
 var gomPath string

@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"time"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
-
 	"github.com/phogolabs/prana/fake"
 	"github.com/phogolabs/prana/sqlmigr"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Printer", func() {

@@ -8,11 +8,11 @@ import (
 	"path/filepath"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/prana/sqlmigr"
+	"github.com/phogolabs/prana/storage"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/phogolabs/parcello"
-	"github.com/phogolabs/prana/fake"
-	"github.com/phogolabs/prana/sqlmigr"
 )
 
 var _ = Describe("Runner", func() {
@@ -33,7 +33,7 @@ var _ = Describe("Runner", func() {
 		Expect(err).To(BeNil())
 
 		runner = &sqlmigr.Runner{
-			FileSystem: parcello.Dir(dir),
+			FileSystem: storage.New(dir),
 			DB:         db,
 		}
 
@@ -121,13 +121,6 @@ var _ = Describe("Runner", func() {
 				Expect(runner.Run(item)).To(HaveOccurred())
 			})
 		})
-
-		Context("when the dir is not valid", func() {
-			It("returns an error", func() {
-				runner.FileSystem = parcello.Dir("/")
-				Expect(runner.Run(item).Error()).To(Equal("open /20160102150_schema.sql: no such file or directory"))
-			})
-		})
 	})
 
 	Describe("Revert", func() {
@@ -186,18 +179,6 @@ var _ = Describe("Runner", func() {
 
 			It("return an error", func() {
 				Expect(runner.Revert(item)).To(MatchError("routine 'down' not found for migration '20160102150_schema'"))
-			})
-		})
-
-		Context("when the dir is not valid", func() {
-			JustBeforeEach(func() {
-				fs := &fake.FileSystem{}
-				fs.OpenFileReturns(nil, fmt.Errorf("oh no!"))
-				runner.FileSystem = fs
-			})
-
-			It("returns an error", func() {
-				Expect(runner.Revert(item)).To(MatchError("oh no!"))
 			})
 		})
 	})

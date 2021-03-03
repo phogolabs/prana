@@ -8,9 +8,10 @@ import (
 	"path/filepath"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/onsi/gomega/gexec"
+
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"github.com/onsi/gomega/gexec"
 )
 
 var _ = Describe("Script Sync", func() {
