@@ -16,80 +16,61 @@ var template embed.FS
 
 var (
 	intDef = &TypeDef{
-		Type:         "int",
-		NullableType: "schema.NullInt",
+		Type: "int",
 	}
 	uintDef = &TypeDef{
-		Type:         "Uint",
-		NullableType: "schema.NullUint",
+		Type: "Uint",
 	}
 	int16Def = &TypeDef{
-		Type:         "int16",
-		NullableType: "schema.NullInt16",
+		Type: "int16",
 	}
 	int64Def = &TypeDef{
-		Type:         "int64",
-		NullableType: "schema.NullInt64",
+		Type: "int64",
 	}
 	int8Def = &TypeDef{
-		Type:         "int8",
-		NullableType: "schema.NullInt8",
+		Type: "int8",
 	}
 	uint8Def = &TypeDef{
-		Type:         "uint8",
-		NullableType: "schema.NullUint8",
+		Type: "uint8",
 	}
 	uint16Def = &TypeDef{
-		Type:         "uint16",
-		NullableType: "schema.NullUint16",
+		Type: "uint16",
 	}
 	uint32Def = &TypeDef{
-		Type:         "uint32",
-		NullableType: "schema.NullUint32",
+		Type: "uint32",
 	}
 	int32Def = &TypeDef{
-		Type:         "int32",
-		NullableType: "schema.NullInt32",
+		Type: "int32",
 	}
 	uint64Def = &TypeDef{
-		Type:         "uint64",
-		NullableType: "schema.NullUint64",
+		Type: "uint64",
 	}
 	float32Def = &TypeDef{
-		Type:         "float32",
-		NullableType: "schema.NullFloat32",
+		Type: "float32",
 	}
 	float64Def = &TypeDef{
-		Type:         "float64",
-		NullableType: "schema.NullFloat64",
+		Type: "float64",
 	}
 	stringDef = &TypeDef{
-		Type:         "string",
-		NullableType: "schema.NullString",
+		Type: "string",
 	}
 	byteDef = &TypeDef{
-		Type:         "byte",
-		NullableType: "schema.NullByte",
+		Type: "byte",
 	}
 	byteSliceDef = &TypeDef{
-		Type:         "[]byte",
-		NullableType: "schema.NullBytes",
+		Type: "[]byte",
 	}
 	boolDef = &TypeDef{
-		Type:         "bool",
-		NullableType: "schema.NullBool",
+		Type: "bool",
 	}
 	timeDef = &TypeDef{
-		Type:         "time.Time",
-		NullableType: "schema.NullTime",
+		Type: "time.Time",
 	}
 	uuidDef = &TypeDef{
-		Type:         "schema.UUID",
-		NullableType: "schema.NullUUID",
+		Type: "schema.UUID",
 	}
 	jsonDef = &TypeDef{
-		Type:         "[]byte",
-		NullableType: "schema.NullJSON",
+		Type: "[]byte",
 	}
 	hstoreDef = &TypeDef{
 		Type:         "hstore.Hstore",
@@ -310,8 +291,13 @@ type TypeDef struct {
 // As returns the type name if nullable is true, otherwise the nullable type
 func (t *TypeDef) As(nullable bool) string {
 	if nullable {
-		return t.NullableType
+		if t.NullableType != "" {
+			return t.NullableType
+		}
+
+		return "*" + t.Type
 	}
+
 	return t.Type
 }
 
