@@ -7,10 +7,11 @@ import (
 	"io/ioutil"
 	"strings"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/gomega"
 	"github.com/phogolabs/prana/sqlmodel"
 	"golang.org/x/tools/imports"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Codegen", func() {

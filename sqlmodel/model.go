@@ -58,7 +58,8 @@ var (
 		Type: "byte",
 	}
 	byteSliceDef = &TypeDef{
-		Type: "[]byte",
+		Type:         "[]byte",
+		NullableType: "[]byte",
 	}
 	boolDef = &TypeDef{
 		Type: "bool",
@@ -70,7 +71,8 @@ var (
 		Type: "schema.UUID",
 	}
 	jsonDef = &TypeDef{
-		Type: "[]byte",
+		Type:         "[]byte",
+		NullableType: "[]byte",
 	}
 	hstoreDef = &TypeDef{
 		Type:         "hstore.Hstore",
