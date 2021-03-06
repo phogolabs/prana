@@ -18,18 +18,11 @@ type {{Model.Type}}Repository struct {
 {{#if Model.HasDocumentation}}
 // SelectAll returns all {{Model.Type}} from the database
 {{/if}}
-func (r *{{Model.Type}}Repository) SelectAll() ([]*model.{{Model.Type}}, error) {
-  return r.SelectAllContext(context.TODO())
-}
-
-{{#if Model.HasDocumentation}}
-// SelectAllContext returns all {{Model.Type}} from the database
-{{/if}}
-func (r *{{Model.Type}}Repository) SelectAllContext(ctx context.Context) ([]*model.{{Model.Type}}, error) {
+func (r *{{Model.Type}}Repository) SelectAll(ctx context.Context) ([]*model.{{Model.Type}}, error) {
   records := []*model.{{Model.Type}}{}
   routine := orm.Routine("{{Model.SelectAllRoutine}}")
-  
-  if err := r.Gateway.SelectContext(ctx, &records, routine); err != nil {
+
+  if err := r.Gateway.All(ctx, &records, routine); err != nil {
     return nil, err
   }
 
@@ -39,14 +32,7 @@ func (r *{{Model.Type}}Repository) SelectAllContext(ctx context.Context) ([]*mod
 {{#if Model.HasDocumentation}}
 // SelectByPK returns a record of {{Model.Type}} for given primary key
 {{/if}}
-func (r *{{Model.Type}}Repository) SelectByPK({{Model.PrimaryKeyArgs}}) (*model.{{Model.Type}}, error) {
-  return r.SelectByPKContext(context.TODO(), {{Model.PrimaryKeyParams}})
-}
-
-{{#if Model.HasDocumentation}}
-// SelectByPKContext returns a record of {{Model.Type}} for given primary key
-{{/if}}
-func (r *{{Model.Type}}Repository) SelectByPKContext(ctx context.Context, {{Model.PrimaryKeyArgs}}) (*model.{{Model.Type}}, error) {
+func (r *{{Model.Type}}Repository) SelectByPK(ctx context.Context, {{Model.PrimaryKeyArgs}}) (*model.{{Model.Type}}, error) {
   param := orm.Map{
     {{#each Model.PrimaryKey}}
       "{{@key}}": {{this}},
@@ -56,70 +42,35 @@ func (r *{{Model.Type}}Repository) SelectByPKContext(ctx context.Context, {{Mode
   routine := orm.Routine("{{Model.SelectByPKRoutine}}", param)
   record := &model.{{Model.Type}}{}
 
-  if err := r.Gateway.SelectOneContext(ctx, record, routine); err != nil {
+  if err := r.Gateway.Only(ctx, record, routine); err != nil {
     return nil, err
   }
-  
+
   return record, nil
-}
-
-{{#if Model.HasDocumentation}}
-// SearchAll returns all {{Type}} from the database for given RQL query
-{{/if}}
-func (r *{{Model.Type}}Repository) SearchAll(query *orm.RQLQuery) ([]*model.{{model.type}}, error) {
-  return r.SearchAllContext(context.TODO(), query)
-}
-
-{{#if Model.HasDocumentation}}
-// SearchAllContext returns all {{Type}} from the database for given RQL query
-{{/if}}
-func (r *{{Model.Type}}Repository) SearchAllContext(ctx context.Context, query *orm.RQLQuery) ([]*model.{{model.type}}, error) {
-  records := []*model.{{Model.Type}}{}
-  routine := orm.RQL("{{Name}}", query)
-  
-  if err := r.Gateway.SelectContext(ctx, &records, routine); err != nil {
-    return nil, err
-  }
-
-  return records, nil
 }
 
 {{#if Model.HasDocumentation}}
 // Insert inserts a record of type {{model.type}} into the database
 {{/if}}
-func (r *{{Model.Type}}Repository) Insert(row *model.{{Model.Type}}) error {
-  return r.InsertContext(context.TODO(), row)
-}
-
-{{#if Model.HasDocumentation}}
-// InsertContext inserts a record of type {{model.type}} into the database
-{{/if}}
-func (r *{{Model.Type}}Repository) InsertContext(ctx context.Context, row *model.{{Model.Type}}) error {
+func (r *{{Model.Type}}Repository) Insert(ctx context.Context, row *model.{{Model.Type}}) error {
   routine := orm.Routine("{{Model.InsertRoutine}}", row)
   {{#if (equal Driver "postgresql")}}
-  err := r.Gateway.SelectOneContext(ctx, row, routine)
+  err := r.Gateway.Only(ctx, row, routine)
   {{else}}
-  _, err := r.Gateway.ExecContext(ctx, routine)
+  _, err := r.Gateway.Exec(ctx, routine)
   {{/if}}
   return err
 }
 
 {{#if Model.HasDocumentation}}
-// UpdateByPK updates a record of type {{model.type}} for given primary key
-{{/if}}
-func (r *{{Model.Type}}Repository) UpdateByPK(row *model.{{Model.Type}}) error {
-  return r.UpdateByPKContext(context.TODO(), row)
-}
-
-{{#if Model.HasDocumentation}}
 // UpdateByPKContext updates a record of type {{model.type}} for given primary key
 {{/if}}
-func (r *{{Model.Type}}Repository) UpdateByPKContext(ctx context.Context, row *model.{{Model.Type}}) error {
+func (r *{{Model.Type}}Repository) UpdateByPK(ctx context.Context, row *model.{{Model.Type}}) error {
   routine := orm.Routine("{{Model.UpdateByPKRoutine}}", row)
   {{#if (equal Driver "postgresql")}}
-  err := r.Gateway.SelectOneContext(ctx, row, routine)
+  err := r.Gateway.Only(ctx, row, routine)
   {{else}}
-  _, err := r.Gateway.ExecContext(ctx, routine)
+  _, err := r.Gateway.Exec(ctx, routine)
   {{/if}}
   return err
 }
@@ -127,14 +78,7 @@ func (r *{{Model.Type}}Repository) UpdateByPKContext(ctx context.Context, row *m
 {{#if Model.HasDocumentation}}
 // DeleteByPK deletes a record of {{Model.Type}} for given primary key
 {{/if}}
-func (r *{{Model.Type}}Repository) DeleteByPK({{Model.PrimaryKeyArgs}}) error {
-  return r.DeleteByPKContext(context.TODO(), {{Model.PrimaryKeyParams}})
-}
-
-{{#if Model.HasDocumentation}}
-// DeleteByPKContext deletes a record of {{Model.Type}} for given primary key
-{{/if}}
-func (r *{{Model.Type}}Repository) DeleteByPKContext(ctx context.Context, {{Model.PrimaryKeyArgs}}) error {
+func (r *{{Model.Type}}Repository) DeleteByPK(ctx context.Context, {{Model.PrimaryKeyArgs}}) error {
   param := orm.Map{
     {{#each Model.PrimaryKey}}
       "{{@key}}": {{this}},
@@ -142,7 +86,7 @@ func (r *{{Model.Type}}Repository) DeleteByPKContext(ctx context.Context, {{Mode
   }
 
   routine := orm.Routine("{{Model.DeleteByPKRoutine}}", param)
-  _, err := r.Gateway.ExecContext(ctx, routine)
+  _, err := r.Gateway.Exec(ctx, routine)
   return err
 }
 {{/tables}}

@@ -8,7 +8,7 @@
 package {{Meta.RepositoryPackage}}_test
 
 import (
-	"database/sql"
+  "context"
 
 	"github.com/phogolabs/orm"
 	"github.com/phogolabs/schema"
@@ -36,24 +36,24 @@ var _ = Describe("{{Model.Type}}Repository", func() {
 	})
 
 	AfterEach(func() {
-		_, err := gateway.Exec(orm.SQL("DELETE FROM {{Name}}"))
+		_, err := gateway.Exec(orm.Query("DELETE FROM {{Name}}"))
 		Expect(err).NotTo(HaveOccurred())
 	})
 
 	Describe("SelectAll", func() {
 		It("returns no records", func() {
-			records, err := repository.SelectAll()
+			records, err := repository.SelectAll(ctx)
 			Expect(err).NotTo(HaveOccurred())
 			Expect(records).To(BeEmpty())
 		})
 
 		Context("when there is a record", func() {
 			BeforeEach(func() {
-				Expect(repository.Insert(entity)).To(Succeed())
+				Expect(repository.Insert(ctx, entity)).To(Succeed())
 			})
 
 			It("returns all records", func() {
-				records, err := repository.SelectAll()
+				records, err := repository.SelectAll(ctx)
 				Expect(err).NotTo(HaveOccurred())
 				Expect(records).To(HaveLen(1))
 				Expect(records[0]).To(Equal(entity))
@@ -65,36 +65,25 @@ var _ = Describe("{{Model.Type}}Repository", func() {
 		It("return a record by primary key", func() {
 			Expect(repository.Insert(entity)).To(Succeed())
 
-			record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
+			record, err := repository.SelectByPK(ctx, {{Model.PrimaryKeyEntityParams}})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(record).To(Equal(entity))
 		})
 
 		Context("when the record does not exist", func() {
 			It("returns an error", func() {
-        record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
-				Expect(err).To(Equal(sql.ErrNoRows))
+        record, err := repository.SelectByPK(ctx, {{Model.PrimaryKeyEntityParams}})
+				Expect(err).To(HaveOccurred())
 				Expect(record).To(BeNil())
 			})
 		})
 	})
 
-	Describe("SearchAll", func() {
-		It("returns all records for given RQL", func() {
-			Expect(repository.Insert(entity)).To(Succeed())
-
-			records, err := repository.SearchAll(&orm.RQLQuery{})
-			Expect(err).NotTo(HaveOccurred())
-			Expect(records).To(HaveLen(1))
-			Expect(records[0]).To(Equal(entity))
-		})
-	})
-
 	Describe("Insert", func() {
 		It("inserts a new member successfully", func() {
-			Expect(repository.Insert(entity)).To(Succeed())
+			Expect(repository.Insert(ctx, entity)).To(Succeed())
 
-			record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
+			record, err := repository.SelectByPK(ctx, {{Model.PrimaryKeyEntityParams}})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(record).To(Equal(entity))
 		})
@@ -102,13 +91,13 @@ var _ = Describe("{{Model.Type}}Repository", func() {
 
 	Describe("UpdateByPK", func() {
 		BeforeEach(func() {
-			Expect(repository.Insert(entity)).To(Succeed())
+			Expect(repository.Insert(ctx, entity)).To(Succeed())
 		})
 
 		It("updates a record by primary key", func() {
-			Expect(repository.UpdateByPK(entity)).To(Succeed())
+			Expect(repository.UpdateByPK(ctx, entity)).To(Succeed())
 
-			record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
+			record, err := repository.SelectByPK(ctx, {{Model.PrimaryKeyEntityParams}})
 			Expect(err).NotTo(HaveOccurred())
 			Expect(record).To(Equal(entity))
 		})
@@ -116,14 +105,14 @@ var _ = Describe("{{Model.Type}}Repository", func() {
 
 	Describe("DeleteByPK", func() {
 		BeforeEach(func() {
-			Expect(repository.Insert(entity)).To(Succeed())
+			Expect(repository.Insert(ctx, entity)).To(Succeed())
 		})
 
 		It("deletes a record by primary key", func() {
-			Expect(repository.DeleteByPK({{Model.PrimaryKeyEntityParams}})).To(Succeed())
+			Expect(repository.DeleteByPK(ctx, {{Model.PrimaryKeyEntityParams}})).To(Succeed())
 
-			record, err := repository.SelectByPK({{Model.PrimaryKeyEntityParams}})
-			Expect(err).To(Equal(sql.ErrNoRows))
+			record, err := repository.SelectByPK(ctx, {{Model.PrimaryKeyEntityParams}})
+			Expect(err).To(HaveOccurred())
 			Expect(record).To(BeNil())
 		})
 	})
