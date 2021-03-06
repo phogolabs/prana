@@ -16,7 +16,7 @@ changelog:
     - '^docs:'
     - '^test:'
 brews:
-- github:
+- tap:
     owner: phogolabs
     name: homebrew-tap
   name: prana
