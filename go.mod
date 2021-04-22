@@ -10,7 +10,7 @@ require (
 	github.com/google/go-cmp v0.5.5 // indirect
 	github.com/gosuri/uitable v0.0.4
 	github.com/jmoiron/sqlx v1.3.1
-	github.com/lib/pq v1.9.0
+	github.com/lib/pq v1.10.1
 	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/mattn/go-sqlite3 v1.14.6
 	github.com/olekukonko/tablewriter v0.0.5
