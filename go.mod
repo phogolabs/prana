@@ -18,6 +18,5 @@ require (
 	github.com/phogolabs/cli v0.0.0-20210430125239-bcee8250ce56
 	github.com/phogolabs/log v0.0.0-20210430124854-15b4a15a74cc
 	github.com/rivo/uniseg v0.2.0 // indirect
-	golang.org/x/mod v0.4.2 // indirect
-	golang.org/x/tools v0.1.0
+	golang.org/x/tools v0.1.2
 )
