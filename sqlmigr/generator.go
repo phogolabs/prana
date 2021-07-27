@@ -69,8 +69,10 @@ func (g *Generator) write(filename string, data []byte, perm os.FileMode) error 
 			err = io.ErrShortWrite
 		}
 	}
-	if err1 := f.Close(); err == nil {
-		err = err1
+
+	if xerr := f.Close(); err == nil {
+		err = xerr
 	}
+
 	return err
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/phogolabs/log"
 	"github.com/phogolabs/prana/sqlexec"
 )
 
@@ -41,7 +42,9 @@ func (r *Runner) exec(step string, m *Migration) error {
 
 	for _, query := range statements {
 		if _, err := tx.Exec(query); err != nil {
-			tx.Rollback()
+			if xerr := tx.Rollback(); xerr != nil {
+				log.WithError(xerr).Error("rollback failure")
+			}
 
 			return &RunnerError{
 				Err:       err,

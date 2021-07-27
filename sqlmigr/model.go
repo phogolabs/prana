@@ -23,6 +23,16 @@ var (
 	every  = "sql"
 )
 
+var (
+	// setup migration
+	setup = &Migration{
+		ID:          min.Format(format),
+		Description: "setup",
+		Drivers:     []string{every},
+		CreatedAt:   time.Now(),
+	}
+)
+
 // FileSystem provides with primitives to work with the underlying file system
 type FileSystem = fs.FS
 
@@ -163,13 +173,13 @@ func IsNotExist(err error) bool {
 
 	switch {
 	// SQLite
-	case msg == "no such table: migrations":
+	case strings.HasPrefix(msg, "no such table"):
 		return true
 		// PostgreSQL
-	case msg == `pq: relation "migrations" does not exist`:
+	case strings.HasSuffix(msg, "does not exist"):
 		return true
 		// MySQL
-	case strings.HasSuffix(msg, "migrations' doesn't exist"):
+	case strings.HasSuffix(msg, "doesn't exist"):
 		return true
 	default:
 		return false

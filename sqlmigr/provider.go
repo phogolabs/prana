@@ -3,6 +3,7 @@ package sqlmigr
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -39,7 +40,7 @@ func (m *Provider) Migrations() ([]*Migration, error) {
 func (m *Provider) files() ([]*Migration, error) {
 	local := []*Migration{}
 
-	err := fs.WalkDir(m.FileSystem, ".", func(path string, info os.DirEntry, err error) error {
+	err := fs.WalkDir(m.FileSystem, ".", func(path string, info os.DirEntry, xerr error) error {
 		if ferr := m.filter(info); ferr != nil {
 			if ferr.Error() == "skip" {
 				ferr = nil
@@ -109,7 +110,7 @@ func (m *Provider) supported(drivers []string) bool {
 func (m *Provider) query() ([]*Migration, error) {
 	query := &bytes.Buffer{}
 	query.WriteString("SELECT id, description, created_at ")
-	query.WriteString("FROM migrations ")
+	query.WriteString("FROM " + m.table() + " ")
 	query.WriteString("ORDER BY id ASC")
 
 	remote := []*Migration{}
@@ -126,7 +127,7 @@ func (m *Provider) Insert(item *Migration) error {
 	item.CreatedAt = time.Now()
 
 	builder := &bytes.Buffer{}
-	builder.WriteString("INSERT INTO migrations(id, description, created_at) ")
+	builder.WriteString("INSERT INTO " + m.table() + "(id, description, created_at) ")
 	builder.WriteString("VALUES (?, ?, ?)")
 
 	query := m.DB.Rebind(builder.String())
@@ -140,7 +141,7 @@ func (m *Provider) Insert(item *Migration) error {
 // Delete deletes applied sqlmigr item from sqlmigrs table.
 func (m *Provider) Delete(item *Migration) error {
 	builder := &bytes.Buffer{}
-	builder.WriteString("DELETE FROM migrations ")
+	builder.WriteString("DELETE FROM " + m.table() + " ")
 	builder.WriteString("WHERE id = ?")
 
 	query := m.DB.Rebind(builder.String())
@@ -155,7 +156,7 @@ func (m *Provider) Delete(item *Migration) error {
 func (m *Provider) Exists(item *Migration) bool {
 	count := 0
 
-	if err := m.DB.Get(&count, "SELECT count(id) FROM migrations WHERE id = ?", item.ID); err != nil {
+	if err := m.DB.Get(&count, "SELECT count(id) FROM "+m.table()+" WHERE id = ?", item.ID); err != nil {
 		return false
 	}
 
@@ -182,4 +183,23 @@ func (m *Provider) merge(remote, local []*Migration) ([]*Migration, error) {
 	}
 
 	return result, nil
+}
+
+func (m *Provider) table() string {
+	for _, path := range setup.Filenames() {
+		file, err := m.FileSystem.Open(path)
+		if err != nil {
+			continue
+		}
+		// close the file
+		defer file.Close()
+
+		if data, err := io.ReadAll(file); err == nil {
+			if match := migrationRgxp.FindSubmatch(data); len(match) == 2 {
+				return string(match[1])
+			}
+		}
+	}
+
+	return "migrations"
 }

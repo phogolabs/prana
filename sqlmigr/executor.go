@@ -3,12 +3,15 @@ package sqlmigr
 import (
 	"bytes"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
 	"github.com/go-openapi/inflect"
 	"github.com/phogolabs/log"
 )
+
+var migrationRgxp = regexp.MustCompile(`CREATE TABLE IF NOT EXISTS\s*([a-z]+)\s*`)
 
 // Executor provides a group of operations that works with migrations.
 type Executor struct {
@@ -25,14 +28,8 @@ type Executor struct {
 // Setup setups the current project for database migrations by creating
 // migration directory and related database.
 func (m *Executor) Setup() error {
-	migration := &Migration{
-		ID:          min.Format(format),
-		Description: "setup",
-		Drivers:     []string{every},
-		CreatedAt:   time.Now(),
-	}
-
 	up := &bytes.Buffer{}
+
 	fmt.Fprintln(up, "CREATE TABLE IF NOT EXISTS migrations (")
 	fmt.Fprintln(up, " id          VARCHAR(15) NOT NULL PRIMARY KEY,")
 	fmt.Fprintln(up, " description TEXT        NOT NULL,")
@@ -48,7 +45,7 @@ func (m *Executor) Setup() error {
 		DownCommand: down,
 	}
 
-	return m.Generator.Write(migration, content)
+	return m.Generator.Write(setup, content)
 }
 
 // Create creates a migration script successfully if the project has already
