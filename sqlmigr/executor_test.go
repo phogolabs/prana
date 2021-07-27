@@ -54,9 +54,9 @@ var _ = Describe("Executor", func() {
 
 			up := &bytes.Buffer{}
 			fmt.Fprintln(up, "CREATE TABLE IF NOT EXISTS migrations (")
-			fmt.Fprintln(up, " id          VARCHAR(15) NOT NULL PRIMARY KEY,")
-			fmt.Fprintln(up, " description TEXT        NOT NULL,")
-			fmt.Fprintln(up, " created_at  TIMESTAMP   NOT NULL")
+			fmt.Fprintln(up, " id          CHAR(15)  NOT NULL PRIMARY KEY,")
+			fmt.Fprintln(up, " description TEXT      NOT NULL,")
+			fmt.Fprintln(up, " created_at  TIMESTAMP NOT NULL")
 			fmt.Fprintln(up, ");")
 			fmt.Fprintln(up)
 			Expect(string(data)).To(Equal(up.String()))
