@@ -11,7 +11,7 @@ import (
 	"github.com/phogolabs/log"
 )
 
-var migrationRgxp = regexp.MustCompile(`CREATE TABLE IF NOT EXISTS\s*([a-z]+)\s*`)
+var migrationRgxp = regexp.MustCompile(`CREATE TABLE IF NOT EXISTS\s*([a-zA-Z0-9\.]+)\s*`)
 
 // Executor provides a group of operations that works with migrations.
 type Executor struct {
