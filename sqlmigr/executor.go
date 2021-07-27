@@ -31,7 +31,7 @@ func (m *Executor) Setup() error {
 	up := &bytes.Buffer{}
 
 	fmt.Fprintln(up, "CREATE TABLE IF NOT EXISTS migrations (")
-	fmt.Fprintln(up, " id          CHAR(15)  NOT NULL PRIMARY KEY,")
+	fmt.Fprintln(up, " id          CHAR(14)  NOT NULL PRIMARY KEY,")
 	fmt.Fprintln(up, " description TEXT      NOT NULL,")
 	fmt.Fprintln(up, " created_at  TIMESTAMP NOT NULL")
 	fmt.Fprintln(up, ");")
