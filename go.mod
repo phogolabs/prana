@@ -16,7 +16,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.13 // indirect
 	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/olekukonko/tablewriter v0.0.5
-	github.com/onsi/ginkgo v1.14.0
+	github.com/onsi/ginkgo v1.14.1
 	github.com/onsi/gomega v1.10.1
 	github.com/phogolabs/cli v0.0.0-20210430125239-bcee8250ce56
 	github.com/phogolabs/flaw v0.0.0-20210430130223-f948049b189e // indirect
