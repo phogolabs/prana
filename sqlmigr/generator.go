@@ -64,8 +64,9 @@ func (g *Generator) write(filename string, data []byte, perm os.FileMode) error 
 	}
 
 	if writer, ok := f.(io.Writer); ok {
-		n, err := writer.Write(data)
-		if err == nil && n < len(data) {
+		var n int
+
+		if n, err = writer.Write(data); err == nil && n < len(data) {
 			err = io.ErrShortWrite
 		}
 	}
