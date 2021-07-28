@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-var separatorRgxp = regexp.MustCompile(`^[\s]*[-]*[\s]*GO[;]*\s*`)
+var separatorRgxp = regexp.MustCompile(`^[\s]*[-]*[\s]*(?i)go[;]*\s*`)
 
 // Splitter splits a statement by GO separator
 type Splitter struct{}
