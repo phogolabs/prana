@@ -9,6 +9,10 @@ builds:
   - linux
   - darwin
   - windows
+  goarch:
+  - arm
+  - arm64
+  - amd64
 changelog:
   sort: asc
   filters:
