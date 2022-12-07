@@ -22,7 +22,6 @@ require (
 	github.com/phogolabs/flaw v0.0.0-20210430130223-f948049b189e // indirect
 	github.com/phogolabs/log v0.0.0-20210430125128-bb23cd1dfac5
 	github.com/zclconf/go-cty v1.9.0 // indirect
-	golang.org/x/sys v0.0.0-20210630005230-0f9fa26af87c // indirect
-	golang.org/x/tools v0.1.5
+	golang.org/x/tools v0.4.0
 	google.golang.org/genproto v0.0.0-20210726200206-e7812ac95cc0 // indirect
 )
