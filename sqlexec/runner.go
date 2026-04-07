@@ -54,7 +54,7 @@ func (r *Runner) Print(writer io.Writer, rows *sqlx.Rows) error {
 		return err
 	}
 
-	table.SetHeader(columns)
+	table.Header(columns)
 
 	for rows.Next() {
 		record, err := rows.SliceScan()
