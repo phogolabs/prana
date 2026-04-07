@@ -3,9 +3,7 @@ name: main
 on:
   push:
     branches:
-      - master
-    ignore-tags:
-      - 'v*'
+      - main
   pull_request:
 
 jobs:
@@ -15,7 +13,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:10.8
+        image: postgres:16
         env:
           POSTGRES_USER: prana
           POSTGRES_PASSWORD: prana
@@ -25,7 +23,7 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_USER: prana
           MYSQL_PASSWORD: prana
@@ -37,12 +35,12 @@ jobs:
 
     steps:
       - name: Check out Code
-        uses: actions/checkout@v1
+        uses: actions/checkout@v4
 
       - name: Set up Golang
-        uses: actions/setup-go@v1
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.16.x'
+          go-version: '1.25.x'
 
       - name: Run Tests
         run: go test -race -coverprofile=coverage.txt -covermode=atomic ./...
@@ -50,7 +48,7 @@ jobs:
           TEST_PSQL_URL: "postgres://prana:prana@127.0.0.1:${{ job.services.postgres.ports[5432] }}/prana?sslmode=disable"
           TEST_MYSQL_URL: "prana:prana@tcp(127.0.0.1:${{ job.services.mysql.ports['3306'] }})/prana"
 
-      - name: Upload tests coverage to codeconv.io
-        uses: codecov/codecov-action@v1
+      - name: Upload tests coverage to codecov.io
+        uses: codecov/codecov-action@v5
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
