@@ -49,6 +49,6 @@ jobs:
           TEST_MYSQL_URL: "prana:prana@tcp(127.0.0.1:${{ job.services.mysql.ports['3306'] }})/prana"
 
       - name: Upload tests coverage to codecov.io
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
