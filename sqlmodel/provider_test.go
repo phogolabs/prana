@@ -284,9 +284,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 			fmt.Fprintln(query, " hstore_field_null                    hstore NULL,")
 			fmt.Fprintln(query, " hstore_field_not_null                hstore NOT NULL,")
 			fmt.Fprintln(query, " mood_field_null                      mood NULL,")
-			fmt.Fprintln(query, " mood_field_not_null                  mood NOT NULL,")
-			fmt.Fprintln(query, " abstime_field_null                   abstime NULL,")
-			fmt.Fprintln(query, " abstime_field_not_null               abstime NOT NULL")
+			fmt.Fprintln(query, " mood_field_not_null                  mood NOT NULL")
 
 			_, err := db.Exec("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"")
 			Expect(err).NotTo(HaveOccurred())
