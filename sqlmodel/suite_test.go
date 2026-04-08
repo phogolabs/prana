@@ -1214,7 +1214,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[38]
 	Expect(column.Name).To(Equal("bit_tinyint_field_null"))
 	Expect(column.Type.Name).To(Equal("tinyint"))
-	Expect(column.Type.Underlying).To(Equal("tinyint"))
+	Expect(column.Type.Underlying).To(Equal("tinyint(1)"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1225,7 +1225,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[39]
 	Expect(column.Name).To(Equal("bit_tinyint_field_not_null"))
 	Expect(column.Type.Name).To(Equal("tinyint"))
-	Expect(column.Type.Underlying).To(Equal("tinyint"))
+	Expect(column.Type.Underlying).To(Equal("tinyint(1)"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
