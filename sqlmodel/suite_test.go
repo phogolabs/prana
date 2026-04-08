@@ -1198,7 +1198,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("*bool"))
+	Expect(column.ScanType).To(Equal("*uint8"))
 
 	column = columns[37]
 	Expect(column.Name).To(Equal("bit_tinyint_field_unsigned_not_null"))
@@ -1209,7 +1209,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("bool"))
+	Expect(column.ScanType).To(Equal("uint8"))
 
 	column = columns[38]
 	Expect(column.Name).To(Equal("bit_tinyint_field_null"))
@@ -1220,7 +1220,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("*bool"))
+	Expect(column.ScanType).To(Equal("*int8"))
 
 	column = columns[39]
 	Expect(column.Name).To(Equal("bit_tinyint_field_not_null"))
@@ -1231,7 +1231,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	Expect(column.Type.CharMaxLength).To(Equal(0))
 	Expect(column.Type.Precision).To(Equal(3))
 	Expect(column.Type.PrecisionScale).To(Equal(0))
-	Expect(column.ScanType).To(Equal("bool"))
+	Expect(column.ScanType).To(Equal("int8"))
 
 	column = columns[40]
 	Expect(column.Name).To(Equal("tinyint_field_unsigned_null"))
