@@ -10,10 +10,14 @@ on:
 jobs:
   pipeline:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Check out Code
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Set up Golang
         uses: actions/setup-go@v6

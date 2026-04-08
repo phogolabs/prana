@@ -21,7 +21,7 @@ changelog:
     exclude:
     - '^docs:'
     - '^test:'
-brews:
+homebrew_casks:
 - repository:
     owner: phogolabs
     name: homebrew-tap
