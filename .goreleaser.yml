@@ -1,3 +1,5 @@
+version: 2
+
 before:
   hooks:
     - go mod download
@@ -20,7 +22,7 @@ changelog:
     - '^docs:'
     - '^test:'
 brews:
-- tap:
+- repository:
     owner: phogolabs
     name: homebrew-tap
   name: prana
