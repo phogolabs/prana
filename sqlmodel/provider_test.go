@@ -314,7 +314,7 @@ var _ = Describe("PostgreSQLProvider", func() {
 
 			table := schema.Tables[0]
 			Expect(table.Name).To(Equal("test"))
-			Expect(table.Columns).To(HaveLen(67))
+			Expect(table.Columns).To(HaveLen(65))
 			ExpectColumnsForPostgreSQL(table.Columns)
 		})
 

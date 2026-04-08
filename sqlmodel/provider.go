@@ -497,6 +497,7 @@ func (m *SQLiteProvider) Schema(schema string, names ...string) (*Schema, error)
 }
 
 func (m *SQLiteProvider) create(info *sqliteInf) ColumnType {
+	info.Type = strings.ToLower(info.Type)
 	pattern := regexp.MustCompile("([a-z\\s]*)\\(([0-9]*),?([0-9]*)\\)")
 
 	var (

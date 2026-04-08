@@ -928,7 +928,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[12]
 	Expect(column.Name).To(Equal("smallint_field_null"))
 	Expect(column.Type.Name).To(Equal("smallint"))
-	Expect(column.Type.Underlying).To(Equal("smallint(6)"))
+	Expect(column.Type.Underlying).To(Equal("smallint"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -939,7 +939,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[13]
 	Expect(column.Name).To(Equal("smallint_field_not_null"))
 	Expect(column.Type.Name).To(Equal("smallint"))
-	Expect(column.Type.Underlying).To(Equal("smallint(6)"))
+	Expect(column.Type.Underlying).To(Equal("smallint"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -950,7 +950,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[14]
 	Expect(column.Name).To(Equal("int_field_null"))
 	Expect(column.Type.Name).To(Equal("int"))
-	Expect(column.Type.Underlying).To(Equal("int(11)"))
+	Expect(column.Type.Underlying).To(Equal("int"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -961,7 +961,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[15]
 	Expect(column.Name).To(Equal("int_field_not_null"))
 	Expect(column.Type.Name).To(Equal("int"))
-	Expect(column.Type.Underlying).To(Equal("int(11)"))
+	Expect(column.Type.Underlying).To(Equal("int"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -972,7 +972,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[16]
 	Expect(column.Name).To(Equal("integer_field_null"))
 	Expect(column.Type.Name).To(Equal("int"))
-	Expect(column.Type.Underlying).To(Equal("int(11)"))
+	Expect(column.Type.Underlying).To(Equal("int"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -983,7 +983,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[17]
 	Expect(column.Name).To(Equal("integer_field_not_null"))
 	Expect(column.Type.Name).To(Equal("int"))
-	Expect(column.Type.Underlying).To(Equal("int(11)"))
+	Expect(column.Type.Underlying).To(Equal("int"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -994,7 +994,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[18]
 	Expect(column.Name).To(Equal("bigint_field_null"))
 	Expect(column.Type.Name).To(Equal("bigint"))
-	Expect(column.Type.Underlying).To(Equal("bigint(20)"))
+	Expect(column.Type.Underlying).To(Equal("bigint"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1005,7 +1005,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[19]
 	Expect(column.Name).To(Equal("bigint_field_not_null"))
 	Expect(column.Type.Name).To(Equal("bigint"))
-	Expect(column.Type.Underlying).To(Equal("bigint(20)"))
+	Expect(column.Type.Underlying).To(Equal("bigint"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1016,7 +1016,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[20]
 	Expect(column.Name).To(Equal("serial_field_not_null"))
 	Expect(column.Type.Name).To(Equal("bigint"))
-	Expect(column.Type.Underlying).To(Equal("bigint(20)"))
+	Expect(column.Type.Underlying).To(Equal("bigint"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1236,7 +1236,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[40]
 	Expect(column.Name).To(Equal("tinyint_field_unsigned_null"))
 	Expect(column.Type.Name).To(Equal("tinyint"))
-	Expect(column.Type.Underlying).To(Equal("tinyint(2)"))
+	Expect(column.Type.Underlying).To(Equal("tinyint"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1247,7 +1247,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[41]
 	Expect(column.Name).To(Equal("tinyint_field_unsigned_not_null"))
 	Expect(column.Type.Name).To(Equal("tinyint"))
-	Expect(column.Type.Underlying).To(Equal("tinyint(2)"))
+	Expect(column.Type.Underlying).To(Equal("tinyint"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1258,7 +1258,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[42]
 	Expect(column.Name).To(Equal("tinyint_field_null"))
 	Expect(column.Type.Name).To(Equal("tinyint"))
-	Expect(column.Type.Underlying).To(Equal("tinyint(2)"))
+	Expect(column.Type.Underlying).To(Equal("tinyint"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1269,7 +1269,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[43]
 	Expect(column.Name).To(Equal("tinyint_field_not_null"))
 	Expect(column.Type.Name).To(Equal("tinyint"))
-	Expect(column.Type.Underlying).To(Equal("tinyint(2)"))
+	Expect(column.Type.Underlying).To(Equal("tinyint"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1280,7 +1280,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[44]
 	Expect(column.Name).To(Equal("smallint_field_unsigned_null"))
 	Expect(column.Type.Name).To(Equal("smallint"))
-	Expect(column.Type.Underlying).To(Equal("smallint(5)"))
+	Expect(column.Type.Underlying).To(Equal("smallint"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1291,7 +1291,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[45]
 	Expect(column.Name).To(Equal("smallint_field_unsigned_not_null"))
 	Expect(column.Type.Name).To(Equal("smallint"))
-	Expect(column.Type.Underlying).To(Equal("smallint(5)"))
+	Expect(column.Type.Underlying).To(Equal("smallint"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1302,7 +1302,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[46]
 	Expect(column.Name).To(Equal("mediumint_field_unsigned_null"))
 	Expect(column.Type.Name).To(Equal("mediumint"))
-	Expect(column.Type.Underlying).To(Equal("mediumint(8)"))
+	Expect(column.Type.Underlying).To(Equal("mediumint"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1313,7 +1313,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[47]
 	Expect(column.Name).To(Equal("mediumint_field_unsigned_not_null"))
 	Expect(column.Type.Name).To(Equal("mediumint"))
-	Expect(column.Type.Underlying).To(Equal("mediumint(8)"))
+	Expect(column.Type.Underlying).To(Equal("mediumint"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1324,7 +1324,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[48]
 	Expect(column.Name).To(Equal("mediumint_field_null"))
 	Expect(column.Type.Name).To(Equal("mediumint"))
-	Expect(column.Type.Underlying).To(Equal("mediumint(9)"))
+	Expect(column.Type.Underlying).To(Equal("mediumint"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1335,7 +1335,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[49]
 	Expect(column.Name).To(Equal("mediumint_field_not_null"))
 	Expect(column.Type.Name).To(Equal("mediumint"))
-	Expect(column.Type.Underlying).To(Equal("mediumint(9)"))
+	Expect(column.Type.Underlying).To(Equal("mediumint"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(false))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1346,7 +1346,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[50]
 	Expect(column.Name).To(Equal("int_field_unsigned_null"))
 	Expect(column.Type.Name).To(Equal("int"))
-	Expect(column.Type.Underlying).To(Equal("int(10)"))
+	Expect(column.Type.Underlying).To(Equal("int"))
 	Expect(column.Type.IsNullable).To(Equal(true))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
@@ -1357,7 +1357,7 @@ func ExpectColumnsForMySQL(columns []sqlmodel.Column) {
 	column = columns[51]
 	Expect(column.Name).To(Equal("int_field_unsigned_not_null"))
 	Expect(column.Type.Name).To(Equal("int"))
-	Expect(column.Type.Underlying).To(Equal("int(10)"))
+	Expect(column.Type.Underlying).To(Equal("int"))
 	Expect(column.Type.IsNullable).To(Equal(false))
 	Expect(column.Type.IsUnsigned).To(Equal(true))
 	Expect(column.Type.CharMaxLength).To(Equal(0))
