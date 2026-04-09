@@ -175,11 +175,11 @@ func IsNotExist(err error) bool {
 	// SQLite
 	case strings.HasPrefix(msg, "no such table"):
 		return true
-		// PostgreSQL
-	case strings.HasSuffix(msg, "does not exist"):
+		// PostgreSQL (lib/pq v1.12+ appends position and SQLSTATE code)
+	case strings.Contains(msg, "does not exist"):
 		return true
 		// MySQL
-	case strings.HasSuffix(msg, "doesn't exist"):
+	case strings.Contains(msg, "doesn't exist"):
 		return true
 	default:
 		return false

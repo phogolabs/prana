@@ -101,6 +101,13 @@ var _ = Describe("IsNotExist", func() {
 		})
 	})
 
+	Context("when the error is PostgreSQL error with lib/pq v1.12+", func() {
+		It("returns true", func() {
+			err := fmt.Errorf(`pq: relation "migrations" does not exist at column 41 (42P01)`)
+			Expect(sqlmigr.IsNotExist(err)).To(BeTrue())
+		})
+	})
+
 	Context("when the error is MySQL error", func() {
 		It("returns true", func() {
 			err := fmt.Errorf("migrations' doesn't exist")
