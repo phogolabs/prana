@@ -28,5 +28,3 @@ homebrew_casks:
   name: prana
   description: Golang Database Management and Code Generation
   homepage: https://github.com/phogolabs/prana
-  test: |
-   system "#{bin}/prana -v"
