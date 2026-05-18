@@ -13,7 +13,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.44
 	github.com/olekukonko/tablewriter v1.1.4
 	github.com/onsi/ginkgo v1.16.5
-	github.com/onsi/gomega v1.40.0
+	github.com/onsi/gomega v1.41.0
 	github.com/phogolabs/cli v0.0.0-20231016090708-46e75809a680
 	github.com/phogolabs/log v0.0.0-20230111045248-dad4d3c50e0f
 	golang.org/x/tools v0.45.0
