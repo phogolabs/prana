@@ -16,7 +16,7 @@ require (
 	github.com/onsi/gomega v1.42.1
 	github.com/phogolabs/cli v0.0.0-20231016090708-46e75809a680
 	github.com/phogolabs/log v0.0.0-20230111045248-dad4d3c50e0f
-	golang.org/x/tools v0.46.0
+	golang.org/x/tools v0.47.0
 )
 
 require (
